@@ -23,5 +23,12 @@
             android:layout_height="wrap_content"
             android:text="AnimationUtils"
             android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_ColorUtils"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ColorUtils"
+            android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

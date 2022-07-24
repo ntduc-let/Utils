@@ -18,5 +18,9 @@ class MainActivity : AppCompatActivity() {
         binding.btnAnimationUtils.setOnClickListener {
             startActivity(Intent(this, AnimUtilsActivity::class.java))
         }
+
+        binding.btnColorUtils.setOnClickListener {
+            startActivity(Intent(this, ColorUtilsActivity::class.java))
+        }
     }
 }
