@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/ActivityUtils" />
             <option value="$PROJECT_DIR$/AnimationUtils" />
             <option value="$PROJECT_DIR$/ColorUtils" />
+            <option value="$PROJECT_DIR$/ContextUtils" />
             <option value="$PROJECT_DIR$/ToastUtils" />
             <option value="$PROJECT_DIR$/app" />
           </set>

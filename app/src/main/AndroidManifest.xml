@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
         <activity
+            android:name=".ContextUtilsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ColorUtilsActivity"
             android:exported="true" />
         <activity

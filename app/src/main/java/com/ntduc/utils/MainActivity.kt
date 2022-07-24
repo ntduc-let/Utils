@@ -22,5 +22,9 @@ class MainActivity : AppCompatActivity() {
         binding.btnColorUtils.setOnClickListener {
             startActivity(Intent(this, ColorUtilsActivity::class.java))
         }
+
+        binding.btnContextUtils.setOnClickListener {
+            startActivity(Intent(this, ContextUtilsActivity::class.java))
+        }
     }
 }
