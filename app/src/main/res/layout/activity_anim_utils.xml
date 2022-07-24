@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".AnimUtilsActivity">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_fade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fade"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_translate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Translate"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_fadeInVertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fade In Vertical"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_fadeOutVertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fade Out Vertical"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_fadeInHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fade In Horizontal"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_fadeOutHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fade Out Horizontal"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_easeInVertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ease In Vertical"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_reveal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reveal"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </ScrollView>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextViewTextViewTextViewTextViewTex"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView2"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
