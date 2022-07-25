@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import com.ntduc.activityutils.*
-import com.ntduc.toastutils.ToastUtils
+import com.ntduc.toastutils.showShort
 import com.ntduc.utils.databinding.ActivityActiUtilsBinding
 
 class ActiUtilsActivity : AppCompatActivity() {
@@ -47,16 +47,16 @@ class ActiUtilsActivity : AppCompatActivity() {
             hideKeyboard()
         }
         binding.btnSupportsPictureInPicture.setOnClickListener {
-            ToastUtils(this).showShort("Hỗ trợ PIP: $supportsPictureInPicture")
+            showShort("Hỗ trợ PIP: $supportsPictureInPicture")
         }
         binding.btnBrightness.setOnClickListener {
             brightness = binding.edtBrightness.text.toString().toFloat()
         }
         binding.btnGetStatusBarHeight.setOnClickListener {
-            ToastUtils(this).showShort("StatusBar Height: $getStatusBarHeight px")
+            showShort("StatusBar Height: $getStatusBarHeight px")
         }
         binding.btnDisplaySizePixels.setOnClickListener {
-            ToastUtils(this).showShort("Display Size: ${displaySizePixels.x} px, ${displaySizePixels.y} px")
+            showShort("Display Size: ${displaySizePixels.x} px, ${displaySizePixels.y} px")
         }
         binding.btnSetStatusBarColor.setOnClickListener {
             setStatusBarColor(R.color.teal_200)
@@ -77,7 +77,7 @@ class ActiUtilsActivity : AppCompatActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.System.canWrite(this)) {
                     sleepDuration = 5000
-                    ToastUtils(this).showShort("Sleep after: ${sleepDuration}ms")
+                    showShort("Sleep after: ${sleepDuration}ms")
                 } else {
                     try {
                         val uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID)

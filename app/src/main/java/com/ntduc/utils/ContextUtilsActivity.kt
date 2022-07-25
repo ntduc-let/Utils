@@ -6,7 +6,8 @@ import com.ntduc.contextutils.showConfirmationDialog
 import com.ntduc.contextutils.showDialog
 import com.ntduc.contextutils.showMultiPicker
 import com.ntduc.contextutils.showSinglePicker
-import com.ntduc.toastutils.ToastUtils
+import com.ntduc.toastutils.Toast
+import com.ntduc.toastutils.showShort
 import com.ntduc.utils.databinding.ActivityContextUtilsBinding
 
 class ContextUtilsActivity : AppCompatActivity() {
@@ -20,17 +21,17 @@ class ContextUtilsActivity : AppCompatActivity() {
         }
         binding.btnShowConfirmationDialog.setOnClickListener {
             showConfirmationDialog("", "showDialog", onResponse = {
-                ToastUtils(this).showShort(it.toString())
+                showShort(it.toString())
             }, cancelable = false)
         }
         binding.btnShowSinglePicker.setOnClickListener {
             showSinglePicker("Title", listOf("Một", "Hai", "Ba").toTypedArray(), onResponse = {
-                ToastUtils(this).showShort(it.toString())
+                showShort(it.toString())
             }, 0)
         }
         binding.btnShowMultiPicker.setOnClickListener {
             showMultiPicker("Title", listOf("Một", "Hai", "Ba").toTypedArray(), onResponse = { index, isChecked ->
-                if (isChecked) ToastUtils(this).showShort(index.toString())
+                if (isChecked) showShort(index.toString())
             }, listOf(true, true, false).toBooleanArray())
         }
     }
