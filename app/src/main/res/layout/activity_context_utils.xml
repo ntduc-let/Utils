@@ -29,15 +29,42 @@
             android:id="@+id/btn_showSinglePicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="show Single Picker"
+            android:text="Show Single Picker"
             android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btn_showMultiPicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="show Multi Picker"
+            android:text="Show Multi Picker"
             android:textAllCaps="false" />
 
+        <Button
+            android:id="@+id/btn_isLocationEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Is Location Enabled"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_deviceID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Device ID"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getConnectionType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Connection Type"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_deviceNetworkType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Device Network Type"
+            android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

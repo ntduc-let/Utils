@@ -11,10 +11,13 @@ import android.preference.PreferenceManager
 import androidx.annotation.IntRange
 import android.provider.Settings
 import android.telephony.TelephonyManager
+import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 
 val Context.isLocationEnabled: Boolean
-    get() = (getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    get() = (getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.isProviderEnabled(
+        LocationManager.NETWORK_PROVIDER
+    )
         ?: false
 
 val Context.deviceID
@@ -75,6 +78,8 @@ fun Context.getConnectionType(): Int {
  * 4 = 4g internet
  * 5 = 5g internet
  */
+@RequiresApi(Build.VERSION_CODES.N)
+@SuppressLint("SwitchIntDef")
 @IntRange(from = 0, to = 5)
 @RequiresPermission(READ_PHONE_STATE)
 fun Context.deviceNetworkType(): Int {
@@ -86,26 +91,23 @@ fun Context.deviceNetworkType(): Int {
     val NET5G = 5
     val telephonyManager = telephonyManager ?: return NO_TELEPHONY
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return telephonyManager.dataNetworkType
-    } else {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-            && telephonyManager.dataNetworkType == TelephonyManager.NETWORK_TYPE_NR) { //New Radio
-            return NET5G
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            when (telephonyManager.networkType) {
-                TelephonyManager.NETWORK_TYPE_IWLAN      //Industrial Wireless Local Area Network, transfer IP data between a mobile device and operator’s core network through a Wi-Fi access
-                -> return NET4G
-                TelephonyManager.NETWORK_TYPE_TD_SCDMA   //3G Time division synchronous code division multiple access, China-Mobile standard
-                -> return NET3G
-                TelephonyManager.NETWORK_TYPE_GSM        // Global System for Mobile Communications, standard for 2g
-                -> return NET2G
-            }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        && telephonyManager.dataNetworkType == TelephonyManager.NETWORK_TYPE_NR
+    ) { //New Radio
+        return NET5G
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        when (telephonyManager.dataNetworkType) {
+            TelephonyManager.NETWORK_TYPE_IWLAN      //Industrial Wireless Local Area Network, transfer IP data between a mobile device and operator’s core network through a Wi-Fi access
+            -> return NET4G
+            TelephonyManager.NETWORK_TYPE_TD_SCDMA   //3G Time division synchronous code division multiple access, China-Mobile standard
+            -> return NET3G
+            TelephonyManager.NETWORK_TYPE_GSM        // Global System for Mobile Communications, standard for 2g
+            -> return NET2G
         }
     }
 
-    return when (telephonyManager.networkType) {
+    return when (telephonyManager.dataNetworkType) {
         TelephonyManager.NETWORK_TYPE_GPRS,     //2G(2.5) General Packet Radio Service 114 kbps
         TelephonyManager.NETWORK_TYPE_EDGE,     //2G(2.75G) Enhanced Data Rate for GSM Evolution 384 kbps
         TelephonyManager.NETWORK_TYPE_CDMA,     //2G Code Division Multiple Access  ~ 14-64 kbps
@@ -129,11 +131,3 @@ fun Context.deviceNetworkType(): Int {
         else -> UNKNOWN
     }
 }
-
-/**
- * Gets the number of unallocated bytes that are available for the application to utilize
- */
-val Context.freePhoneStorageSpace get() = filesDir.freeSpace
-
-
-val Context.defaultPrefs get() = PreferenceManager.getDefaultSharedPreferences(this)
