@@ -2,17 +2,23 @@ package com.ntduc.contextutils
 
 import android.Manifest.permission.READ_PHONE_STATE
 import android.annotation.SuppressLint
-import android.content.Context
+import android.content.*
+import android.content.res.Configuration
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
-import android.preference.PreferenceManager
-import androidx.annotation.IntRange
 import android.provider.Settings
 import android.telephony.TelephonyManager
+import android.text.TextUtils.isEmpty
+import android.util.DisplayMetrics
+import android.view.LayoutInflater
+import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 
 val Context.isLocationEnabled: Boolean
     get() = (getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.isProviderEnabled(
@@ -131,3 +137,200 @@ fun Context.deviceNetworkType(): Int {
         else -> UNKNOWN
     }
 }
+
+/*
+<permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
+<queries>
+    <intent>
+        <action android:name="android.intent.action.MAIN" />
+    </intent>
+</queries>
+ */
+@SuppressLint("QueryPermissionsNeeded")
+inline fun Context.openEmail(
+    title: String = "Select an email client",
+    onCantHandleAction: () -> Unit = {}
+) {
+    try {
+        val emailClientNames = ArrayList<String>()
+        val emailClientPackageNames = ArrayList<String>()
+        // finding list of email clients that support send email
+        val intent = Intent(
+            Intent.ACTION_SENDTO, Uri.fromParts("mailto", "abc@gmail.com", null)
+        )
+        val packages = packageManager.queryIntentActivities(intent, 0)
+        if (packages.isNotEmpty()) {
+            for (resolveInfo in packages) {
+                // finding the package name
+                val packageName = resolveInfo.activityInfo.packageName
+                emailClientNames.add(resolveInfo.loadLabel(packageManager).toString())
+                emailClientPackageNames.add(packageName)
+            }
+            // a selection dialog  for the email clients
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(title)
+            builder.setItems(emailClientNames.toTypedArray()) { _, which ->
+                // on click we launch the right package
+                val theIntent =
+                    packageManager.getLaunchIntentForPackage(emailClientPackageNames[which])
+                startActivity(theIntent)
+            }
+            val dialog = builder.create()
+            dialog.show()
+        }
+    } catch (e: ActivityNotFoundException) {
+        // Show error message
+        onCantHandleAction()
+    }
+}
+
+inline fun Context.sendEmail(
+    myEmail: String,
+    subject: String,
+    text: String,
+    title: String = "Send an e-mail...",
+    onCantHandleAction: () -> Unit = {}
+) {
+    val selectorIntent = Intent(Intent.ACTION_SENDTO)
+    selectorIntent.data = Uri.parse("mailto:")
+
+    val i = Intent(Intent.ACTION_SEND)
+//    i.type = "message/rfc822"
+    i.selector = selectorIntent
+    i.putExtra(Intent.EXTRA_EMAIL, arrayOf(myEmail))
+    i.putExtra(Intent.EXTRA_TEXT, text)
+    i.putExtra(Intent.EXTRA_SUBJECT, subject)
+
+    try {
+        startActivity(Intent.createChooser(i, title))
+    } catch (ex: ActivityNotFoundException) {
+        onCantHandleAction()
+    }
+}
+
+inline fun Context.sendEmail(
+    emails: Array<String>,
+    subject: String,
+    text: String,
+    title: String = "Send an e-mail...",
+    onCantHandleAction: () -> Unit = {}
+) {
+    val selectorIntent = Intent(Intent.ACTION_SENDTO)
+    selectorIntent.data = Uri.parse("mailto:")
+
+    val i = Intent(Intent.ACTION_SEND)
+//    i.type = "message/rfc822"
+    i.selector = selectorIntent
+    i.putExtra(Intent.EXTRA_EMAIL, emails)
+    i.putExtra(Intent.EXTRA_TEXT, text)
+    i.putExtra(Intent.EXTRA_SUBJECT, subject)
+
+    try {
+        startActivity(Intent.createChooser(i, title))
+    } catch (ex: ActivityNotFoundException) {
+        onCantHandleAction()
+    }
+}
+
+@SuppressLint("QueryPermissionsNeeded")
+inline fun Context.shareText(
+    text: String,
+    subject: String = "",
+    onCantHandleAction: () -> Unit = {}
+) {
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "text/plain"
+    intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+    intent.putExtra(Intent.EXTRA_TEXT, text)
+
+    if (intent.resolveActivity(packageManager) != null) {
+        startActivity(Intent.createChooser(intent, null))
+    } else {
+        onCantHandleAction()
+    }
+}
+
+@SuppressLint("QueryPermissionsNeeded")
+inline fun Context.sendSMS(number: String, text: String = "", onCantHandleAction: () -> Unit = {}) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("sms:$number"))
+    intent.putExtra("sms_body", text)
+    if (intent.resolveActivity(packageManager) != null) {
+        startActivity(Intent.createChooser(intent, null))
+    } else {
+        onCantHandleAction()
+    }
+}
+
+fun Context.watchYoutube(id: String) {
+    val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$id"))
+    val webIntent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("http://www.youtube.com/watch?v=$id")
+    )
+    try {
+        this.startActivity(appIntent)
+    } catch (ex: ActivityNotFoundException) {
+        this.startActivity(webIntent)
+    }
+}
+
+@SuppressLint("QueryPermissionsNeeded")
+fun Context?.openGoogleMaps(address: String?) {
+    this ?: return
+    if (isEmpty(address))
+        return
+
+    val gmmIntentUri = Uri.parse("geo:0,0?q=${address?.trim()}")
+    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+    mapIntent.`package` = "com.google.android.apps.maps"
+
+    if (mapIntent.resolveActivity(packageManager) != null) {
+        startActivity(mapIntent)
+    }
+}
+
+fun Context.copyToClipboard(text: String) {
+    val clipboard = clipboardManager
+    val clip = ClipData.newPlainText("label", text)
+    clipboard?.setPrimaryClip(clip)
+}
+
+fun Context.getTextFromClipboard(): CharSequence {
+    val clipData = clipboardManager?.primaryClip
+    if (clipData != null && clipData.itemCount > 0)
+        return clipData.getItemAt(0).coerceToText(this)
+
+    return ""
+}
+
+fun Context.getUriFromClipboard(): Uri? {
+    val clipData = clipboardManager?.primaryClip
+    if (clipData != null && clipData.itemCount > 0)
+        return clipData.getItemAt(0).uri
+
+    return null
+}
+
+fun Context.getColorCompat(color: Int) = ContextCompat.getColor(this, color)
+
+fun Context.getDrawableCompat(drawable: Int) = ContextCompat.getDrawable(this, drawable)
+
+inline val Context.displayWidth: Int
+    get() = resources.displayMetrics.widthPixels
+
+inline val Context.displayHeight: Int
+    get() = resources.displayMetrics.heightPixels
+
+inline val Context.displayMetrics: DisplayMetrics
+    get() = resources.displayMetrics
+
+inline val Context.inflater: LayoutInflater
+    get() = LayoutInflater.from(this)
+
+val Context.isDarkTheme
+    get() = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+        Configuration.UI_MODE_NIGHT_NO,
+        Configuration.UI_MODE_NIGHT_UNDEFINED -> false
+        else -> true
+    }

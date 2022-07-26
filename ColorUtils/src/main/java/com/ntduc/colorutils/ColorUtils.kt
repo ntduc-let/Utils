@@ -3,14 +3,18 @@ package com.ntduc.colorutils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.widget.*
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
+import androidx.annotation.IdRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import java.util.*
@@ -84,6 +88,13 @@ fun Toolbar.tint(@ColorInt color: Int, tintTitle: Boolean = true) {
         .forEach { (getChildAt(it) as? ImageButton)?.setColorFilter(color) }
 }
 
+fun Toolbar?.changeNavigateUpColor(@IdRes color: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        this?.navigationIcon?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+    } else {
+        this?.navigationIcon?.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+    }
+}
 /*==================================================================================================*/
 @ColorInt
 fun getTitleTextColor(@ColorInt color: Int): Int {

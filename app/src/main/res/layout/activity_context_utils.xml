@@ -66,5 +66,54 @@
             android:layout_height="wrap_content"
             android:text="Device Network Type"
             android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_openEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open Email"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_sendEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send Email"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_shareText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Share Text"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_sendSMS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send SMS"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_watchYoutube"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Watch Youtube"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_openGoogleMaps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open Google Maps"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getTextFromClipboard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Text From Clipboard"
+            android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

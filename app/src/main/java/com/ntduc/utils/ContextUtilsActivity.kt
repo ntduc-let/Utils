@@ -75,6 +75,34 @@ class ContextUtilsActivity : AppCompatActivity() {
                 }
             }
         }
+
+        binding.btnOpenEmail.setOnClickListener {
+            openEmail {
+                showShort("openEmail")
+            }
+        }
+
+        binding.btnSendEmail.setOnClickListener {
+            sendEmail(listOf("savatar2204@gmail.com", "savatar2205@gmail.com").toTypedArray(), "subject", "text", onCantHandleAction = {
+                showShort("sendEmail")
+            })
+        }
+
+        binding.btnSendSMS.setOnClickListener {
+            sendSMS("0813615988")
+        }
+
+        binding.btnWatchYoutube.setOnClickListener {
+            watchYoutube("LCAHVao0kkE")
+        }
+
+        binding.btnOpenGoogleMaps.setOnClickListener {
+            openGoogleMaps("Hà Nội")
+        }
+
+        binding.btnGetTextFromClipboard.setOnClickListener {
+            showShort(getTextFromClipboard().toString())
+        }
     }
 
     override fun onRequestPermissionsResult(
