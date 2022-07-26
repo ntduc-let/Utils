@@ -5,11 +5,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.ntduc.contextutils.*
-import com.ntduc.toastutils.Toast
-import com.ntduc.toastutils.showShort
+import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityContextUtilsBinding
 
 class ContextUtilsActivity : AppCompatActivity() {
@@ -23,34 +21,34 @@ class ContextUtilsActivity : AppCompatActivity() {
         }
         binding.btnShowConfirmationDialog.setOnClickListener {
             showConfirmationDialog("", "showDialog", onResponse = {
-                showShort(it.toString())
+                shortToast(it.toString())
             }, cancelable = false)
         }
         binding.btnShowSinglePicker.setOnClickListener {
             showSinglePicker("Title", listOf("Một", "Hai", "Ba").toTypedArray(), onResponse = {
-                showShort(it.toString())
+                shortToast(it.toString())
             }, 0)
         }
         binding.btnShowMultiPicker.setOnClickListener {
             showMultiPicker("Title", listOf("Một", "Hai", "Ba").toTypedArray(), onResponse = { index, isChecked ->
-                if (isChecked) showShort(index.toString())
+                if (isChecked) shortToast(index.toString())
             }, listOf(true, true, false).toBooleanArray())
         }
 
         binding.btnIsLocationEnabled.setOnClickListener {
-            showShort("IsLocationEnabled $isLocationEnabled")
+            shortToast("IsLocationEnabled $isLocationEnabled")
         }
 
         binding.btnDeviceID.setOnClickListener {
-            showShort("DeviceID $deviceID")
+            shortToast("DeviceID $deviceID")
         }
 
         binding.btnGetConnectionType.setOnClickListener {
             when(getConnectionType()){
-                0 -> showShort("No Connection")
-                1 -> showShort("Mobile Data")
-                2 -> showShort("Wifi")
-                3 -> showShort("VPN")
+                0 -> shortToast("No Connection")
+                1 -> shortToast("Mobile Data")
+                2 -> shortToast("Wifi")
+                3 -> shortToast("VPN")
             }
         }
 
@@ -66,25 +64,25 @@ class ContextUtilsActivity : AppCompatActivity() {
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 when(deviceNetworkType()){
-                    0 -> showShort("no telephony manager available")
-                    1 -> showShort("unknown telephony")
-                    2 -> showShort("2g internet")
-                    3 -> showShort("3g internet")
-                    4 -> showShort("4g internet")
-                    5 -> showShort("5g internet")
+                    0 -> shortToast("no telephony manager available")
+                    1 -> shortToast("unknown telephony")
+                    2 -> shortToast("2g internet")
+                    3 -> shortToast("3g internet")
+                    4 -> shortToast("4g internet")
+                    5 -> shortToast("5g internet")
                 }
             }
         }
 
         binding.btnOpenEmail.setOnClickListener {
             openEmail {
-                showShort("openEmail")
+                shortToast("openEmail")
             }
         }
 
         binding.btnSendEmail.setOnClickListener {
             sendEmail(listOf("savatar2204@gmail.com", "savatar2205@gmail.com").toTypedArray(), "subject", "text", onCantHandleAction = {
-                showShort("sendEmail")
+                shortToast("sendEmail")
             })
         }
 
@@ -101,7 +99,7 @@ class ContextUtilsActivity : AppCompatActivity() {
         }
 
         binding.btnGetTextFromClipboard.setOnClickListener {
-            showShort(getTextFromClipboard().toString())
+            shortToast(getTextFromClipboard().toString())
         }
     }
 
@@ -114,9 +112,9 @@ class ContextUtilsActivity : AppCompatActivity() {
         if (requestCode == 100
             && grantResults.isNotEmpty()
             && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            showShort("PERMISSION_GRANTED")
+            shortToast("PERMISSION_GRANTED")
         } else {
-            showShort("PERMISSION_DENIED")
+            shortToast("PERMISSION_DENIED")
         }
     }
 }
