@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/ColorUtils" />
             <option value="$PROJECT_DIR$/ContextUtils" />
             <option value="$PROJECT_DIR$/ToastUtils" />
+            <option value="$PROJECT_DIR$/ViewPager2Utils" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

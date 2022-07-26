@@ -1,4 +1,4 @@
-package com.ntduc.utils
+package com.ntduc.utils.activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +25,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnContextUtils.setOnClickListener {
             startActivity(Intent(this, ContextUtilsActivity::class.java))
+        }
+
+        binding.btnViewPager2Utils.setOnClickListener {
+            startActivity(Intent(this, ViewPager2UtilsActivity::class.java))
         }
     }
 }

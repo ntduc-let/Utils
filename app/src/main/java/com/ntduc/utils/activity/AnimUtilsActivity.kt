@@ -1,4 +1,4 @@
-package com.ntduc.utils
+package com.ntduc.utils.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

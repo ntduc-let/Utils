@@ -1,4 +1,4 @@
-package com.ntduc.utils
+package com.ntduc.utils.activity
 
 import android.Manifest
 import android.content.pm.PackageManager

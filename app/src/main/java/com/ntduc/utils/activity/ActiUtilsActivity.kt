@@ -1,4 +1,4 @@
-package com.ntduc.utils
+package com.ntduc.utils.activity
 
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.provider.Settings
 import com.ntduc.activityutils.*
 import com.ntduc.toastutils.shortToast
+import com.ntduc.utils.BuildConfig
+import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ActivityActiUtilsBinding
 
 class ActiUtilsActivity : AppCompatActivity() {
