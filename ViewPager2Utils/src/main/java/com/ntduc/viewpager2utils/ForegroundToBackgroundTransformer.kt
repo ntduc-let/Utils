@@ -1,12 +1,14 @@
 package com.ntduc.viewpager2utils
 
 import android.view.View
+import kotlin.math.abs
+import kotlin.math.max
 
 open class ForegroundToBackgroundTransformer : ABaseTransformer() {
     override fun onTransform(page: View, position: Float) {
         val height = page.height.toFloat()
         val width = page.width.toFloat()
-        val scale = min(if (position > 0) 1f else Math.abs(1f + position), 0.5f)
+        val scale = max(if (position > 0) 1f else abs(1f + position), 0.5f)
 
         page.scaleX = scale
         page.scaleY = scale
