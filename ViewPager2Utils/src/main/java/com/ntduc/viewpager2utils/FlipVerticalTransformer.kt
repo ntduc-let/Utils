@@ -6,10 +6,12 @@ open class FlipVerticalTransformer : ABaseTransformer() {
     override fun onTransform(page: View, position: Float) {
         val rotation = -180f * position
 
-        page.alpha = if (rotation > 90f || rotation < -90f) 0f else 1f
-        page.pivotX = page.width * 0.5f
-        page.pivotY = page.height * 0.5f
-        page.rotationX = rotation
+        page.apply {
+            alpha = if (rotation > 90f || rotation < -90f) 0f else 1f
+            pivotX = width * 0.5f
+            pivotY = height * 0.5f
+            rotationX = rotation
+        }
     }
 
     override fun onPostTransform(page: View, position: Float) {

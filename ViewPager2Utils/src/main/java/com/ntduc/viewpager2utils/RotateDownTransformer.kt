@@ -7,13 +7,16 @@ open class RotateDownTransformer : ABaseTransformer() {
         get() = true
 
     override fun onTransform(page: View, position: Float) {
-        val width = page.width.toFloat()
-        val height = page.height.toFloat()
         val rotation = ROT_MOD * position
 
-        page.pivotX = width * 0.5f
-        page.pivotY = height
-        page.rotation = rotation
+        page.apply {
+            val width = width.toFloat()
+            val height = height.toFloat()
+
+            pivotX = width * 0.5f
+            pivotY = height
+            this.rotation = rotation
+        }
     }
 
     companion object {

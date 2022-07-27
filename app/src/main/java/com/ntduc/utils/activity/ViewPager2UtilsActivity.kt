@@ -15,6 +15,6 @@ class ViewPager2UtilsActivity : AppCompatActivity() {
 
         val adapter = FragmentAdapter(this)
         binding.pager.adapter = adapter
-        binding.pager.setPageTransformer(AlphaTransformer())
+        binding.pager.setPageTransformer(ZoomOutTransformer())
     }
 }

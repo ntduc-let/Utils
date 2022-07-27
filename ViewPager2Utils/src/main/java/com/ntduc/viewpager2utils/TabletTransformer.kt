@@ -3,16 +3,19 @@ package com.ntduc.viewpager2utils
 import android.graphics.Camera
 import android.graphics.Matrix
 import android.view.View
+import kotlin.math.abs
 
 open class TabletTransformer : ABaseTransformer() {
     override fun onTransform(page: View, position: Float) {
         val rotation = if (position < 0) ROT_MOD else -ROT_MOD
-        val rotationY = rotation * Math.abs(position)
+        val rotationY = rotation * abs(position)
 
-        page.translationX = getOffsetXForRotation(rotationY, page.width, page.height)
-        page.pivotX = page.width * 0.5f
-        page.pivotY = 0f
-        page.rotationY = rotationY
+        page.apply {
+            translationX = getOffsetXForRotation(rotationY, width, height)
+            pivotX = width * 0.5f
+            pivotY = 0f
+            this.rotationY = rotationY
+        }
     }
 
     companion object {

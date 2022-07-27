@@ -8,8 +8,10 @@ open class CubeInTransformer : ABaseTransformer() {
 
     override fun onTransform(page: View, position: Float) {
         // Rotate the fragment on the left or right edge
-        page.pivotX = if (position > 0) 0f else page.width.toFloat()
-        page.pivotY = 0f
-        page.rotationY = -90f * position
+        page.apply {
+            pivotX = if (position > 0) 0f else width.toFloat()
+            pivotY = 0f
+            rotationY = -90f * position
+        }
     }
 }

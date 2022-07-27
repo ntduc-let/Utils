@@ -8,20 +8,22 @@ open class UltraDepthScaleTransformer : ABaseTransformer() {
         val scale = MIN_SCALE + (1 - MIN_SCALE) * (1 - abs(position))
         val rotation = MAX_ROTATION * abs(position)
 
-        if (position <= 0f) {
-            page.translationX = page.width * -position * 0.19f
-            page.pivotY = 0.5f * page.height
-            page.pivotX = 0.5f * page.width
-            page.scaleX = scale
-            page.scaleY = scale
-            page.rotationY = rotation
-        } else if (position <= 1f) {
-            page.translationX = page.width * -position * 0.19f
-            page.pivotY = 0.5f * page.height
-            page.pivotX = 0.5f * page.width
-            page.scaleX = scale
-            page.scaleY = scale
-            page.rotationY = -rotation
+        page.apply {
+            if (position <= 0f) {
+                translationX = width * -position * 0.19f
+                pivotY = 0.5f * height
+                pivotX = 0.5f * width
+                scaleX = scale
+                scaleY = scale
+                rotationY = rotation
+            } else if (position <= 1f) {
+                translationX = width * -position * 0.19f
+                pivotY = 0.5f * height
+                pivotX = 0.5f * width
+                scaleX = scale
+                scaleY = scale
+                rotationY = -rotation
+            }
         }
     }
 

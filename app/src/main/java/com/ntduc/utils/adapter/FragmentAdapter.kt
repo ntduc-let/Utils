@@ -12,15 +12,18 @@ class FragmentAdapter(
 ) : FragmentStateAdapter(fa) {
 
     override fun createFragment(position: Int): Fragment {
-        when(position){
-            0 -> return OneFragment()
-            1 -> return SecondFragment()
-            2 -> return ThreeFragment()
-            else -> return OneFragment()
+        return when(position){
+            0 -> OneFragment()
+            1 -> SecondFragment()
+            2 -> ThreeFragment()
+            3 -> OneFragment()
+            4 -> SecondFragment()
+            5 -> ThreeFragment()
+            else -> OneFragment()
         }
     }
 
     override fun getItemCount(): Int {
-        return 3
+        return 6
     }
 }
