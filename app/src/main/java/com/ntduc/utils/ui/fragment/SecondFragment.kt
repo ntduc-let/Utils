@@ -1,4 +1,4 @@
-package com.ntduc.utils.fragment
+package com.ntduc.utils.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater

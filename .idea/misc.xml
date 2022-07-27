@@ -9,12 +9,13 @@
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_color_utils.xml" value="0.25" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_context_utils.xml" value="0.3625" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_main.xml" value="0.3625" />
-        <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_view_pager2_utils.xml" value="0.2" />
+        <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_view_pager2_utils.xml" value="0.25" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/fragment_one.xml" value="0.33" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/fragment_screen_slide_page.xml" value="0.3614583333333333" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/fragment_second.xml" value="0.22" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/fragment_three.xml" value="0.25" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/item_image.xml" value="0.2375" />
+        <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/list_item.xml" value="0.184375" />
       </map>
     </option>
   </component>

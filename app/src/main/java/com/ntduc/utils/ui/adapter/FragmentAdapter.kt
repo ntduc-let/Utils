@@ -1,11 +1,11 @@
-package com.ntduc.utils.adapter
+package com.ntduc.utils.ui.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.ntduc.utils.fragment.OneFragment
-import com.ntduc.utils.fragment.SecondFragment
-import com.ntduc.utils.fragment.ThreeFragment
+import com.ntduc.utils.ui.fragment.OneFragment
+import com.ntduc.utils.ui.fragment.SecondFragment
+import com.ntduc.utils.ui.fragment.ThreeFragment
 
 class FragmentAdapter(
     fa: FragmentActivity
