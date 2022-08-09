@@ -66,9 +66,12 @@ android {
 }
 dependencies {
   ...
-  implementation 'com.github.ntduc-let.Utils:ActivityUtils:1.0.0'
-  implementation 'com.github.ntduc-let.Utils:AnimationUtils:1.0.0'
-  implementation 'com.github.ntduc-let.Utils:ToastUtils:1.0.0'
+  implementation 'com.github.ntduc-let.Utils:ActivityUtils:1.0.1'
+  implementation 'com.github.ntduc-let.Utils:AnimationUtils:1.0.1'
+  implementation 'com.github.ntduc-let.Utils:ColorUtils:1.0.1'
+  implementation 'com.github.ntduc-let.Utils:ContextUtils:1.0.1'
+  implementation 'com.github.ntduc-let.Utils:ToastUtils:1.0.1'
+  implementation 'com.github.ntduc-let.Utils:ViewPager2Utils:1.0.1'
 }
 ```
 
@@ -90,7 +93,3 @@ dependencyResolutionManagement {
   }
 }
 ```
-
-
-
-
