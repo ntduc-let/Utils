@@ -30,5 +30,9 @@ class MainActivity : AppCompatActivity() {
         binding.btnViewPager2Utils.setOnClickListener {
             startActivity(Intent(this, ViewPager2UtilsActivity::class.java))
         }
+
+        binding.btnStringUtils.setOnClickListener {
+            startActivity(Intent(this, StringUtilsActivity::class.java))
+        }
     }
 }

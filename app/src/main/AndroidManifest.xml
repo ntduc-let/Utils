@@ -27,22 +27,25 @@
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
         <activity
-            android:name="com.ntduc.utils.ui.activity.ViewPager2UtilsActivity"
+            android:name=".ui.activity.StringUtilsActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.ui.activity.ContextUtilsActivity"
+            android:name=".ui.activity.ViewPager2UtilsActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.ui.activity.ColorUtilsActivity"
+            android:name=".ui.activity.ContextUtilsActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.ui.activity.ActiUtilsActivity"
+            android:name=".ui.activity.ColorUtilsActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.ui.activity.AnimUtilsActivity"
+            android:name=".ui.activity.ActiUtilsActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.ui.activity.MainActivity"
+            android:name=".ui.activity.AnimUtilsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

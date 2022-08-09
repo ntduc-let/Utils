@@ -3,53 +3,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.activity.StringUtilsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <EditText
+            android:id="@+id/edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/txt"
+            android:textSize="24sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <Button
-            android:id="@+id/btn_ActivityUtils"
+            android:id="@+id/btn_isNumeric"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ActivityUtils"
+            android:text="isNumeric"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_AnimationUtils"
+            android:id="@+id/btn_convertToCamelCase"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AnimationUtils"
+            android:text="convertToCamelCase"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_ColorUtils"
+            android:id="@+id/btn_ellipsize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ColorUtils"
+            android:text="ellipsize"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_ContextUtils"
+            android:id="@+id/btn_setBackgroundColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ContextUtils"
+            android:text="setBackgroundColor"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_ViewPager2Utils"
+            android:id="@+id/btn_setForegroundColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ViewPager2Utils"
+            android:text="setForegroundColor"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_StringUtils"
+            android:id="@+id/btn_highlight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="StringUtils"
+            android:text="highlight"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_randomString"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="randomString"
             android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>
