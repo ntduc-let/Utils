@@ -9,9 +9,9 @@ Setup
 ## Key Store
 ```
 Key store path: [Trong thư mục app]
-Password: prox@123456
+Password: password
 Alias: MyApp
-Password: prox@123456
+Password: password
 First and Last Name: Duc Nguyen
 Organizational Unit: Mobile
 Organization: ProX Global
@@ -32,16 +32,16 @@ android {
   signingConfigs {
     debug {
       keyAlias 'MyApp'
-      keyPassword 'prox@123456'
+      keyPassword 'password'
       storeFile file('MyApp.jks')
-      storePassword 'prox@123456'
+      storePassword 'password'
     }
 
     release {
       keyAlias 'MyApp'
-      keyPassword 'prox@123456'
+      keyPassword 'password'
       storeFile file('MyApp.jks')
-      storePassword 'prox@123456'
+      storePassword 'password'
     }
   }
   buildTypes {
