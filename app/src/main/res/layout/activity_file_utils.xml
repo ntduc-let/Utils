@@ -3,60 +3,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.activity.FileUtilsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_ActivityUtils"
+        <TextView
+            android:id="@+id/txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ActivityUtils"
+            android:textSize="24sp"/>
+
+        <Button
+            android:id="@+id/btn_selectFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select File"
+            android:backgroundTint="#2962FF"
+            android:textColor="@color/white"
+            android:textAllCaps="false" />
+
+        <EditText
+            android:id="@+id/edt_renameFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_renameFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rename File"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_AnimationUtils"
+            android:id="@+id/btn_deleteFile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AnimationUtils"
+            android:text="Delete File"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_ColorUtils"
+            android:id="@+id/btn_shareFile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ColorUtils"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_ContextUtils"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ContextUtils"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_ViewPager2Utils"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ViewPager2Utils"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_StringUtils"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="StringUtils"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_FileUtils"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="FileUtils"
+            android:text="Share File"
             android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

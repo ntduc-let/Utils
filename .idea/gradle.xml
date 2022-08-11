@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/ColorUtils" />
             <option value="$PROJECT_DIR$/ContextUtils" />
             <option value="$PROJECT_DIR$/DateTimeUtils" />
+            <option value="$PROJECT_DIR$/FileUtils" />
             <option value="$PROJECT_DIR$/NumberUtils" />
             <option value="$PROJECT_DIR$/StringUtils" />
             <option value="$PROJECT_DIR$/ToastUtils" />

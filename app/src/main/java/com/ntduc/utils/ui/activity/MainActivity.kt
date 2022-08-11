@@ -34,5 +34,9 @@ class MainActivity : AppCompatActivity() {
         binding.btnStringUtils.setOnClickListener {
             startActivity(Intent(this, StringUtilsActivity::class.java))
         }
+
+        binding.btnFileUtils.setOnClickListener {
+            startActivity(Intent(this, FileUtilsActivity::class.java))
+        }
     }
 }
