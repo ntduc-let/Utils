@@ -80,11 +80,6 @@ dependencies {
 }
 ```
 
-## gradle.properties
-```
-authToken=jp_4c9t9e41gasb6p7vq3arh4ujpl
-```
-
 ## settings.gradle
 ```
 dependencyResolutionManagement {
@@ -93,7 +88,6 @@ dependencyResolutionManagement {
     mavenCentral()
     maven {
       url "https://jitpack.io"
-      credentials { username authToken }
     }
   }
 }
