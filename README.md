@@ -67,16 +67,16 @@ android {
 dependencies {
   ...
   def utilsVersion = "1.0.2"
-  implementation 'com.github.ntduc-let.Utils:ActivityUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:AnimationUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ColorUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ContextUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:DateTimeUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:FileUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:NumberUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:StringUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ToastUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ViewPager2Utils:$utilsVersion'
+  implementation "com.github.ntduc-let.Utils:ActivityUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:AnimationUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ColorUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ContextUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:DateTimeUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:FileUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:NumberUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:StringUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ToastUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ViewPager2Utils:$utilsVersion"
 }
 ```
 
