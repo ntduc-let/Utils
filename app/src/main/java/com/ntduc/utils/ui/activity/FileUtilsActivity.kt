@@ -73,9 +73,13 @@ class FileUtilsActivity : AppCompatActivity() {
                 shortToast("Please enter name file")
                 return@setOnClickListener
             }
-            if (renameFile(binding.txt.text.toString().asFile(), binding.edtRenameFile.text.toString(), onCompleted = {
-                    Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
-                })) {
+            if (renameFile(
+                    binding.txt.text.toString().asFile(),
+                    binding.edtRenameFile.text.toString(),
+                    onCompleted = {
+                        Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
+                    })
+            ) {
                 shortToast("Rename success")
                 binding.txt.text = ""
                 binding.edtRenameFile.setText("")
@@ -107,6 +111,18 @@ class FileUtilsActivity : AppCompatActivity() {
             }
 
             shareFile(binding.txt.text.toString().asFile(), "com.ntduc.utils.provider")
+        }
+
+        binding.btnGetAllFile.setOnClickListener {
+            startActivity(Intent(this, GetAllFileActivity::class.java))
+        }
+
+        binding.btnGetAllAudio.setOnClickListener {
+            startActivity(Intent(this, GetAllAudioActivity::class.java))
+        }
+
+        binding.btnGetAllVideo.setOnClickListener {
+            startActivity(Intent(this, GetAllVideoActivity::class.java))
         }
     }
 

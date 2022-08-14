@@ -50,5 +50,33 @@
             android:layout_height="wrap_content"
             android:text="Share File"
             android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getAllFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get All File"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getAllAudio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get All Audio"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getAllImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get All Image"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getAllVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get All Video"
+            android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

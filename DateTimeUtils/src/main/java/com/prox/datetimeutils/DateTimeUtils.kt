@@ -101,6 +101,17 @@ fun timeAsMillis(hours: Int, minutes: Int, seconds: Int): Long {
             TimeUnit.SECONDS.toMillis(seconds.toLong())
 }
 
+fun Long.formatAsTime(): String {
+    val seconds = (TimeUnit.MILLISECONDS.toSeconds(this) % 60L).toInt()
+    val minutes = (TimeUnit.MILLISECONDS.toMinutes(this) % 60L).toInt()
+    val hours = TimeUnit.MILLISECONDS.toHours(this).toInt()
+    return if (hours == 0) String.format(
+        "%02d:%02d",
+        minutes,
+        seconds
+    ) else String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
 fun extractHours(millis: Long): Long {
     return millis / (1000 * 60 * 60)
 }
@@ -129,7 +140,8 @@ fun convertDate(date: String, defaultFormat: String, formatWanted: String): Stri
     }
 }
 
-fun getDateTimeFromMillis(millis: Long, dateFormat: String): String = SimpleDateFormat(dateFormat, Locale.getDefault()).format(Date(millis))
+fun getDateTimeFromMillis(millis: Long, dateFormat: String): String =
+    SimpleDateFormat(dateFormat, Locale.getDefault()).format(Date(millis))
 
 const val TIME_12HOUR = "hh:mm:ss a"
 const val TIME_24HOUR = "HH:mm:ss"
@@ -155,6 +167,8 @@ fun getCurDate(format: String): String {
     )
 }
 
-fun convert24HoursTimeTo12HoursTime(date: String): String = convertDate(date, TIME_24HOUR, TIME_12HOUR)
+fun convert24HoursTimeTo12HoursTime(date: String): String =
+    convertDate(date, TIME_24HOUR, TIME_12HOUR)
 
-fun convert12HoursTimeTo24HoursTime(date: String): String = convertDate(date, TIME_12HOUR, TIME_24HOUR)
+fun convert12HoursTimeTo24HoursTime(date: String): String =
+    convertDate(date, TIME_12HOUR, TIME_24HOUR)

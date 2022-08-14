@@ -55,16 +55,23 @@
         android:textColor="#0091EA" />
 
     <TextView
-        android:id="@+id/txt_height"
+        android:id="@+id/txt_album"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Height: "
+        android:text="Album: "
         android:textColor="#0091EA" />
 
     <TextView
-        android:id="@+id/txt_width"
+        android:id="@+id/txt_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Width: "
+        android:text="Artist: "
+        android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: "
         android:textColor="#0091EA" />
 </androidx.appcompat.widget.LinearLayoutCompat>

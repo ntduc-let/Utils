@@ -53,18 +53,4 @@
         android:layout_height="wrap_content"
         android:text="Data: "
         android:textColor="#0091EA" />
-
-    <TextView
-        android:id="@+id/txt_height"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Height: "
-        android:textColor="#0091EA" />
-
-    <TextView
-        android:id="@+id/txt_width"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Width: "
-        android:textColor="#0091EA" />
 </androidx.appcompat.widget.LinearLayoutCompat>

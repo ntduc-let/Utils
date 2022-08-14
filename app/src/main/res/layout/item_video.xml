@@ -67,4 +67,46 @@
         android:layout_height="wrap_content"
         android:text="Width: "
         android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_album"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Album: "
+        android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Artist: "
+        android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: "
+        android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_bucketID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bucket ID: "
+        android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_bucketDisplayName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bucket Display Name: "
+        android:textColor="#0091EA" />
+
+    <TextView
+        android:id="@+id/txt_resolution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resolution: "
+        android:textColor="#0091EA" />
 </androidx.appcompat.widget.LinearLayoutCompat>

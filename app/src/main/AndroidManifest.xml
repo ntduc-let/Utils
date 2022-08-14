@@ -34,6 +34,18 @@
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.GetAllVideoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.activity.GetAllImageActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.activity.GetAllAudioActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.activity.GetAllFileActivity"
+            android:exported="true" />
+        <activity
             android:name=".ui.activity.FileUtilsActivity"
             android:exported="true" />
         <activity
