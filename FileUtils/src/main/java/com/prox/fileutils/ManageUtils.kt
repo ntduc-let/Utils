@@ -128,8 +128,8 @@ fun Context.getFiles(
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
             val size = cursor.getLong(col_size)
-            val dateAdded = cursor.getLong(col_dateAdded)
-            val dateModified = cursor.getLong(col_dateModified)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
             val data = cursor.getString(col_data)
 
             files.add(BaseFile(title, displayName, mimeType, size, dateAdded, dateModified, data))
@@ -191,8 +191,8 @@ fun Context.getAudios(
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
             val size = cursor.getLong(col_size)
-            val dateAdded = cursor.getLong(col_dateAdded)
-            val dateModified = cursor.getLong(col_dateModified)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
             val data = cursor.getString(col_data)
             val album = cursor.getString(col_album)
             val artist = cursor.getString(col_artist)
@@ -268,8 +268,8 @@ fun Context.getImages(
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
             val size = cursor.getLong(col_size)
-            val dateAdded = cursor.getLong(col_dateAdded)
-            val dateModified = cursor.getLong(col_dateModified)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
             val data = cursor.getString(col_data)
             val height = cursor.getLong(col_height)
             val width = cursor.getLong(col_width)
@@ -356,8 +356,8 @@ fun Context.getVideos(
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
             val size = cursor.getLong(col_size)
-            val dateAdded = cursor.getLong(col_dateAdded)
-            val dateModified = cursor.getLong(col_dateModified)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
             val data = cursor.getString(col_data)
             val height = cursor.getLong(col_height)
             val width = cursor.getLong(col_width)
