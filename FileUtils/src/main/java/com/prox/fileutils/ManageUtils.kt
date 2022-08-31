@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
@@ -18,7 +19,7 @@ fun Context.renameFile(fileOld: File, nameNew: String, onCompleted: () -> Unit):
     try {
         val pathNew = "${fileOld.parentFile?.path}/${nameNew}.${fileOld.extension}"
         val fileNew = File(pathNew)
-        if (fileNew.exists()){
+        if (fileNew.exists()) {
             return false
         }
 
@@ -81,10 +82,11 @@ fun Context.shareFile(file: File, authority: String) {
     startActivity(chooser)
 }
 
-fun Context.getFiles(types: List<String>): List<BaseFile> {
+fun Context.getFiles(
+    uri: Uri = MediaStore.Files.getContentUri("external"),
+    types: List<String>
+): List<BaseFile> {
     val files = ArrayList<BaseFile>()
-
-    val uri = MediaStore.Files.getContentUri("external")
 
     val projection = arrayOf(
         MediaStore.Files.FileColumns.TITLE,
@@ -137,10 +139,11 @@ fun Context.getFiles(types: List<String>): List<BaseFile> {
     return files
 }
 
-fun Context.getAudios(types: List<String>): List<BaseAudio> {
+fun Context.getAudios(
+    uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    types: List<String>
+): List<BaseAudio> {
     val audios = ArrayList<BaseAudio>()
-
-    val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
     val projection = arrayOf(
         MediaStore.Audio.AudioColumns.TITLE,
@@ -195,17 +198,31 @@ fun Context.getAudios(types: List<String>): List<BaseAudio> {
             val artist = cursor.getString(col_artist)
             val duration = cursor.getLong(col_duration)
 
-            audios.add(BaseAudio(title, displayName, mimeType, size, dateAdded, dateModified, data, album, artist, duration))
+            audios.add(
+                BaseAudio(
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data,
+                    album,
+                    artist,
+                    duration
+                )
+            )
         }
         cursor.close()
     }
     return audios
 }
 
-fun Context.getImages(types: List<String>): List<BaseImage> {
+fun Context.getImages(
+    uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+    types: List<String>
+): List<BaseImage> {
     val images = ArrayList<BaseImage>()
-
-    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
     val projection = arrayOf(
         MediaStore.Images.ImageColumns.TITLE,
@@ -217,7 +234,7 @@ fun Context.getImages(types: List<String>): List<BaseImage> {
         MediaStore.Images.ImageColumns.DATA,
         MediaStore.Images.ImageColumns.HEIGHT,
         MediaStore.Images.ImageColumns.WIDTH
-        )
+    )
     var selection = ""
     for (i in types.indices) {
         if (i == 0) {
@@ -257,17 +274,30 @@ fun Context.getImages(types: List<String>): List<BaseImage> {
             val height = cursor.getLong(col_height)
             val width = cursor.getLong(col_width)
 
-            images.add(BaseImage(title, displayName, mimeType, size, dateAdded, dateModified, data, height, width))
+            images.add(
+                BaseImage(
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data,
+                    height,
+                    width
+                )
+            )
         }
         cursor.close()
     }
     return images
 }
 
-fun Context.getVideos(types: List<String>): List<BaseVideo> {
+fun Context.getVideos(
+    uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+    types: List<String>
+): List<BaseVideo> {
     val videos = ArrayList<BaseVideo>()
-
-    val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
 
     val projection = arrayOf(
         MediaStore.Video.VideoColumns.TITLE,
@@ -317,7 +347,8 @@ fun Context.getVideos(types: List<String>): List<BaseVideo> {
         val col_artist = cursor.getColumnIndex(MediaStore.Video.VideoColumns.ARTIST)
         val col_duration = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION)
         val col_bucketID = cursor.getColumnIndex(MediaStore.Video.VideoColumns.BUCKET_ID)
-        val col_bucketDisplayName = cursor.getColumnIndex(MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME)
+        val col_bucketDisplayName =
+            cursor.getColumnIndex(MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME)
         val col_resolution = cursor.getColumnIndex(MediaStore.Video.VideoColumns.RESOLUTION)
 
         while (cursor.moveToNext()) {
@@ -337,7 +368,25 @@ fun Context.getVideos(types: List<String>): List<BaseVideo> {
             val bucketDisplayName = cursor.getString(col_bucketDisplayName)
             val resolution = cursor.getString(col_resolution)
 
-            videos.add(BaseVideo(title, displayName, mimeType, size, dateAdded, dateModified, data, height, width, album, artist, duration, bucketID, bucketDisplayName, resolution))
+            videos.add(
+                BaseVideo(
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data,
+                    height,
+                    width,
+                    album,
+                    artist,
+                    duration,
+                    bucketID,
+                    bucketDisplayName,
+                    resolution
+                )
+            )
         }
         cursor.close()
     }

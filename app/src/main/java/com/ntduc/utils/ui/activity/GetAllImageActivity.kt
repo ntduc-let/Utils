@@ -25,7 +25,7 @@ class GetAllImageActivity : AppCompatActivity() {
 
 
         activityScope.launch(Dispatchers.IO){
-            val files = getImages(listOf("jpg", "png"))
+            val files = getImages(types = listOf("jpg", "png"))
             launch(Dispatchers.Main){
                 adapter.updateData(files)
             }

@@ -25,7 +25,7 @@ class GetAllFileActivity : AppCompatActivity() {
 
 
         activityScope.launch(Dispatchers.IO){
-            val files = getFiles(listOf("doc", "docx", "ppt", "pptx", "xls", "xlsx", "pdf"))
+            val files = getFiles(types = listOf("doc", "docx", "ppt", "pptx", "xls", "xlsx", "pdf"))
             launch(Dispatchers.Main){
                 adapter.updateData(files)
             }

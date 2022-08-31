@@ -24,7 +24,7 @@ class GetAllAudioActivity : AppCompatActivity() {
         binding.root.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         activityScope.launch(Dispatchers.IO){
-            val files = getAudios(listOf("mp3"))
+            val files = getAudios(types = listOf("mp3"))
             launch(Dispatchers.Main){
                 adapter.updateData(files)
             }

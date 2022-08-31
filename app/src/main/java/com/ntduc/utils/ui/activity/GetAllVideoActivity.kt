@@ -28,7 +28,7 @@ class GetAllVideoActivity : AppCompatActivity() {
 
 
         activityScope.launch(Dispatchers.IO){
-            val files = getVideos(listOf("mp4"))
+            val files = getVideos(types = listOf("mp4"))
             launch(Dispatchers.Main){
                 adapter.updateData(files)
             }

@@ -1,19 +1,19 @@
 package com.prox.fileutils.model
 
 open class BaseVideo(
-    title: String = "",
-    displayName: String = "",
-    mineType: String = "",
-    size: Long = 0,
-    dateAdded: Long = 0,
-    dateModified: Long = 0,
-    data: String = "",
-    var height: Long = 0,
-    var width: Long = 0,
-    var album: String = "",
-    var artist: String = "",
-    var duration: Long = 0,
-    var bucketID: Long = 0,
-    var bucketDisplayName: String = "",
-    var resolution: String = ""
-) : BaseFile(title, displayName, mineType, size, dateAdded, dateModified, data)
+    title: String? = null,
+    displayName: String? = null,
+    mimeType: String? = null,
+    size: Long? = null,
+    dateAdded: Long? = null,
+    dateModified: Long? = null,
+    data: String? = null,
+    var height: Long? = null,
+    var width: Long? = null,
+    var album: String? = null,
+    var artist: String? = null,
+    var duration: Long? = null,
+    var bucketID: Long? = null,
+    var bucketDisplayName: String? = null,
+    var resolution: String? = null
+) : BaseFile(title, displayName, mimeType, size, dateAdded, dateModified, data)
