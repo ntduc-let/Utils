@@ -1,360 +1,445 @@
 package com.prox.fileutils
 
-import android.content.ContentResolver
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import androidx.annotation.Nullable
+import android.provider.MediaStore
+import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
-import androidx.core.net.toFile
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
-import java.nio.channels.FileChannel
-import java.nio.charset.Charset
-import java.util.*
+import com.prox.fileutils.model.BaseFile
+import com.prox.fileutils.model.BaseAudio
+import com.prox.fileutils.model.BaseImage
+import com.prox.fileutils.model.BaseVideo
+import java.io.File
 
-fun File.deleteAll() {
-    if (isFile && exists()) {
-        delete()
-        return
-    }
-    if (isDirectory) {
-        val files = listFiles()
-        if (files == null || files.isEmpty()) {
-            delete()
-            return
-        }
-        files.forEach { it.deleteAll() }
-        delete()
-    }
-}
-
-fun File.readToString(): String {
-    var text: String
-    open().use { inpS ->
-        inpS.bufferedReader().use {
-            text = it.readText()
-            it.close()
-        }
-        inpS.close()
-    }
-    return text
-}
-
-fun File.open(): InputStream = FileInputStream(this)
-
-fun File.move(dest: File) {
-    if (isFile)
-        renameTo(dest)
-    else
-        moveDirectory(dest)
-}
-
-fun File.copy(dest: File) {
-    if (isDirectory)
-        copyDirectory(dest)
-    else
-        copyFile(dest)
-}
-
-fun File.isImage(): Boolean {
-    val options = BitmapFactory.Options()
-    options.inJustDecodeBounds = true
-    return try {
-        val bitmap = BitmapFactory.decodeFile(absolutePath, options)
-        val result = options.outWidth != -1 && options.outHeight != -1
-        bitmap.recycle()
-        return result
-    } catch (e: Exception) {
-        false
-    }
-}
-
-fun File.toByteArray(): ByteArray {
-    val bos = ByteArrayOutputStream(this.length().toInt())
-    val input = FileInputStream(this)
-    val size = 1024
-    val buffer = ByteArray(size)
-    var len = input.read(buffer, 0, size)
-    while (len != -1) {
-        bos.write(buffer, 0, len)
-        len = input.read(buffer, 0, size)
-    }
-    input.close()
-    bos.close()
-    return bos.toByteArray()
-}
-
-fun File.copyFromInputStream(inputStream: InputStream) =
-    inputStream.use { input -> outputStream().use { output -> input.copyTo(output) } }
-
-fun Context.deleteCache() {
+fun Context.renameFile(file: File, name: String, onCompleted: () -> Unit): Boolean {
     try {
-        val dir = this.cacheDir
-        if (dir != null && dir.isDirectory) {
-            deleteDir(dir)
+        val pathNew = "${file.parentFile?.path}/${name}.${file.extension}"
+        val fileNew = File(pathNew)
+        if (fileNew.exists()) {
+            return false
+        }
+
+        if (file.renameTo(fileNew)) {
+            var index = 0
+            MediaScannerConnection.scanFile(
+                this, listOf(file.path, fileNew.path).toTypedArray(), null
+            ) { _, _ ->
+                index++
+                if (index == listOf(file.path, fileNew.path).size) {
+                    onCompleted()
+                }
+            }
+            return true
         }
     } catch (e: Exception) {
+        e.printStackTrace()
     }
-
+    return false
 }
 
-fun deleteDir(@Nullable dir: File?): Boolean {
-    if (dir != null && dir.isDirectory) {
-        val children = dir.list()
-        if (children.isNullOrEmpty()) return false
-        for (i in children.indices) {
-            val success = deleteDir(File(dir, children[i]))
-            if (!success) {
-                return false
-            }
-        }
-    }
-    return dir?.delete() == true
-}
+fun Context.copyFile(
+    file: File,
+    dest: File,
+    overwrite: Boolean = false,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    onCompleted: () -> Unit
+): Boolean {
+    val pathDest = if (dest.isDirectory) "${dest.path}/${file.name}" else dest.path
 
-
-fun String.toUri(): Uri {
-    return Uri.parse(this)
-}
-
-fun File.toUri(): Uri {
-    return Uri.fromFile(this)
-}
-
-
-fun File.copyInputStreamToFile(inputStream: InputStream) {
-    inputStream.use { input ->
-        this.outputStream().use { fileOut ->
-            input.copyTo(fileOut)
-        }
-    }
-}
-
-fun ContentResolver.fileSize(uri: Uri): Long? {
-    return openFileDescriptor(uri, "r")?.statSize
-}
-
-fun downloadFile(urlPath: String, localPath: String, callback: (Uri?) -> Unit = {}): Uri? {
-    var uri: Uri? = null
-    val connection = URL(urlPath).openConnection() as HttpURLConnection
-
-    if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-        uri = Uri.fromFile(connection.inputStream.outAsFile(localPath.toFile()))
-    }
-    connection.disconnect()
-    if (uri is Uri) {
-        callback(uri)
-    } else {
-        callback(null)
-    }
-    return uri
-}
-
-fun downloadFileWithProgress(urlPath: String, localPath: String,
-                             connectionCallBack: (responseCode: Int) -> Unit = {},
-                             onError: (Exception) -> Unit = {}, progress: (Int) -> Unit = {}, callback: (Uri?) -> Unit = {}) {
-    val uri = localPath.toFile().toUri()
-    val connection = URL(urlPath).openConnection() as HttpURLConnection
-    val input = connection.inputStream
-    val output = FileOutputStream(uri.toFile())
     try {
-        connection.connect()
-
-        val responseCode = connection.responseCode
-        connectionCallBack(responseCode)
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            return
-        }
-
-        val fileLength = connection.contentLength
-        val data = ByteArray(4096)
-        var total: Long = 0
-        var count: Int
-        while (input.read(data).also { count = it } != -1) {
-            total += count.toLong()
-            if (fileLength > 0)
-                progress((total * 100 / fileLength).toInt())
-            output.write(data, 0, count)
-        }
+        file.copyTo(File(pathDest), overwrite, bufferSize)
     } catch (e: Exception) {
-        onError(e)
-        return
-    } finally {
-        tryOrIgnore {
-            output.close()
-            input?.close()
-        }
-        connection.disconnect()
-    }
-    callback(uri)
-}
-
-
-fun String.toFile() = File(this)
-
-fun saveFile(fullPath: String, content: String): File =
-    fullPath.toFile().apply {
-        writeText(content, Charset.defaultCharset())
+        e.printStackTrace()
+        return false
     }
 
-
-fun InputStream.getString(): String = this.bufferedReader().readText()
-
-fun InputStream.outAsFile(file: File): File {
-    file.createNewFile()
-
-    use { input ->
-        file.outputStream().use { fileOut ->
-            input.copyTo(fileOut)
-        }
+    MediaScannerConnection.scanFile(this, listOf(pathDest).toTypedArray(), null) { _, _ ->
+        onCompleted()
     }
-    return file
+    return true
 }
 
-fun InputStream.outAsBitmap(): Bitmap? = use {
-    BitmapFactory.decodeStream(it)
-}
+fun Context.moveFile(
+    file: File,
+    dest: File,
+    overwrite: Boolean = false,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    onCompleted: () -> Unit
+): Boolean {
+    val pathDest = if (dest.isDirectory) "${dest.path}/${file.name}" else dest.path
 
-/**
- * Gets an uri of file
- */
-fun File.getUriFromFile(context: Context, authority: String): Uri {
-    return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-        FileProvider.getUriForFile(context, authority, this)
-    } else {
-        Uri.fromFile(this)
+    try {
+        file.copyTo(File(pathDest), overwrite, bufferSize)
+        file.delete()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return false
     }
-}
 
-
-/**
- * Gets an uri of file
- */
-fun Context.getUriFromFile(file: File, authority: String): Uri {
-    return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-        FileProvider.getUriForFile(this, authority, file)
-    } else {
-        Uri.fromFile(file)
-    }
-}
-
-
-/**
- * Checks and returns if there's a valid directory with given path
- */
-fun String.getAsDirectory(): File? {
-    val directory = File(Environment.getRootDirectory(), this)
-    return if (directory.exists()) {
-        directory
-    } else {
-        null
-    }
-}
-
-/**
- * Gets all files in given directory
- */
-fun File.getFiles(): List<File> {
-    val inFiles = ArrayList<File>()
-    val files = this.listFiles()
-    if (files != null) {
-        for (file in files) {
-            if (file.isDirectory) {
-                inFiles.addAll(file.getFiles())
-            } else {
-                inFiles.add(file)
-            }
+    var index = 0
+    MediaScannerConnection.scanFile(
+        this, listOf(file.path, pathDest).toTypedArray(), null
+    ) { _, _ ->
+        index++
+        if (index == listOf(file.path, pathDest).size) {
+            onCompleted()
         }
     }
-    return inFiles
+    return true
 }
 
-/**
- * Gets the file count of given directory
- */
-fun File.getFileCount() = getFiles().size
-
-/**
- * Calculates the folder size
- */
-fun File.getFolderSize(): Long {
-    var size: Long = 0
-    if (isDirectory) {
-        val files = listFiles()
-        if (files != null) {
-            for (file in files) {
-                size += if (file.isDirectory) {
-                    file.getFolderSize()
-                } else {
-                    file.length()
+fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit): Boolean {
+    var index = 0
+    for (file in files) {
+        if (file.delete()) {
+            MediaScannerConnection.scanFile(
+                this, listOf(file.path).toTypedArray(), null
+            ) { _, _ ->
+                index++
+                if (index == files.size) {
+                    onCompleted()
                 }
             }
         } else {
-            size = 0
-        }
-    } else {
-        size = length()
-    }
-
-    return size
-}
-
-// Private Methods
-private fun File.copyFile(dest: File) {
-    var fi: FileInputStream? = null
-    var fo: FileOutputStream? = null
-    var ic: FileChannel? = null
-    var oc: FileChannel? = null
-    try {
-        if (!dest.exists()) {
-            dest.createNewFile()
-        }
-        fi = FileInputStream(this)
-        fo = FileOutputStream(dest)
-        ic = fi.channel
-        oc = fo.channel
-        ic.transferTo(0, ic.size(), oc)
-    } catch (e: Exception) {
-        e.printStackTrace()
-    } finally {
-        fi?.close()
-        fo?.close()
-        ic?.close()
-        oc?.close()
-    }
-}
-
-
-private fun File.copyDirectory(dest: File) {
-    if (!dest.exists()) {
-        dest.mkdirs()
-    }
-    val files = listFiles()
-    files?.forEach {
-        if (it.isFile) {
-            it.copyFile(File("${dest.absolutePath}/${it.name}"))
-        }
-        if (it.isDirectory) {
-            val dirSrc = File("$absolutePath/${it.name}")
-            val dirDest = File("${dest.absolutePath}/${it.name}")
-            dirSrc.copyDirectory(dirDest)
+            return false
         }
     }
+    return true
 }
 
-
-private fun File.moveDirectory(dest: File) {
-    copyDirectory(dest)
-    deleteAll()
+@SuppressLint("QueryPermissionsNeeded")
+fun Context.shareFile(file: File, authority: String) {
+    val uri = FileProvider.getUriForFile(this, authority, file)
+    val intentShareFile = Intent(Intent.ACTION_SEND)
+    val titleFull = file.name
+    intentShareFile.type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
+    intentShareFile.putExtra(Intent.EXTRA_STREAM, uri)
+    intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    val chooser = Intent.createChooser(intentShareFile, titleFull)
+    val resInfoList =
+        packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+    for (resolveInfo in resInfoList) {
+        val packageName = resolveInfo.activityInfo.packageName
+        grantUriPermission(
+            packageName,
+            uri,
+            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    }
+    startActivity(chooser)
 }
 
-private fun tryOrIgnore(runnable: () -> Unit) = try {
-    runnable()
-} catch (e: Exception) {
-    e.printStackTrace()
+fun Context.getFiles(
+    uri: Uri = MediaStore.Files.getContentUri("external"),
+    types: List<String>
+): List<BaseFile> {
+    val files = ArrayList<BaseFile>()
+
+    val projection = arrayOf(
+        MediaStore.Files.FileColumns.TITLE,
+        MediaStore.Files.FileColumns.DISPLAY_NAME,
+        MediaStore.Files.FileColumns.MIME_TYPE,
+        MediaStore.Files.FileColumns.SIZE,
+        MediaStore.Files.FileColumns.DATE_ADDED,
+        MediaStore.Files.FileColumns.DATE_MODIFIED,
+        MediaStore.Files.FileColumns.DATA
+    )
+    var selection = ""
+    for (i in types.indices) {
+        if (i == 0) {
+            selection = "${MediaStore.Files.FileColumns.DATA} LIKE '%.${types[i]}'"
+        } else {
+            selection += " OR ${MediaStore.Files.FileColumns.DATA} LIKE '%.${types[i]}'"
+        }
+    }
+
+    val sortOrder = "${MediaStore.Files.FileColumns.DATA} ASC"
+
+    this.contentResolver.query(
+        uri,
+        projection,
+        selection,
+        null,
+        sortOrder
+    )?.use { cursor ->
+        val col_title = cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE)
+        val col_displayName = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+        val col_mimeType = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)
+        val col_size = cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)
+        val col_dateAdded = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED)
+        val col_dateModified = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)
+        val col_data = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+
+        while (cursor.moveToNext()) {
+            val title = cursor.getString(col_title)
+            val displayName = cursor.getString(col_displayName)
+            val mimeType = cursor.getString(col_mimeType)
+            val size = cursor.getLong(col_size)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
+            val data = cursor.getString(col_data)
+
+            files.add(BaseFile(title, displayName, mimeType, size, dateAdded, dateModified, data))
+        }
+        cursor.close()
+    }
+    return files
+}
+
+fun Context.getAudios(
+    uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    types: List<String>
+): List<BaseAudio> {
+    val audios = ArrayList<BaseAudio>()
+
+    val projection = arrayOf(
+        MediaStore.Audio.AudioColumns.TITLE,
+        MediaStore.Audio.AudioColumns.DISPLAY_NAME,
+        MediaStore.Audio.AudioColumns.MIME_TYPE,
+        MediaStore.Audio.AudioColumns.SIZE,
+        MediaStore.Audio.AudioColumns.DATE_ADDED,
+        MediaStore.Audio.AudioColumns.DATE_MODIFIED,
+        MediaStore.Audio.AudioColumns.DATA,
+        MediaStore.Audio.AudioColumns.ALBUM,
+        MediaStore.Audio.AudioColumns.ARTIST,
+        MediaStore.Audio.AudioColumns.DURATION
+    )
+    var selection = ""
+    for (i in types.indices) {
+        if (i == 0) {
+            selection = "${MediaStore.Audio.AudioColumns.DATA} LIKE '%.${types[i]}'"
+        } else {
+            selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '%.${types[i]}'"
+        }
+    }
+
+    val sortOrder = "${MediaStore.Audio.AudioColumns.DATA} ASC"
+
+    this.contentResolver.query(
+        uri,
+        projection,
+        selection,
+        null,
+        sortOrder
+    )?.use { cursor ->
+        val col_title = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE)
+        val col_displayName = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DISPLAY_NAME)
+        val col_mimeType = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.MIME_TYPE)
+        val col_size = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.SIZE)
+        val col_dateAdded = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATE_ADDED)
+        val col_dateModified = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATE_MODIFIED)
+        val col_data = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA)
+        val col_album = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)
+        val col_artist = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST)
+        val col_duration = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)
+
+        while (cursor.moveToNext()) {
+            val title = cursor.getString(col_title)
+            val displayName = cursor.getString(col_displayName)
+            val mimeType = cursor.getString(col_mimeType)
+            val size = cursor.getLong(col_size)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
+            val data = cursor.getString(col_data)
+            val album = cursor.getString(col_album)
+            val artist = cursor.getString(col_artist)
+            val duration = cursor.getLong(col_duration)
+
+            audios.add(
+                BaseAudio(
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data,
+                    album,
+                    artist,
+                    duration
+                )
+            )
+        }
+        cursor.close()
+    }
+    return audios
+}
+
+fun Context.getImages(
+    uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+    types: List<String>
+): List<BaseImage> {
+    val images = ArrayList<BaseImage>()
+
+    val projection = arrayOf(
+        MediaStore.Images.ImageColumns.TITLE,
+        MediaStore.Images.ImageColumns.DISPLAY_NAME,
+        MediaStore.Images.ImageColumns.MIME_TYPE,
+        MediaStore.Images.ImageColumns.SIZE,
+        MediaStore.Images.ImageColumns.DATE_ADDED,
+        MediaStore.Images.ImageColumns.DATE_MODIFIED,
+        MediaStore.Images.ImageColumns.DATA,
+        MediaStore.Images.ImageColumns.HEIGHT,
+        MediaStore.Images.ImageColumns.WIDTH
+    )
+    var selection = ""
+    for (i in types.indices) {
+        if (i == 0) {
+            selection = "${MediaStore.Images.ImageColumns.DATA} LIKE '%.${types[i]}'"
+        } else {
+            selection += " OR ${MediaStore.Images.ImageColumns.DATA} LIKE '%.${types[i]}'"
+        }
+    }
+
+    val sortOrder = "${MediaStore.Images.ImageColumns.DATA} ASC"
+
+    this.contentResolver.query(
+        uri,
+        projection,
+        selection,
+        null,
+        sortOrder
+    )?.use { cursor ->
+        val col_title = cursor.getColumnIndex(MediaStore.Images.ImageColumns.TITLE)
+        val col_displayName = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+        val col_mimeType = cursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)
+        val col_size = cursor.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)
+        val col_dateAdded = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_ADDED)
+        val col_dateModified = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_MODIFIED)
+        val col_data = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+        val col_height = cursor.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
+        val col_width = cursor.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)
+
+        while (cursor.moveToNext()) {
+            val title = cursor.getString(col_title)
+            val displayName = cursor.getString(col_displayName)
+            val mimeType = cursor.getString(col_mimeType)
+            val size = cursor.getLong(col_size)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
+            val data = cursor.getString(col_data)
+            val height = cursor.getLong(col_height)
+            val width = cursor.getLong(col_width)
+
+            images.add(
+                BaseImage(
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data,
+                    height,
+                    width
+                )
+            )
+        }
+        cursor.close()
+    }
+    return images
+}
+
+fun Context.getVideos(
+    uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+    types: List<String>
+): List<BaseVideo> {
+    val videos = ArrayList<BaseVideo>()
+
+    val projection = arrayOf(
+        MediaStore.Video.VideoColumns.TITLE,
+        MediaStore.Video.VideoColumns.DISPLAY_NAME,
+        MediaStore.Video.VideoColumns.MIME_TYPE,
+        MediaStore.Video.VideoColumns.SIZE,
+        MediaStore.Video.VideoColumns.DATE_ADDED,
+        MediaStore.Video.VideoColumns.DATE_MODIFIED,
+        MediaStore.Video.VideoColumns.DATA,
+        MediaStore.Video.VideoColumns.HEIGHT,
+        MediaStore.Video.VideoColumns.WIDTH,
+        MediaStore.Video.VideoColumns.ALBUM,
+        MediaStore.Video.VideoColumns.ARTIST,
+        MediaStore.Video.VideoColumns.DURATION,
+        MediaStore.Video.VideoColumns.BUCKET_ID,
+        MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME,
+        MediaStore.Video.VideoColumns.RESOLUTION
+    )
+    var selection = ""
+    for (i in types.indices) {
+        if (i == 0) {
+            selection = "${MediaStore.Video.VideoColumns.DATA} LIKE '%.${types[i]}'"
+        } else {
+            selection += " OR ${MediaStore.Video.VideoColumns.DATA} LIKE '%.${types[i]}'"
+        }
+    }
+
+    val sortOrder = "${MediaStore.Video.VideoColumns.DATA} ASC"
+
+    this.contentResolver.query(
+        uri,
+        projection,
+        selection,
+        null,
+        sortOrder
+    )?.use { cursor ->
+        val col_title = cursor.getColumnIndex(MediaStore.Video.VideoColumns.TITLE)
+        val col_displayName = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DISPLAY_NAME)
+        val col_mimeType = cursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)
+        val col_size = cursor.getColumnIndex(MediaStore.Video.VideoColumns.SIZE)
+        val col_dateAdded = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATE_ADDED)
+        val col_dateModified = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATE_MODIFIED)
+        val col_data = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA)
+        val col_height = cursor.getColumnIndex(MediaStore.Video.VideoColumns.HEIGHT)
+        val col_width = cursor.getColumnIndex(MediaStore.Video.VideoColumns.WIDTH)
+        val col_album = cursor.getColumnIndex(MediaStore.Video.VideoColumns.ALBUM)
+        val col_artist = cursor.getColumnIndex(MediaStore.Video.VideoColumns.ARTIST)
+        val col_duration = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION)
+        val col_bucketID = cursor.getColumnIndex(MediaStore.Video.VideoColumns.BUCKET_ID)
+        val col_bucketDisplayName =
+            cursor.getColumnIndex(MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME)
+        val col_resolution = cursor.getColumnIndex(MediaStore.Video.VideoColumns.RESOLUTION)
+
+        while (cursor.moveToNext()) {
+            val title = cursor.getString(col_title)
+            val displayName = cursor.getString(col_displayName)
+            val mimeType = cursor.getString(col_mimeType)
+            val size = cursor.getLong(col_size)
+            val dateAdded = cursor.getLong(col_dateAdded) * 1000
+            val dateModified = cursor.getLong(col_dateModified) * 1000
+            val data = cursor.getString(col_data)
+            val height = cursor.getLong(col_height)
+            val width = cursor.getLong(col_width)
+            val album = cursor.getString(col_album)
+            val artist = cursor.getString(col_artist)
+            val duration = cursor.getLong(col_duration)
+            val bucketID = cursor.getLong(col_bucketID)
+            val bucketDisplayName = cursor.getString(col_bucketDisplayName)
+            val resolution = cursor.getString(col_resolution)
+
+            videos.add(
+                BaseVideo(
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data,
+                    height,
+                    width,
+                    album,
+                    artist,
+                    duration,
+                    bucketID,
+                    bucketDisplayName,
+                    resolution
+                )
+            )
+        }
+        cursor.close()
+    }
+    return videos
 }

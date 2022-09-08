@@ -14,16 +14,16 @@
             android:id="@+id/txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"/>
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/btn_selectFile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select File"
             android:backgroundTint="#2962FF"
-            android:textColor="@color/white"
-            android:textAllCaps="false" />
+            android:text="Select File"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
 
         <EditText
             android:id="@+id/edt_renameFile"
@@ -35,6 +35,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Rename File"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_copyFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Copy File"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_moveFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Move File"
             android:textAllCaps="false" />
 
         <Button

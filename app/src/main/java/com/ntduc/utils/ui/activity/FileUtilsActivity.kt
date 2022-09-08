@@ -4,16 +4,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityFileUtilsBinding
-import com.prox.fileutils.deleteFiles
-import com.prox.fileutils.getRealPath
-import com.prox.fileutils.renameFile
-import com.prox.fileutils.shareFile
+import com.prox.fileutils.*
 import com.prox.stringutils.asFile
+
 
 class FileUtilsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFileUtilsBinding
@@ -23,6 +22,60 @@ class FileUtilsActivity : AppCompatActivity() {
             if (it.resultCode == RESULT_OK) {
                 val intent = it.data ?: return@registerForActivityResult
                 binding.txt.text = intent.data?.getRealPath(this) ?: "not found"
+            } else {
+                shortToast("Cancel")
+            }
+        }
+    private val selectFolderCopyFileLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                val intent = it.data ?: return@registerForActivityResult
+                val docUri = DocumentsContract.buildDocumentUriUsingTree(
+                    intent.data,
+                    DocumentsContract.getTreeDocumentId(intent.data)
+                )
+                val uri = docUri.getRealPath(this)
+                if (uri != null) {
+                    if (copyFile(
+                            file = binding.txt.text.toString().asFile(),
+                            dest = uri.asFile(),
+                            overwrite = true,
+                            onCompleted = {
+                                Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
+                            })
+                    ) {
+                        shortToast("Copy Success")
+                    } else {
+                        shortToast("Copy Error")
+                    }
+                }
+            } else {
+                shortToast("Cancel")
+            }
+        }
+    private val selectFolderMoveFileLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                val intent = it.data ?: return@registerForActivityResult
+                val docUri = DocumentsContract.buildDocumentUriUsingTree(
+                    intent.data,
+                    DocumentsContract.getTreeDocumentId(intent.data)
+                )
+                val uri = docUri.getRealPath(this)
+                if (uri != null) {
+                    if (moveFile(
+                            file = binding.txt.text.toString().asFile(),
+                            dest = uri.asFile(),
+                            overwrite = true,
+                            onCompleted = {
+                                Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
+                            })
+                    ) {
+                        shortToast("Move Success")
+                    } else {
+                        shortToast("Move Error")
+                    }
+                }
             } else {
                 shortToast("Cancel")
             }
@@ -60,6 +113,22 @@ class FileUtilsActivity : AppCompatActivity() {
             } else {
                 shortToast("Rename false")
             }
+        }
+
+        binding.btnCopyFile.setOnClickListener {
+            if (binding.txt.text.trim().isEmpty()) {
+                shortToast("Please select file")
+                return@setOnClickListener
+            }
+            selectFolderCopyFile()
+        }
+
+        binding.btnMoveFile.setOnClickListener {
+            if (binding.txt.text.trim().isEmpty()) {
+                shortToast("Please select file")
+                return@setOnClickListener
+            }
+            selectFolderMoveFile()
         }
 
         binding.btnDeleteFile.setOnClickListener {
@@ -110,5 +179,15 @@ class FileUtilsActivity : AppCompatActivity() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.setDataAndType(uri, "*/*")
         selectFileLauncher.launch(intent)
+    }
+
+    private fun selectFolderCopyFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        selectFolderCopyFileLauncher.launch(intent)
+    }
+
+    private fun selectFolderMoveFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        selectFolderMoveFileLauncher.launch(intent)
     }
 }
