@@ -13,7 +13,11 @@ import com.prox.fileutils.model.BaseFile
 import com.prox.fileutils.model.BaseAudio
 import com.prox.fileutils.model.BaseImage
 import com.prox.fileutils.model.BaseVideo
-import java.io.File
+import java.io.*
+
+fun File.getMimeType(): String? {
+    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+}
 
 fun Context.renameFile(file: File, name: String, onCompleted: () -> Unit): Boolean {
     try {
@@ -116,7 +120,7 @@ fun Context.shareFile(file: File, authority: String) {
     val uri = FileProvider.getUriForFile(this, authority, file)
     val intentShareFile = Intent(Intent.ACTION_SEND)
     val titleFull = file.name
-    intentShareFile.type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
+    intentShareFile.type = file.getMimeType()
     intentShareFile.putExtra(Intent.EXTRA_STREAM, uri)
     intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     val chooser = Intent.createChooser(intentShareFile, titleFull)

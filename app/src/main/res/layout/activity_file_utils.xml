@@ -92,5 +92,12 @@
             android:layout_height="wrap_content"
             android:text="Get All Video"
             android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btn_zip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#D50000"
+            android:text="Zip manager"
+            android:textColor="@color/white" />
     </LinearLayout>
 </ScrollView>
