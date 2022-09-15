@@ -34,43 +34,49 @@
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
         <activity
-            android:name=".ui.activity.ZipActivity"
+            android:name="com.ntduc.utils.file_utils.activity.RecyclerViewStickyActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.GetAllVideoActivity"
+            android:name="com.ntduc.utils.file_utils.activity.RecyclerUtilsActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.GetAllImageActivity"
+            android:name="com.ntduc.utils.file_utils.activity.ZipActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.GetAllAudioActivity"
+            android:name="com.ntduc.utils.file_utils.activity.GetAllVideoActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.GetAllFileActivity"
+            android:name="com.ntduc.utils.file_utils.activity.GetAllImageActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.FileUtilsActivity"
+            android:name="com.ntduc.utils.file_utils.activity.GetAllAudioActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.StringUtilsActivity"
+            android:name="com.ntduc.utils.file_utils.activity.GetAllFileActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.ViewPager2UtilsActivity"
+            android:name=".file_utils.activity.FileUtilsActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.ContextUtilsActivity"
+            android:name=".string_utils.StringUtilsActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.ColorUtilsActivity"
+            android:name=".view_pager_2_utils.activity.ViewPager2UtilsActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.ActiUtilsActivity"
+            android:name=".context_utils.ContextUtilsActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.AnimUtilsActivity"
+            android:name=".color_utils.ColorUtilsActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".activity_utils.ActiUtilsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".animation_utils.AnimUtilsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

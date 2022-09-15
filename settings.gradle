@@ -10,7 +10,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven {
             url "https://jitpack.io"
         }
@@ -28,3 +27,4 @@ include ':NumberUtils'
 include ':DateTimeUtils'
 include ':StringUtils'
 include ':FileUtils'
+include ':RecyclerViewUtils'

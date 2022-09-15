@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.ViewPager2UtilsActivity">
+    tools:context=".view_pager_2_utils.activity.ViewPager2UtilsActivity">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/menu"
