@@ -171,6 +171,10 @@ class FileUtilsActivity : AppCompatActivity() {
         binding.btnGetAllVideo.setOnClickListener {
             startActivity(Intent(this, GetAllVideoActivity::class.java))
         }
+
+        binding.btnZip.setOnClickListener {
+            startActivity(Intent(this, ZipActivity::class.java))
+        }
     }
 
     private fun selectFile() {
