@@ -1,10 +1,11 @@
-package com.ntduc.utils.file_utils.activity
+package com.ntduc.utils.recycler_view_utils
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ntduc.contextutils.inflater
 import com.ntduc.utils.databinding.ActivityRecyclerUtilsBinding
+import com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity
 
 class RecyclerUtilsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRecyclerUtilsBinding

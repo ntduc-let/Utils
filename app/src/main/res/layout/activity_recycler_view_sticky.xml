@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".file_utils.activity.RecyclerViewStickyActivity">
+    tools:context=".recycler_view_utils.sticky.RecyclerViewStickyActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv"

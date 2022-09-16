@@ -34,10 +34,10 @@
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
         <activity
-            android:name="com.ntduc.utils.file_utils.activity.RecyclerViewStickyActivity"
+            android:name="com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.file_utils.activity.RecyclerUtilsActivity"
+            android:name="com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity"
             android:exported="true" />
         <activity
             android:name="com.ntduc.utils.file_utils.activity.ZipActivity"

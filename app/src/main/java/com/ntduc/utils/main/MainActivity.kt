@@ -20,7 +20,7 @@ import com.ntduc.utils.context_utils.ContextUtilsActivity
 import com.ntduc.utils.databinding.ActivityMainBinding
 import com.ntduc.utils.file_utils.activity.FileUtilsActivity
 import com.ntduc.utils.string_utils.StringUtilsActivity
-import com.ntduc.utils.file_utils.activity.*
+import com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity
 import com.ntduc.utils.view_pager_2_utils.activity.ViewPager2UtilsActivity
 
 class MainActivity : AppCompatActivity() {

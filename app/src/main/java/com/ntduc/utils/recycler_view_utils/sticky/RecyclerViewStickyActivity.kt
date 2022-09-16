@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.activity
+package com.ntduc.utils.recycler_view_utils.sticky
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

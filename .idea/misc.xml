@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="CheckstyleConfigurable">
+    <option name="suppFilterFilename" value="" />
+    <option name="suppCommentFilter" value="false" />
+    <option name="offComment" value="CHECKSTYLE\:OFF" />
+    <option name="onComment" value="CHECKSTYLE\:ON" />
+    <option name="checkFormat" value=".*" />
+    <option name="messageFormat" value="" />
+    <option name="checkCPP" value="true" />
+    <option name="checkC" value="true" />
+    <option name="suppNearbyCommentFilter" value="false" />
+    <option name="snCommentFormat" value="SUPPRESS CHECKSTYLE (\w+)" />
+    <option name="snCheckFormat" value="$1" />
+    <option name="snMessageFormat" value="" />
+    <option name="snInfluenceFormat" value="0" />
+    <option name="snCheckCPP" value="true" />
+    <option name="snCheckC" value="true" />
+    <option name="pathToUserRulesConfiguration" value="" />
+    <option name="pathToJarWithRules" value="" />
+  </component>
   <component name="CiFilterState">
     <option name="selectedSeverities">
       <map>
@@ -24,6 +43,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.181" />
+        <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/drawable/ic_launcher_background.xml" value="0.103" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_acti_utils.xml" value="0.3625" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_anim_utils.xml" value="0.3625" />
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/layout/activity_color_utils.xml" value="0.25" />
@@ -55,6 +75,12 @@
         <entry key="..\:/lib-ntduc-let/utils/app/src/main/res/menu/rcv_main.xml" value="0.8709273182957393" />
       </map>
     </option>
+  </component>
+  <component name="FindBugsConfigurable">
+    <option name="make" value="true" />
+    <option name="effort" value="default" />
+    <option name="priority" value="Medium" />
+    <option name="excludeFilter" value="" />
   </component>
   <component name="LocalFilterState">
     <option name="selectedSeverities">
@@ -118,5 +144,11 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="QAPlugAnalysisUIOptions">
+    <option name="SHOW_STRUCTURE" value="true" />
+  </component>
+  <component name="SuppressionsComponent">
+    <option name="suppComments" value="[]" />
   </component>
 </project>
