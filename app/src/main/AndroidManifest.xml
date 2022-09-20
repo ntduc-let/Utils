@@ -46,13 +46,13 @@
             android:name="com.ntduc.utils.file_utils.activity.GetAllVideoActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.file_utils.activity.GetAllImageActivity"
+            android:name="com.ntduc.utils.file_utils.get_all_image.activity.GetAllImageActivity"
             android:exported="true" />
         <activity
             android:name="com.ntduc.utils.file_utils.activity.GetAllAudioActivity"
             android:exported="true" />
         <activity
-            android:name="com.ntduc.utils.file_utils.activity.GetAllFileActivity"
+            android:name="com.ntduc.utils.file_utils.get_all_file.activity.GetAllFileActivity"
             android:exported="true" />
         <activity
             android:name=".file_utils.activity.FileUtilsActivity"

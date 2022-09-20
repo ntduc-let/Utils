@@ -1,10 +1,10 @@
-package com.ntduc.utils.file_utils.activity
+package com.ntduc.utils.file_utils.get_all_file.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.utils.databinding.ActivityGetAllFileBinding
-import com.ntduc.utils.file_utils.adapter.GetAllFileAdapter
+import com.ntduc.utils.file_utils.get_all_file.adapter.GetAllFileAdapter
 import com.ntduc.fileutils.getFiles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ class GetAllFileActivity : AppCompatActivity() {
         activityScope.launch(Dispatchers.IO){
             val files = getFiles(types = listOf("doc", "docx", "ppt", "pptx", "xls", "xlsx", "pdf"))
             launch(Dispatchers.Main){
-                adapter.updateData(files)
+//                adapter.updateData(files)
             }
         }
     }

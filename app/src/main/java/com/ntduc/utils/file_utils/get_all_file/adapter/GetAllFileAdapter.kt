@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.adapter
+package com.ntduc.utils.file_utils.get_all_file.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.numberutils.formatBytes
 import com.ntduc.utils.databinding.ItemFileBinding
 import com.ntduc.datetimeutils.getDateTimeFromMillis
-import com.ntduc.fileutils.model.BaseFile
+import com.ntduc.utils.file_utils.model.MyFile
 
 class GetAllFileAdapter(
     val context: Context,
-    private var files: List<BaseFile> = listOf()
+    private var files: List<MyFile> = listOf()
 ) : RecyclerView.Adapter<GetAllFileAdapter.ViewHolder>() {
 
     inner class ViewHolder(binding: ItemFileBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -48,7 +48,7 @@ class GetAllFileAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newList: List<BaseFile>) {
+    fun updateData(newList: List<MyFile>) {
         files = newList
         notifyDataSetChanged()
     }

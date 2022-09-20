@@ -26,7 +26,7 @@ class GetAllAudioActivity : AppCompatActivity() {
         activityScope.launch(Dispatchers.IO){
             val files = getAudios(types = listOf("mp3"))
             launch(Dispatchers.Main){
-                adapter.updateData(files)
+//                adapter.updateData(files)
             }
         }
     }
