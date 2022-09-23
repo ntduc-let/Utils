@@ -2,22 +2,23 @@ package com.ntduc.utils.file_utils.get_all_image.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.utils.databinding.ActivityGetAllImageBinding
 import com.ntduc.fileutils.getImages
+import com.ntduc.recyclerviewutils.sticky.StickyHeadersGridLayoutManager
+import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
+import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import com.ntduc.utils.file_utils.get_all_image.adapter.GetAllImageAdapter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity
+import kotlinx.coroutines.*
 
 class GetAllImageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGetAllImageBinding
     private lateinit var adapter: GetAllImageAdapter
     private lateinit var viewModel: GetAllImageViewModel
-
-    private val activityScope = CoroutineScope(Job() + Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,17 +26,6 @@ class GetAllImageActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         init()
-
-//        adapter = GetAllImageAdapter(this, listOf())
-//        binding.root.adapter = adapter
-//        binding.root.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-        activityScope.launch(Dispatchers.IO){
-            val files = getImages(types = listOf("jpg", "png"))
-            launch(Dispatchers.Main){
-//                adapter.updateData(files)
-            }
-        }
     }
 
     override fun onStart() {
@@ -43,19 +33,44 @@ class GetAllImageActivity : AppCompatActivity() {
         viewModel.loadAllPhoto(this)
     }
 
-    private fun init(){
+    private fun init() {
         initView()
         initData()
     }
 
     private fun initData() {
-        adapter = GetAllImageAdapter(this, listOf())
-//        binding.root.adapter = adapter
-//        binding.root.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        viewModel.listAllPhoto.observe(this) {
+            if (viewModel.isLoadListAllPhoto) {
+                binding.layoutLoading.root.visibility = View.GONE
+                if (it.isEmpty()) {
+                    binding.layoutNoItem.root.visibility = View.VISIBLE
+                    binding.rcvList.visibility = View.INVISIBLE
+                } else {
+                    binding.layoutNoItem.root.visibility = View.GONE
+                    binding.rcvList.visibility = View.VISIBLE
+                    adapter.updateData(it)
+                }
+            } else {
+                binding.layoutLoading.root.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun initView() {
-        adapter = GetAllImageAdapter(this, listOf())
         viewModel = ViewModelProvider(this)[GetAllImageViewModel::class.java]
+
+        adapter = GetAllImageAdapter(this)
+        binding.rcvList.adapter = adapter
+        binding.rcvList.setHasFixedSize(true)
+        val layoutManager: StickyHeadersGridLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
+            StickyHeadersGridLayoutManager(this, 3)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (adapter.isStickyHeader(position)) {
+                    3
+                } else 1
+            }
+        }
+        binding.rcvList.layoutManager = layoutManager
     }
 }

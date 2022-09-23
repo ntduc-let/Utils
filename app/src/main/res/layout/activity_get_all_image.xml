@@ -9,6 +9,8 @@
         android:id="@+id/rcv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F2F4F7"
+        android:paddingHorizontal="12dp"
         android:visibility="gone" />
 
     <include
