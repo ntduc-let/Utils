@@ -4,9 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import com.ntduc.recyclerviewutils.sticky.StickyHeadersGridLayoutManager
 import com.ntduc.utils.databinding.ActivityGetAllImageBinding
-import com.ntduc.recyclerviewutils.sticky.StickyHeadersStaggeredGridLayoutManager
 import com.ntduc.utils.file_utils.get_all_image.adapter.GetAllImageAdapter
 import com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity
 
@@ -56,8 +56,16 @@ class GetAllImageActivity : AppCompatActivity() {
 
         adapter = GetAllImageAdapter(this)
         binding.rcvList.adapter = adapter
-        val layoutManager: StickyHeadersStaggeredGridLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
-            StickyHeadersStaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.rcvList.setHasFixedSize(true)
+        val layoutManager: StickyHeadersGridLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
+            StickyHeadersGridLayoutManager(this, 3)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (adapter.isStickyHeader(position)) {
+                    3
+                } else 1
+            }
+        }
         binding.rcvList.layoutManager = layoutManager
     }
 }
