@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.get_all_image.activity
+package com.ntduc.utils.file_utils.get_all_audio.activity
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
@@ -7,28 +7,27 @@ import androidx.lifecycle.viewModelScope
 import com.ntduc.datetimeutils.getDateTimeFromMillis
 import com.ntduc.datetimeutils.isToday
 import com.ntduc.datetimeutils.isYesterday
-import com.ntduc.fileutils.getImages
-import com.ntduc.utils.file_utils.model.MyFile
-import com.ntduc.utils.file_utils.model.MyFolderImage
-import com.ntduc.utils.file_utils.model.MyImage
+import com.ntduc.fileutils.getAudios
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
+import com.ntduc.utils.file_utils.model.*
 import kotlinx.coroutines.*
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class GetAllImageViewModel : ViewModel() {
-    var listAllPhoto: MutableLiveData<List<MyFolderImage>> = MutableLiveData(listOf())
-    var isLoadListAllPhoto = false
+class GetAllAudioViewModel : ViewModel() {
+    var listAllAudio: MutableLiveData<List<MyFolderAudio>> = MutableLiveData(listOf())
+    var isLoadListAllAudio = false
 
-    fun loadAllPhoto(context: Context) {
+    fun loadAllAudio(context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val images = context.getImages(types = ExtensionConstants.IMAGE.toList())
-                val temp = images.sortedWith { o1, o2 ->
+                val audios = context.getAudios(types = ExtensionConstants.MUSIC.toList())
+                val temp = audios.sortedWith { o1, o2 ->
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }
-                val result = ArrayList<MyImage>()
+                val result = ArrayList<MyAudio>()
                 temp.forEach {
                     val myFile = MyFile(
                         it.title,
@@ -39,28 +38,28 @@ class GetAllImageViewModel : ViewModel() {
                         it.dateModified,
                         it.data
                     )
-                    val myImage = MyImage(myFile, it.height, it.width)
-                    result.add(myImage)
+                    val myAudio = MyAudio(myFile, it.album, it.artist, it.duration)
+                    result.add(myAudio)
                 }
-                loadRecentPhoto(result)
+                loadRecentAudio(result)
             }
         }
     }
 
-    private fun loadRecentPhoto(list: List<MyImage>) {
-        val listRecent = filterRecentPhoto(list)
-        listAllPhoto.postValue(listRecent)
-        isLoadListAllPhoto = true
+    private fun loadRecentAudio(list: List<MyAudio>) {
+        val listRecent = filterRecentAudio(list)
+        listAllAudio.postValue(listRecent)
+        isLoadListAllAudio = true
     }
 
-    private fun filterRecentPhoto(photos: List<MyImage>): ArrayList<MyFolderImage> {
-        val listFolderPhoto = ArrayList<MyFolderImage>()
-        for (photo in photos) {
-            val pos = checkFolderPhotoByTime(photo, listFolderPhoto)
+    private fun filterRecentAudio(audios: List<MyAudio>): ArrayList<MyFolderAudio> {
+        val listFolderAudio = ArrayList<MyFolderAudio>()
+        for (audio in audios) {
+            val pos = checkFolderAudioByTime(audio, listFolderAudio)
             if (pos >= 0) {
-                listFolderPhoto[pos].list.add(photo)
+                listFolderAudio[pos].list.add(audio)
             } else {
-                val file = File(photo.myFile!!.data!!)
+                val file = File(audio.myFile!!.data!!)
                 val folder = MyFile(
                     getNameFolderByTime(file.lastModified()),
                     getNameFolderByTime(file.lastModified()),
@@ -70,21 +69,21 @@ class GetAllImageViewModel : ViewModel() {
                     file.lastModified(),
                     file.parentFile?.path ?: ""
                 )
-                val folderPhoto = MyFolderImage(folder)
-                folderPhoto.list.add(photo)
+                val folderAudio = MyFolderAudio(folder)
+                folderAudio.list.add(audio)
 
-                listFolderPhoto.add(folderPhoto)
+                listFolderAudio.add(folderAudio)
             }
         }
-        return listFolderPhoto
+        return listFolderAudio
     }
 
-    private fun checkFolderPhotoByTime(
-        photo: MyImage,
-        listFolderPhoto: ArrayList<MyFolderImage>
+    private fun checkFolderAudioByTime(
+        audio: MyAudio,
+        listFolderAudio: ArrayList<MyFolderAudio>
     ): Int {
-        for (i in listFolderPhoto.indices) {
-            if (getNameFolderByTime(photo.myFile!!.dateModified) == listFolderPhoto[i].folder.title) {
+        for (i in listFolderAudio.indices) {
+            if (getNameFolderByTime(audio.myFile!!.dateModified) == listFolderAudio[i].folder.title) {
                 return i
             }
         }

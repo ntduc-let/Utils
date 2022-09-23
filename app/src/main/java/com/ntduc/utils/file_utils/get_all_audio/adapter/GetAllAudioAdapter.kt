@@ -1,7 +1,9 @@
-package com.ntduc.utils.file_utils.get_all_image.adapter
+package com.ntduc.utils.file_utils.get_all_audio.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,29 +14,28 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.ntduc.numberutils.formatBytes
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
-import com.ntduc.utils.databinding.ItemImageBinding
+import com.ntduc.utils.databinding.ItemDocumentBinding
 import com.ntduc.utils.databinding.ItemHeaderBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.model.MyFile
-import com.ntduc.utils.file_utils.model.MyFolderImage
-import com.ntduc.utils.file_utils.model.MyImage
+import com.ntduc.utils.file_utils.model.*
 import java.util.ArrayList
 
-class GetAllImageAdapter(
+class GetAllAudioAdapter(
     val context: Context,
-    private var listFolderImage: List<MyFolderImage> = listOf()
+    private var listFolderAudio: List<MyFolderAudio> = listOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders, StickyHeaders.ViewSetup {
-    private var list: ArrayList<MyImage> = ArrayList()
+    private var list: ArrayList<MyAudio> = ArrayList()
 
     init {
         initData()
     }
 
     private fun initData() {
-        listFolderImage.forEach { folder ->
-            list.add(MyImage(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
+        listFolderAudio.forEach { folder ->
+            list.add(MyAudio(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
             folder.list.forEach {
                 list.add(it)
             }
@@ -50,9 +51,9 @@ class GetAllImageAdapter(
         }
     }
 
-    inner class ItemImageViewHolder(binding: ItemImageBinding) :
+    inner class ItemAudioViewHolder(binding: ItemDocumentBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        internal val binding: ItemImageBinding
+        internal val binding: ItemDocumentBinding
 
         init {
             this.binding = binding
@@ -64,8 +65,8 @@ class GetAllImageAdapter(
             val binding = ItemHeaderBinding.inflate(LayoutInflater.from(context), parent, false)
             ItemHeaderViewHolder(binding)
         } else {
-            val binding = ItemImageBinding.inflate(LayoutInflater.from(context), parent, false)
-            ItemImageViewHolder(binding)
+            val binding = ItemDocumentBinding.inflate(LayoutInflater.from(context), parent, false)
+            ItemAudioViewHolder(binding)
         }
     }
 
@@ -77,17 +78,29 @@ class GetAllImageAdapter(
             is ItemHeaderViewHolder -> {
                 holder.binding.txtHeader.text = item.myFile?.title
             }
-            is ItemImageViewHolder -> {
+            is ItemAudioViewHolder -> {
+                val image = try {
+                    val mData = MediaMetadataRetriever()
+                    mData.setDataSource(item.myFile?.data)
+                    val art = mData.embeddedPicture
+                    BitmapFactory.decodeByteArray(art, 0, art!!.size)
+                } catch (e: Exception) {
+                    null
+                }
+
                 var requestOptions = RequestOptions()
                 requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
 
                 Glide.with(context)
                     .applyDefaultRequestOptions(RequestOptions())
-                    .load(item.myFile?.data)
+                    .load(image)
                     .apply(requestOptions)
                     .placeholder(R.drawable.ic_empty)
                     .error(ExtensionConstants.getIconFile(item.myFile?.data ?: ""))
                     .into(holder.binding.img)
+
+                holder.binding.txtTitle.text = item.myFile?.displayName
+                holder.binding.txtDescription.text = item.myFile?.size?.formatBytes()
             }
         }
     }
@@ -126,8 +139,8 @@ class GetAllImageAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newList: List<MyFolderImage>) {
-        listFolderImage = newList
+    fun updateData(newList: List<MyFolderAudio>) {
+        listFolderAudio = newList
         initData()
         notifyDataSetChanged()
     }

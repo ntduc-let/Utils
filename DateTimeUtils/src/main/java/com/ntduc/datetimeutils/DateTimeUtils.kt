@@ -140,8 +140,8 @@ fun convertDate(date: String, defaultFormat: String, formatWanted: String): Stri
     }
 }
 
-fun getDateTimeFromMillis(millis: Long, dateFormat: String): String =
-    SimpleDateFormat(dateFormat, Locale.getDefault()).format(Date(millis))
+fun getDateTimeFromMillis(millis: Long, dateFormat: String, locale: Locale = Locale.getDefault()): String =
+    SimpleDateFormat(dateFormat, locale).format(Date(millis))
 
 const val TIME_12HOUR = "hh:mm:ss a"
 const val TIME_24HOUR = "HH:mm:ss"

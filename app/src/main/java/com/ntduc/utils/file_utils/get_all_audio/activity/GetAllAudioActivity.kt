@@ -1,23 +1,22 @@
-package com.ntduc.utils.file_utils.get_all_image.activity
+package com.ntduc.utils.file_utils.get_all_audio.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.ntduc.utils.databinding.ActivityGetAllImageBinding
-import com.ntduc.recyclerviewutils.sticky.StickyHeadersStaggeredGridLayoutManager
-import com.ntduc.utils.file_utils.get_all_image.adapter.GetAllImageAdapter
+import com.ntduc.utils.databinding.ActivityGetAllAudioBinding
+import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
+import com.ntduc.utils.file_utils.get_all_audio.adapter.GetAllAudioAdapter
 import com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity
 
-class GetAllImageActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityGetAllImageBinding
-    private lateinit var adapter: GetAllImageAdapter
-    private lateinit var viewModel: GetAllImageViewModel
+class GetAllAudioActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityGetAllAudioBinding
+    private lateinit var adapter: GetAllAudioAdapter
+    private lateinit var viewModel: GetAllAudioViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityGetAllImageBinding.inflate(layoutInflater)
+        binding = ActivityGetAllAudioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         init()
@@ -25,7 +24,7 @@ class GetAllImageActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.loadAllPhoto(this)
+        viewModel.loadAllAudio(this)
     }
 
     private fun init() {
@@ -34,8 +33,8 @@ class GetAllImageActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        viewModel.listAllPhoto.observe(this) {
-            if (viewModel.isLoadListAllPhoto) {
+        viewModel.listAllAudio.observe(this) {
+            if (viewModel.isLoadListAllAudio) {
                 binding.layoutLoading.root.visibility = View.GONE
                 if (it.isEmpty()) {
                     binding.layoutNoItem.root.visibility = View.VISIBLE
@@ -52,12 +51,13 @@ class GetAllImageActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewModel = ViewModelProvider(this)[GetAllImageViewModel::class.java]
+        viewModel = ViewModelProvider(this)[GetAllAudioViewModel::class.java]
 
-        adapter = GetAllImageAdapter(this)
+        adapter = GetAllAudioAdapter(this)
         binding.rcvList.adapter = adapter
-        val layoutManager: StickyHeadersStaggeredGridLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
-            StickyHeadersStaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.rcvList.setHasFixedSize(true)
+        val layoutManager: StickyHeadersLinearLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
+            StickyHeadersLinearLayoutManager(this)
         binding.rcvList.layoutManager = layoutManager
     }
 }

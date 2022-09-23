@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.get_all_image.adapter
+package com.ntduc.utils.file_utils.get_all_video.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,29 +12,28 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.ntduc.datetimeutils.formatAsTime
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
-import com.ntduc.utils.databinding.ItemImageBinding
 import com.ntduc.utils.databinding.ItemHeaderBinding
+import com.ntduc.utils.databinding.ItemVideoBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.model.MyFile
-import com.ntduc.utils.file_utils.model.MyFolderImage
-import com.ntduc.utils.file_utils.model.MyImage
+import com.ntduc.utils.file_utils.model.*
 import java.util.ArrayList
 
-class GetAllImageAdapter(
+class GetAllVideoAdapter(
     val context: Context,
-    private var listFolderImage: List<MyFolderImage> = listOf()
+    private var listFolderVideo: List<MyFolderVideo> = listOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders, StickyHeaders.ViewSetup {
-    private var list: ArrayList<MyImage> = ArrayList()
+    private var list: ArrayList<MyVideo> = ArrayList()
 
     init {
         initData()
     }
 
     private fun initData() {
-        listFolderImage.forEach { folder ->
-            list.add(MyImage(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
+        listFolderVideo.forEach { folder ->
+            list.add(MyVideo(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
             folder.list.forEach {
                 list.add(it)
             }
@@ -50,9 +49,9 @@ class GetAllImageAdapter(
         }
     }
 
-    inner class ItemImageViewHolder(binding: ItemImageBinding) :
+    inner class ItemVideoViewHolder(binding: ItemVideoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        internal val binding: ItemImageBinding
+        internal val binding: ItemVideoBinding
 
         init {
             this.binding = binding
@@ -64,8 +63,8 @@ class GetAllImageAdapter(
             val binding = ItemHeaderBinding.inflate(LayoutInflater.from(context), parent, false)
             ItemHeaderViewHolder(binding)
         } else {
-            val binding = ItemImageBinding.inflate(LayoutInflater.from(context), parent, false)
-            ItemImageViewHolder(binding)
+            val binding = ItemVideoBinding.inflate(LayoutInflater.from(context), parent, false)
+            ItemVideoViewHolder(binding)
         }
     }
 
@@ -77,7 +76,7 @@ class GetAllImageAdapter(
             is ItemHeaderViewHolder -> {
                 holder.binding.txtHeader.text = item.myFile?.title
             }
-            is ItemImageViewHolder -> {
+            is ItemVideoViewHolder -> {
                 var requestOptions = RequestOptions()
                 requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
 
@@ -88,6 +87,8 @@ class GetAllImageAdapter(
                     .placeholder(R.drawable.ic_empty)
                     .error(ExtensionConstants.getIconFile(item.myFile?.data ?: ""))
                     .into(holder.binding.img)
+
+                holder.binding.txtTime.text = item.duration?.formatAsTime()
             }
         }
     }
@@ -126,8 +127,8 @@ class GetAllImageAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newList: List<MyFolderImage>) {
-        listFolderImage = newList
+    fun updateData(newList: List<MyFolderVideo>) {
+        listFolderVideo = newList
         initData()
         notifyDataSetChanged()
     }

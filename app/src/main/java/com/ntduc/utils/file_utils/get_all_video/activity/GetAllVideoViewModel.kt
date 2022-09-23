@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.get_all_image.activity
+package com.ntduc.utils.file_utils.get_all_video.activity
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
@@ -7,28 +7,26 @@ import androidx.lifecycle.viewModelScope
 import com.ntduc.datetimeutils.getDateTimeFromMillis
 import com.ntduc.datetimeutils.isToday
 import com.ntduc.datetimeutils.isYesterday
-import com.ntduc.fileutils.getImages
-import com.ntduc.utils.file_utils.model.MyFile
-import com.ntduc.utils.file_utils.model.MyFolderImage
-import com.ntduc.utils.file_utils.model.MyImage
+import com.ntduc.fileutils.getVideos
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
+import com.ntduc.utils.file_utils.model.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class GetAllImageViewModel : ViewModel() {
-    var listAllPhoto: MutableLiveData<List<MyFolderImage>> = MutableLiveData(listOf())
-    var isLoadListAllPhoto = false
+class GetAllVideoViewModel : ViewModel() {
+    var listAllVideo: MutableLiveData<List<MyFolderVideo>> = MutableLiveData(listOf())
+    var isLoadListAllVideo = false
 
-    fun loadAllPhoto(context: Context) {
+    fun loadAllVideo(context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val images = context.getImages(types = ExtensionConstants.IMAGE.toList())
-                val temp = images.sortedWith { o1, o2 ->
+                val videos = context.getVideos(types = ExtensionConstants.VIDEO.toList())
+                val temp = videos.sortedWith { o1, o2 ->
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }
-                val result = ArrayList<MyImage>()
+                val result = ArrayList<MyVideo>()
                 temp.forEach {
                     val myFile = MyFile(
                         it.title,
@@ -39,28 +37,28 @@ class GetAllImageViewModel : ViewModel() {
                         it.dateModified,
                         it.data
                     )
-                    val myImage = MyImage(myFile, it.height, it.width)
-                    result.add(myImage)
+                    val myVideo = MyVideo(myFile, it.height, it.width, it.album, it.artist, it.duration, it.bucketID, it.bucketDisplayName, it.resolution)
+                    result.add(myVideo)
                 }
-                loadRecentPhoto(result)
+                loadRecentVideo(result)
             }
         }
     }
 
-    private fun loadRecentPhoto(list: List<MyImage>) {
-        val listRecent = filterRecentPhoto(list)
-        listAllPhoto.postValue(listRecent)
-        isLoadListAllPhoto = true
+    private fun loadRecentVideo(list: List<MyVideo>) {
+        val listRecent = filterRecentVideo(list)
+        listAllVideo.postValue(listRecent)
+        isLoadListAllVideo = true
     }
 
-    private fun filterRecentPhoto(photos: List<MyImage>): ArrayList<MyFolderImage> {
-        val listFolderPhoto = ArrayList<MyFolderImage>()
-        for (photo in photos) {
-            val pos = checkFolderPhotoByTime(photo, listFolderPhoto)
+    private fun filterRecentVideo(videos: List<MyVideo>): ArrayList<MyFolderVideo> {
+        val listFolderVideo = ArrayList<MyFolderVideo>()
+        for (video in videos) {
+            val pos = checkFolderVideoByTime(video, listFolderVideo)
             if (pos >= 0) {
-                listFolderPhoto[pos].list.add(photo)
+                listFolderVideo[pos].list.add(video)
             } else {
-                val file = File(photo.myFile!!.data!!)
+                val file = File(video.myFile!!.data!!)
                 val folder = MyFile(
                     getNameFolderByTime(file.lastModified()),
                     getNameFolderByTime(file.lastModified()),
@@ -70,21 +68,21 @@ class GetAllImageViewModel : ViewModel() {
                     file.lastModified(),
                     file.parentFile?.path ?: ""
                 )
-                val folderPhoto = MyFolderImage(folder)
-                folderPhoto.list.add(photo)
+                val folderVideo = MyFolderVideo(folder)
+                folderVideo.list.add(video)
 
-                listFolderPhoto.add(folderPhoto)
+                listFolderVideo.add(folderVideo)
             }
         }
-        return listFolderPhoto
+        return listFolderVideo
     }
 
-    private fun checkFolderPhotoByTime(
-        photo: MyImage,
-        listFolderPhoto: ArrayList<MyFolderImage>
+    private fun checkFolderVideoByTime(
+        video: MyVideo,
+        listFolderVideo: ArrayList<MyFolderVideo>
     ): Int {
-        for (i in listFolderPhoto.indices) {
-            if (getNameFolderByTime(photo.myFile!!.dateModified) == listFolderPhoto[i].folder.title) {
+        for (i in listFolderVideo.indices) {
+            if (getNameFolderByTime(video.myFile!!.dateModified) == listFolderVideo[i].folder.title) {
                 return i
             }
         }
