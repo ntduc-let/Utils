@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.model
+package com.ntduc.utils.model
 
 open class MyAudio(
     var myFile: MyFile? = null,

@@ -1,4 +1,4 @@
-package com.ntduc.utils.file_utils.model
+package com.ntduc.utils.model
 
 data class MyFolderFile(
     var folder: MyFile = MyFile(),

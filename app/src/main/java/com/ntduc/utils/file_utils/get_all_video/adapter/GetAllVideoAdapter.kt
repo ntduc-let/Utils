@@ -18,7 +18,9 @@ import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ItemHeaderBinding
 import com.ntduc.utils.databinding.ItemVideoBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.model.*
+import com.ntduc.utils.model.MyFile
+import com.ntduc.utils.model.MyFolderVideo
+import com.ntduc.utils.model.MyVideo
 import java.util.ArrayList
 
 class GetAllVideoAdapter(

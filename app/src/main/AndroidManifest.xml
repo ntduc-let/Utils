@@ -8,13 +8,9 @@
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
-    <permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.MAIN" />
-        </intent>
-    </queries>
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -34,6 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
+        <activity
+            android:name=".app_utils.activity.AppActivity"
+            android:exported="true"></activity>
         <activity
             android:name="com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity"
             android:exported="true" />

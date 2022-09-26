@@ -9,7 +9,9 @@ import com.ntduc.datetimeutils.isToday
 import com.ntduc.datetimeutils.isYesterday
 import com.ntduc.fileutils.getVideos
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.model.*
+import com.ntduc.utils.model.MyFile
+import com.ntduc.utils.model.MyFolderVideo
+import com.ntduc.utils.model.MyVideo
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*

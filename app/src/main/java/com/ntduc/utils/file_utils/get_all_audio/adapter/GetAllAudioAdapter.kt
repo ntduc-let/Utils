@@ -20,7 +20,9 @@ import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ItemDocumentBinding
 import com.ntduc.utils.databinding.ItemHeaderBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.model.*
+import com.ntduc.utils.model.MyAudio
+import com.ntduc.utils.model.MyFile
+import com.ntduc.utils.model.MyFolderAudio
 import java.util.ArrayList
 
 class GetAllAudioAdapter(

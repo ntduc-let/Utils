@@ -1,4 +1,4 @@
-package com.ntduc.utils.model
+package com.ntduc.utils.view_pager_2_utils.model
 
 import com.ntduc.viewpager2utils.ABaseTransformer
 

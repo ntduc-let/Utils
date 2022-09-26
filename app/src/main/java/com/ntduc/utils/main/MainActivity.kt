@@ -15,6 +15,7 @@ import com.ntduc.contextutils.showConfirmationDialog
 import com.ntduc.utils.BuildConfig
 import com.ntduc.utils.activity_utils.ActiUtilsActivity
 import com.ntduc.utils.animation_utils.AnimUtilsActivity
+import com.ntduc.utils.app_utils.activity.AppActivity
 import com.ntduc.utils.color_utils.ColorUtilsActivity
 import com.ntduc.utils.context_utils.ContextUtilsActivity
 import com.ntduc.utils.databinding.ActivityMainBinding
@@ -76,8 +77,13 @@ class MainActivity : AppCompatActivity() {
                 requestPermissionReadAllFile()
             }
         }
+
         binding.btnRecyclerViewUtils.setOnClickListener {
             startActivity(Intent(this, RecyclerUtilsActivity::class.java))
+        }
+
+        binding.btnAppUtils.setOnClickListener {
+            startActivity(Intent(this, AppActivity::class.java))
         }
     }
 

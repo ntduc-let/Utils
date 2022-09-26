@@ -5,7 +5,7 @@ import android.os.Bundle
 import com.ntduc.contextutils.inflater
 import com.ntduc.utils.view_pager_2_utils.adapter.FragmentAdapter
 import com.ntduc.utils.databinding.ActivityViewPager2UtilsBinding
-import com.ntduc.utils.model.Transformer
+import com.ntduc.utils.view_pager_2_utils.model.Transformer
 import com.ntduc.utils.view_pager_2_utils.adapter.MenuAdapter
 import com.ntduc.viewpager2utils.*
 

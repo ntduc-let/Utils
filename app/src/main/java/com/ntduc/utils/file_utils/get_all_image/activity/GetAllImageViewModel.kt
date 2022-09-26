@@ -8,9 +8,9 @@ import com.ntduc.datetimeutils.getDateTimeFromMillis
 import com.ntduc.datetimeutils.isToday
 import com.ntduc.datetimeutils.isYesterday
 import com.ntduc.fileutils.getImages
-import com.ntduc.utils.file_utils.model.MyFile
-import com.ntduc.utils.file_utils.model.MyFolderImage
-import com.ntduc.utils.file_utils.model.MyImage
+import com.ntduc.utils.model.MyFile
+import com.ntduc.utils.model.MyFolderImage
+import com.ntduc.utils.model.MyImage
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import kotlinx.coroutines.*
 import java.io.File

@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import com.ntduc.utils.databinding.ListItemBinding
-import com.ntduc.utils.model.Transformer
+import com.ntduc.utils.view_pager_2_utils.model.Transformer
 
 class MenuAdapter(
     context: Context,

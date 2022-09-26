@@ -65,5 +65,12 @@
             android:layout_height="wrap_content"
             android:text="RecyclerViewUtils"
             android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_AppUtils"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AppUtils"
+            android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

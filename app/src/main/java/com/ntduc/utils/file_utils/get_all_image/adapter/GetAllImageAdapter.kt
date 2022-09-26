@@ -17,9 +17,9 @@ import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ItemImageBinding
 import com.ntduc.utils.databinding.ItemHeaderBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.model.MyFile
-import com.ntduc.utils.file_utils.model.MyFolderImage
-import com.ntduc.utils.file_utils.model.MyImage
+import com.ntduc.utils.model.MyFile
+import com.ntduc.utils.model.MyFolderImage
+import com.ntduc.utils.model.MyImage
 import java.util.ArrayList
 
 class GetAllImageAdapter(
