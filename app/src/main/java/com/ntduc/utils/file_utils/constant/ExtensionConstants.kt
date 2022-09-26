@@ -60,6 +60,20 @@ object ExtensionConstants {
         "m4a"
     )
 
+    val ALL = arrayListOf(
+        *PDF,
+        *EXCEL,
+        *PPT,
+        *TXT,
+        *DOC,
+        *WPS,
+        *ZIP,
+        *VIDEO,
+        *APK,
+        *IMAGE,
+        *MUSIC
+    )
+
     fun getTypeFile(path: String): FileType {
         val extension = File(path).extension
         return when {
