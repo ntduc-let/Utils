@@ -47,7 +47,6 @@ class InstalledAppFragment : Fragment() {
                     binding.layoutNoItem.root.visibility = View.GONE
                     binding.rcvList.visibility = View.VISIBLE
                     adapter.updateData(it)
-                    Log.d("ntduc_debug", "number: ${it.size}")
                 }
             } else {
                 binding.layoutLoading.root.visibility = View.VISIBLE

@@ -54,7 +54,7 @@
         android:paddingHorizontal="0dp"
         android:paddingVertical="8dp"
         android:stateListAnimator="@null"
-        android:text="Install"
+        android:text="Uninstall"
         android:textAllCaps="true"
         android:textColor="@color/white"
         android:textSize="12sp"

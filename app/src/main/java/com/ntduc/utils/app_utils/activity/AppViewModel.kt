@@ -18,16 +18,26 @@ class AppViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val apps = context.getApps()
-                val temp = apps.sortedWith { o1, o2 ->
-                    o2.storage!!.compareTo(o1.storage!!)
-                }
                 val result = ArrayList<MyApp>()
-                temp.forEach {
+                apps.forEach {
                     val myApp = MyApp(
-                        it.name,
-                        it.packageName,
-                        it.icon,
-                        it.storage
+                        name = it.name,
+                        packageName = it.packageName,
+                        icon = it.icon,
+                        category = it.category,
+                        dataDir = it.dataDir,
+                        minSdkVersion = it.minSdkVersion,
+                        targetSdkVersion = it.targetSdkVersion,
+                        nativeLibraryDir = it.nativeLibraryDir,
+                        processName = it.processName,
+                        publicSourceDir = it.publicSourceDir,
+                        sourceDir = it.sourceDir,
+                        splitNames = it.splitNames,
+                        splitPublicSourceDirs = it.splitPublicSourceDirs,
+                        splitSourceDirs = it.splitSourceDirs,
+                        storageUuid = it.storageUuid,
+                        taskAffinity = it.taskAffinity,
+                        uid = it.uid
                     )
                     result.add(myApp)
                 }
