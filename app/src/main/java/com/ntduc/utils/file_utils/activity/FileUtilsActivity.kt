@@ -185,7 +185,7 @@ class FileUtilsActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         val uri = Uri.parse(Environment.getDownloadCacheDirectory().path)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.setDataAndType(uri, "*/*")
+        intent.setDataAndType(uri, "image/*")
         selectFileLauncher.launch(intent)
     }
 

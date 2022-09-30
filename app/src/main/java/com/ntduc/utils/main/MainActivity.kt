@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 val uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID)
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri)
                 requestPermissionLauncher.launch(intent)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
     }
