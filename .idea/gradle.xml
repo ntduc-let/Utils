@@ -7,6 +7,7 @@
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="Android Studio default JDK" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -18,7 +19,6 @@
             <option value="$PROJECT_DIR$/DateTimeUtils" />
             <option value="$PROJECT_DIR$/FileUtils" />
             <option value="$PROJECT_DIR$/NumberUtils" />
-            <option value="$PROJECT_DIR$/PlayerUtils" />
             <option value="$PROJECT_DIR$/RecyclerViewUtils" />
             <option value="$PROJECT_DIR$/StringUtils" />
             <option value="$PROJECT_DIR$/ToastUtils" />
