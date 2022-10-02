@@ -28,4 +28,5 @@
     <dimen name="exo_styled_progress_margin_bottom" tools:keep="@dimen/exo_styled_progress_margin_bottom">51dp</dimen>
 
     <dimen name="marker_width">3dp</dimen>
+    <dimen name="exo_styled_bottom_bar_time_padding">10dp</dimen>
 </resources>

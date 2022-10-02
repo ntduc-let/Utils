@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
-    android:theme="?attr/fileChooserListItemStyle"
     style="?attr/fileChooserListItemStyle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="?attr/fileChooserListItemStyle"
     tools:ignore="ResourceName"
     tools:theme="@style/FileChooserListItemStyle">
 
@@ -46,8 +46,8 @@
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:contentDescription="@string/title_choose"
-        android:visibility="gone"
         android:src="@drawable/ic_folder"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_folder" />
 
 </RelativeLayout>

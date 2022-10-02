@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.brouken.player.dtpv.DoubleTapPlayerView
+    <com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusable="false"
-        app:show_subtitle_button="true"
-        app:dtpv_controller="@id/youtube_overlay" />
+        app:dtpv_controller="@id/youtube_overlay"
+        app:show_subtitle_button="true" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
