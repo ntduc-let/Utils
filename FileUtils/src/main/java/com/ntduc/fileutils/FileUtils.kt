@@ -140,12 +140,11 @@ fun Context.shareFile(file: File, authority: String) {
 @SuppressLint("QueryPermissionsNeeded")
 fun Context.openFile(file: File, authority: String) {
     val uri = FileProvider.getUriForFile(this, authority, file)
-    val intentShareFile = Intent(Intent.ACTION_VIEW)
+    val intentOpenFile = Intent(Intent.ACTION_VIEW)
     val titleFull = file.name
-    intentShareFile.type = file.getMimeType()
-    intentShareFile.putExtra(Intent.EXTRA_STREAM, uri)
-    intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    val chooser = Intent.createChooser(intentShareFile, titleFull)
+    intentOpenFile.setDataAndType(uri, file.getMimeType())
+    intentOpenFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    val chooser = Intent.createChooser(intentOpenFile, titleFull)
     val resInfoList =
         packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
     for (resolveInfo in resInfoList) {
