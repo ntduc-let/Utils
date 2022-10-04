@@ -96,7 +96,7 @@ fun Context.moveFile(
     return true
 }
 
-fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit): Boolean {
+fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit) {
     var index = 0
     for (file in files) {
         if (file.delete()) {
@@ -109,10 +109,9 @@ fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit): Boolean {
                 }
             }
         } else {
-            return false
+            index++
         }
     }
-    return true
 }
 
 @SuppressLint("QueryPermissionsNeeded")
