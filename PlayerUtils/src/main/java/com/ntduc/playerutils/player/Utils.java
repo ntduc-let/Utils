@@ -293,6 +293,7 @@ class Utils {
         showText(playerView, text, 1200);
     }
 
+    //
     public enum Orientation {
         VIDEO(0, R.string.video_orientation_video),
         SYSTEM(1, R.string.video_orientation_system),
@@ -307,6 +308,7 @@ class Utils {
         }
     }
 
+    //Xoay màn hình Activity
     @SuppressLint("SourceLockedOrientationActivity")
     public static void setOrientation(Activity activity, Orientation orientation) {
         switch (orientation) {

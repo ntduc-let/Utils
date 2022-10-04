@@ -222,32 +222,38 @@ public class PlayerActivity extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Xoay màn hình về trạng thái trước đó
         // Rotate ASAP, before super/inflating to avoid glitches with activity launch animation
         mPrefs = new Prefs(this);
         Utils.setOrientation(this, mPrefs.orientation);
 
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT == 28 && Build.MANUFACTURER.equalsIgnoreCase("xiaomi") &&
-                (Build.DEVICE.equalsIgnoreCase("oneday") || Build.DEVICE.equalsIgnoreCase("once"))) {
+
+        //Kiểm tra nhà sản xuất phần cứng để sử dụng layout phù hợp (Android 9)
+        if (Build.VERSION.SDK_INT == 28
+                && Build.MANUFACTURER.equalsIgnoreCase("xiaomi")
+                && (Build.DEVICE.equalsIgnoreCase("oneday") || Build.DEVICE.equalsIgnoreCase("once"))) {
             setContentView(R.layout.activity_player_textureview);
         } else {
             setContentView(R.layout.activity_player);
         }
 
+        //Đối với >= Android 12
         if (Build.VERSION.SDK_INT >= 31) {
             Window window = getWindow();
             if (window != null) {
                 window.setDecorFitsSystemWindows(false);
                 WindowInsetsController windowInsetsController = window.getInsetsController();
                 if (windowInsetsController != null) {
+                    // Từ Android 12 trở lên, BEHAVIOR_DEFAULT cho phép các cử chỉ hệ thống mà không có thanh hệ thống hiển thị
                     // On Android 12 BEHAVIOR_DEFAULT allows system gestures without visible system bars
                     windowInsetsController.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_DEFAULT);
                 }
             }
         }
 
+        //Bật darkmode đối với TV Box
         isTvBox = Utils.isTvBox(this);
-
         if (isTvBox) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
@@ -270,6 +276,8 @@ public class PlayerActivity extends Activity {
         } else if (launchIntent.getData() != null) {
             resetApiAccess();
             final Uri uri = launchIntent.getData();
+
+            //Kiểm tra video có phụ đề không
             if (SubtitleUtils.isSubtitle(uri, type)) {
                 handleSubtitles(uri);
             } else {
@@ -321,6 +329,7 @@ public class PlayerActivity extends Activity {
             focusPlay = true;
         }
 
+        //Xét View
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         playerView = findViewById(R.id.video_view);
@@ -337,7 +346,7 @@ public class PlayerActivity extends Activity {
         playerView.setControllerHideOnTouch(false);
         playerView.setControllerAutoShow(true);
 
-        ((DoubleTapPlayerView)playerView).setDoubleTapEnabled(false);
+        ((DoubleTapPlayerView) playerView).setDoubleTapEnabled(false);
 
         timeBar = playerView.findViewById(R.id.exo_progress);
         timeBar.addListener(new TimeBar.OnScrubListener() {
@@ -383,13 +392,16 @@ public class PlayerActivity extends Activity {
             }
         });
 
+        //Tạo Btn Open file
         buttonOpen = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
         buttonOpen.setImageResource(R.drawable.ic_folder_open_24dp);
         buttonOpen.setId(View.generateViewId());
         buttonOpen.setContentDescription(getString(R.string.button_open));
 
+        //Tải Video
         buttonOpen.setOnClickListener(view -> openFile(mPrefs.mediaUri));
 
+        //Tải phụ đề
         buttonOpen.setOnLongClickListener(view -> {
             if (!isTvBox && mPrefs.askScope) {
                 askForScope(true, false);
@@ -399,6 +411,7 @@ public class PlayerActivity extends Activity {
             return true;
         });
 
+        //Thiết lập PIP cho thiết bị hỗ trợ
         if (Utils.isPiPSupported(this)) {
             // TODO: Android 12 improvements:
             // https://developer.android.com/about/versions/12/features/pip-improvements
@@ -414,6 +427,7 @@ public class PlayerActivity extends Activity {
             }
         }
 
+        //Thiết lập btn Zoom In/Out
         buttonAspectRatio = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
         buttonAspectRatio.setId(Integer.MAX_VALUE - 100);
         buttonAspectRatio.setContentDescription(getString(R.string.button_crop));
@@ -438,6 +452,8 @@ public class PlayerActivity extends Activity {
                 return true;
             });
         }
+
+        //Thiết lập btn Xoay màn hình
         buttonRotation = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
         buttonRotation.setContentDescription(getString(R.string.button_rotate));
         updateButtonRotation();
@@ -449,6 +465,7 @@ public class PlayerActivity extends Activity {
             resetHideCallbacks();
         });
 
+        //Thiết lập Background và title video cho màn Play
         final int titleViewPaddingHorizontal = Utils.dpToPx(14);
         final int titleViewPaddingVertical = getResources().getDimensionPixelOffset(R.dimen.exo_styled_bottom_bar_time_padding);
         FrameLayout centerView = playerView.findViewById(R.id.exo_controls_background);
@@ -464,6 +481,7 @@ public class PlayerActivity extends Activity {
         titleView.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         centerView.addView(titleView);
 
+        //Gửi video
         titleView.setOnLongClickListener(view -> {
             // Prevent FileUriExposedException
             if (mPrefs.mediaUri != null && ContentResolver.SCHEME_FILE.equals(mPrefs.mediaUri.getScheme())) {
@@ -545,8 +563,10 @@ public class PlayerActivity extends Activity {
             e.printStackTrace();
         }
 
+        //Thiết lập btn xóa video
         findViewById(R.id.delete).setOnClickListener(view -> askDeleteMedia());
 
+        //Thiết lập btn next video
         findViewById(R.id.next).setOnClickListener(view -> {
             if (!isTvBox && mPrefs.askScope) {
                 askForScope(false, true);
@@ -555,6 +575,7 @@ public class PlayerActivity extends Activity {
             }
         });
 
+        //Thiết lập btn pause/play video
         exoPlayPause.setOnClickListener(view -> dispatchPlayPause());
 
         // Prevent double tap actions in controller
@@ -563,6 +584,7 @@ public class PlayerActivity extends Activity {
 
         playerListener = new PlayerListener();
 
+        //Thiết lập độ sáng
         mBrightnessControl = new BrightnessControl(this);
         if (mPrefs.brightness >= 0) {
             mBrightnessControl.currentBrightnessLevel = mPrefs.brightness;
@@ -1181,7 +1203,7 @@ public class PlayerActivity extends Activity {
                 HashMap<String, String> headers = new HashMap<>();
                 String userInfo = mPrefs.mediaUri.getUserInfo();
                 if (userInfo != null && userInfo.length() > 0 && userInfo.contains(":")) {
-                    headers.put("Authorization", "Basic " + Base64.encodeToString(userInfo.getBytes(),Base64.NO_WRAP));
+                    headers.put("Authorization", "Basic " + Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
                     DefaultHttpDataSource.Factory defaultHttpDataSourceFactory = new DefaultHttpDataSource.Factory();
                     defaultHttpDataSourceFactory.setDefaultRequestProperties(headers);
                     playerBuilder.setMediaSourceFactory(new DefaultMediaSourceFactory(defaultHttpDataSourceFactory, extractorsFactory));
@@ -1283,7 +1305,7 @@ public class PlayerActivity extends Activity {
 
             updateButtons(true);
 
-            ((DoubleTapPlayerView)playerView).setDoubleTapEnabled(true);
+            ((DoubleTapPlayerView) playerView).setDoubleTapEnabled(true);
 
             if (!apiAccess) {
                 if (nextUriThread != null) {
@@ -1647,7 +1669,7 @@ public class PlayerActivity extends Activity {
     }
 
     private TrackGroup getTrackGroupFromFormatId(int trackType, String id) {
-        if ((id == null && trackType == C.TRACK_TYPE_AUDIO ) || player == null) {
+        if ((id == null && trackType == C.TRACK_TYPE_AUDIO) || player == null) {
             return null;
         }
         for (Tracks.Group group : player.getCurrentTracks().getGroups()) {
@@ -1675,7 +1697,8 @@ public class PlayerActivity extends Activity {
 
         TrackSelectionParameters.Builder overridesBuilder = new TrackSelectionParameters.Builder(this);
         TrackSelectionOverride trackSelectionOverride = null;
-        final List<Integer> tracks = new ArrayList<>(); tracks.add(0);
+        final List<Integer> tracks = new ArrayList<>();
+        tracks.add(0);
         if (subtitleGroup != null) {
             trackSelectionOverride = new TrackSelectionOverride(subtitleGroup, tracks);
             overridesBuilder.addOverride(trackSelectionOverride);
@@ -1744,7 +1767,7 @@ public class PlayerActivity extends Activity {
                 size = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitlesScale;
             } else {
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
-                float ratio = ((float)metrics.heightPixels / (float)metrics.widthPixels);
+                float ratio = ((float) metrics.heightPixels / (float) metrics.widthPixels);
                 if (ratio < 1)
                     ratio = 1 / ratio;
                 size = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitlesScale / ratio;
@@ -2054,7 +2077,7 @@ public class PlayerActivity extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onUserLeaveHint() {
-        if (mPrefs!= null && mPrefs.autoPiP && player != null && player.isPlaying() && Utils.isPiPSupported(this))
+        if (mPrefs != null && mPrefs.autoPiP && player != null && player.isPlaying() && Utils.isPiPSupported(this))
             enterPiP();
         else
             super.onUserLeaveHint();
@@ -2085,23 +2108,23 @@ public class PlayerActivity extends Activity {
             // TODO: Test/disable on Android 11+
             final View videoSurfaceView = playerView.getVideoSurfaceView();
             if (videoSurfaceView instanceof SurfaceView) {
-                ((SurfaceView)videoSurfaceView).getHolder().setFixedSize(format.width, format.height);
+                ((SurfaceView) videoSurfaceView).getHolder().setFixedSize(format.width, format.height);
             }
 
             Rational rational = Utils.getRational(format);
             if (Build.VERSION.SDK_INT >= 33 &&
                     getPackageManager().hasSystemFeature(FEATURE_EXPANDED_PICTURE_IN_PICTURE) &&
                     (rational.floatValue() > rationalLimitWide.floatValue() || rational.floatValue() < rationalLimitTall.floatValue())) {
-                ((PictureInPictureParams.Builder)mPictureInPictureParamsBuilder).setExpandedAspectRatio(rational);
+                ((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).setExpandedAspectRatio(rational);
             }
             if (rational.floatValue() > rationalLimitWide.floatValue())
                 rational = rationalLimitWide;
             else if (rational.floatValue() < rationalLimitTall.floatValue())
                 rational = rationalLimitTall;
 
-            ((PictureInPictureParams.Builder)mPictureInPictureParamsBuilder).setAspectRatio(rational);
+            ((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).setAspectRatio(rational);
         }
-        enterPictureInPictureMode(((PictureInPictureParams.Builder)mPictureInPictureParamsBuilder).build());
+        enterPictureInPictureMode(((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).build());
     }
 
     void setEndControlsVisible(boolean visible) {
@@ -2125,7 +2148,8 @@ public class PlayerActivity extends Activity {
                 skipToNext();
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {});
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+        });
         final AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -2210,7 +2234,7 @@ public class PlayerActivity extends Activity {
         scaleFactor = playerView.getVideoSurfaceView().getScaleX();
         playerView.removeCallbacks(playerView.textClearRunnable);
         playerView.clearIcon();
-        playerView.setCustomErrorMessage((int)(scaleFactor * 100) + "%");
+        playerView.setCustomErrorMessage((int) (scaleFactor * 100) + "%");
         playerView.hideController();
         isScaleStarting = true;
     }
@@ -2223,7 +2247,7 @@ public class PlayerActivity extends Activity {
         }
         scaleFactor = Utils.normalizeScaleFactor(scaleFactor, playerView.getScaleFit());
         playerView.setScale(scaleFactor);
-        playerView.setCustomErrorMessage((int)(scaleFactor * 100) + "%");
+        playerView.setCustomErrorMessage((int) (scaleFactor * 100) + "%");
     }
 
     private void scaleEnd() {
