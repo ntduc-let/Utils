@@ -19,7 +19,7 @@ fun File.getMimeType(): String? {
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
 }
 
-fun Context.renameFile(file: File, name: String, onCompleted: () -> Unit): Boolean {
+fun Context.renameFile(file: File, name: String, onCompleted: (File) -> Unit): Boolean {
     try {
         val pathNew = "${file.parentFile?.path}/${name}.${file.extension}"
         val fileNew = File(pathNew)
@@ -34,7 +34,7 @@ fun Context.renameFile(file: File, name: String, onCompleted: () -> Unit): Boole
             ) { _, _ ->
                 index++
                 if (index == listOf(file.path, fileNew.path).size) {
-                    onCompleted()
+                    onCompleted(fileNew)
                 }
             }
             return true
@@ -50,7 +50,7 @@ fun Context.copyFile(
     dest: File,
     overwrite: Boolean = false,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    onCompleted: () -> Unit
+    onCompleted: (File) -> Unit
 ): Boolean {
     val pathDest = if (dest.isDirectory) "${dest.path}/${file.name}" else dest.path
 
@@ -62,7 +62,7 @@ fun Context.copyFile(
     }
 
     MediaScannerConnection.scanFile(this, listOf(pathDest).toTypedArray(), null) { _, _ ->
-        onCompleted()
+        onCompleted(File(pathDest))
     }
     return true
 }
@@ -72,7 +72,7 @@ fun Context.moveFile(
     dest: File,
     overwrite: Boolean = false,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    onCompleted: () -> Unit
+    onCompleted: (File) -> Unit
 ): Boolean {
     val pathDest = if (dest.isDirectory) "${dest.path}/${file.name}" else dest.path
 
@@ -90,7 +90,7 @@ fun Context.moveFile(
     ) { _, _ ->
         index++
         if (index == listOf(file.path, pathDest).size) {
-            onCompleted()
+            onCompleted(File(pathDest))
         }
     }
     return true
