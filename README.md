@@ -66,19 +66,19 @@ android {
 }
 dependencies {
   ...
-  def utilsVersion = "1.0.7"
-  implementation 'com.github.ntduc-let.Utils:ActivityUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:AnimationUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:AppUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ColorUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ContextUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:DateTimeUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:FileUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:NumberUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:RecyclerViewUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:StringUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ToastUtils:$utilsVersion'
-  implementation 'com.github.ntduc-let.Utils:ViewPager2Utils:$utilsVersion'
+  def utilsVersion = "1.1.0"
+  implementation "com.github.ntduc-let.Utils:ActivityUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:AnimationUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:AppUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ColorUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ContextUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:DateTimeUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:FileUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:NumberUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:RecyclerViewUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:StringUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ToastUtils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:ViewPager2Utils:$utilsVersion"
 }
 ```
 
