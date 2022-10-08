@@ -21,7 +21,8 @@ fun File.getMimeType(): String? {
 
 fun Context.renameFile(file: File, name: String, onCompleted: (File) -> Unit): Boolean {
     try {
-        val pathNew = if (file.isDirectory) "${file.parentFile?.path}/${name}" else "${file.parentFile?.path}/${name}.${file.extension}"
+        val pathNew =
+            if (file.isDirectory) "${file.parentFile?.path}/${name}" else "${file.parentFile?.path}/${name}.${file.extension}"
         val fileNew = File(pathNew)
         if (fileNew.exists()) {
             return false
@@ -89,11 +90,41 @@ fun Context.moveFile(
         this, listOf(file.path, pathDest).toTypedArray(), null
     ) { _, _ ->
         index++
-        if (index == listOf(file.path, pathDest).size) {
+        if (index == 2) {
             onCompleted(File(pathDest))
         }
     }
     return true
+}
+
+fun Context.moveFiles(
+    files: List<File>,
+    dest: File,
+    overwrite: Boolean = false,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    onCompleted: () -> Unit
+) {
+    var index = 0
+
+    files.forEach {
+        val pathDest = if (dest.isDirectory) "${dest.path}/${it.name}" else dest.path
+
+        try {
+            it.copyTo(File(pathDest), overwrite, bufferSize)
+            it.delete()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        MediaScannerConnection.scanFile(
+            this, listOf(it.path, pathDest).toTypedArray(), null
+        ) { _, _ ->
+            index++
+            if (index == files.size * 2) {
+                onCompleted()
+            }
+        }
+    }
 }
 
 fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit) {
