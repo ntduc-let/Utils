@@ -21,7 +21,7 @@ fun File.getMimeType(): String? {
 
 fun Context.renameFile(file: File, name: String, onCompleted: (File) -> Unit): Boolean {
     try {
-        val pathNew = "${file.parentFile?.path}/${name}.${file.extension}"
+        val pathNew = if (file.isDirectory) "${file.parentFile?.path}/${name}" else "${file.parentFile?.path}/${name}.${file.extension}"
         val fileNew = File(pathNew)
         if (fileNew.exists()) {
             return false
@@ -110,6 +110,9 @@ fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit) {
             }
         } else {
             index++
+            if (index == files.size) {
+                onCompleted()
+            }
         }
     }
 }
