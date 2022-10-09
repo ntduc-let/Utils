@@ -192,11 +192,12 @@ fun Context.openFile(file: File, authority: String) {
 }
 
 fun Context.getFiles(
-    uri: Uri = MediaStore.Files.getContentUri("external"),
+    directoryPath: String = "",
     types: List<String>
 ): List<BaseFile> {
     val files = ArrayList<BaseFile>()
 
+    val uri = MediaStore.Files.getContentUri("external")
     val projection = arrayOf(
         MediaStore.Files.FileColumns.TITLE,
         MediaStore.Files.FileColumns.DISPLAY_NAME,
@@ -209,9 +210,9 @@ fun Context.getFiles(
     var selection = ""
     for (i in types.indices) {
         if (i == 0) {
-            selection = "${MediaStore.Files.FileColumns.DATA} LIKE '%.${types[i]}'"
+            selection = "${MediaStore.Files.FileColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         } else {
-            selection += " OR ${MediaStore.Files.FileColumns.DATA} LIKE '%.${types[i]}'"
+            selection += " OR ${MediaStore.Files.FileColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         }
     }
 
@@ -249,11 +250,12 @@ fun Context.getFiles(
 }
 
 fun Context.getAudios(
-    uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    directoryPath: String = "",
     types: List<String>
 ): List<BaseAudio> {
     val audios = ArrayList<BaseAudio>()
 
+    val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
         MediaStore.Audio.AudioColumns.TITLE,
         MediaStore.Audio.AudioColumns.DISPLAY_NAME,
@@ -269,9 +271,9 @@ fun Context.getAudios(
     var selection = ""
     for (i in types.indices) {
         if (i == 0) {
-            selection = "${MediaStore.Audio.AudioColumns.DATA} LIKE '%.${types[i]}'"
+            selection = "${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         } else {
-            selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '%.${types[i]}'"
+            selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         }
     }
 
@@ -328,11 +330,12 @@ fun Context.getAudios(
 }
 
 fun Context.getImages(
-    uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+    directoryPath: String = "",
     types: List<String>
 ): List<BaseImage> {
     val images = ArrayList<BaseImage>()
 
+    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
         MediaStore.Images.ImageColumns.TITLE,
         MediaStore.Images.ImageColumns.DISPLAY_NAME,
@@ -347,9 +350,9 @@ fun Context.getImages(
     var selection = ""
     for (i in types.indices) {
         if (i == 0) {
-            selection = "${MediaStore.Images.ImageColumns.DATA} LIKE '%.${types[i]}'"
+            selection = "${MediaStore.Images.ImageColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         } else {
-            selection += " OR ${MediaStore.Images.ImageColumns.DATA} LIKE '%.${types[i]}'"
+            selection += " OR ${MediaStore.Images.ImageColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         }
     }
 
@@ -403,11 +406,12 @@ fun Context.getImages(
 }
 
 fun Context.getVideos(
-    uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+    directoryPath: String = "",
     types: List<String>
 ): List<BaseVideo> {
     val videos = ArrayList<BaseVideo>()
 
+    val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
         MediaStore.Video.VideoColumns.TITLE,
         MediaStore.Video.VideoColumns.DISPLAY_NAME,
@@ -428,9 +432,9 @@ fun Context.getVideos(
     var selection = ""
     for (i in types.indices) {
         if (i == 0) {
-            selection = "${MediaStore.Video.VideoColumns.DATA} LIKE '%.${types[i]}'"
+            selection = "${MediaStore.Video.VideoColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         } else {
-            selection += " OR ${MediaStore.Video.VideoColumns.DATA} LIKE '%.${types[i]}'"
+            selection += " OR ${MediaStore.Video.VideoColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         }
     }
 

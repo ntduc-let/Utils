@@ -141,14 +141,10 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (deleteFiles(listOf(binding.txt.text.toString().asFile()), onCompleted = {
-                    Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
-                })) {
+            deleteFiles(listOf(binding.txt.text.toString().asFile()), onCompleted = {
                 shortToast("Delete success")
-                binding.txt.text = ""
-            } else {
-                shortToast("Delete false")
-            }
+            })
+            binding.txt.text = ""
         }
 
         binding.btnShareFile.setOnClickListener {
