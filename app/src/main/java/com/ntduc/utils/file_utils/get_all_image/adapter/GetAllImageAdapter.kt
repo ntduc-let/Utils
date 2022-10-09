@@ -88,6 +88,12 @@ class GetAllImageAdapter(
                     .placeholder(R.drawable.ic_empty)
                     .error(ExtensionConstants.getIconFile(item.myFile?.data ?: ""))
                     .into(holder.binding.img)
+
+                holder.binding.root.setOnClickListener {
+                    onOpenListener?.let {
+                        it(item)
+                    }
+                }
             }
         }
     }
@@ -134,5 +140,11 @@ class GetAllImageAdapter(
 
     companion object {
         private const val HEADER_ITEM = 123
+    }
+
+    private var onOpenListener: ((MyImage) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (MyImage) -> Unit) {
+        onOpenListener = listener
     }
 }

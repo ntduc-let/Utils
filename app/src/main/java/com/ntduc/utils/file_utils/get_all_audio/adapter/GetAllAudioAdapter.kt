@@ -31,12 +31,6 @@ class GetAllAudioAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders, StickyHeaders.ViewSetup {
     private var list: ArrayList<MyAudio> = ArrayList()
 
-    private var onPlayListener: ((MyAudio) -> Unit)? = null
-
-    fun setOnPlayListener(listener: ((MyAudio) -> Unit)) {
-        this.onPlayListener = listener
-    }
-
     init {
         initData()
     }
@@ -110,8 +104,10 @@ class GetAllAudioAdapter(
                 holder.binding.txtTitle.text = item.myFile?.displayName
                 holder.binding.txtDescription.text = item.myFile?.size?.formatBytes()
 
-                onPlayListener?.let {
-                    it(item)
+                holder.binding.root.setOnClickListener {
+                    onOpenListener?.let {
+                        it(item)
+                    }
                 }
             }
         }
@@ -159,5 +155,11 @@ class GetAllAudioAdapter(
 
     companion object {
         private const val HEADER_ITEM = 123
+    }
+
+    private var onOpenListener: ((MyAudio) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (MyAudio) -> Unit) {
+        onOpenListener = listener
     }
 }

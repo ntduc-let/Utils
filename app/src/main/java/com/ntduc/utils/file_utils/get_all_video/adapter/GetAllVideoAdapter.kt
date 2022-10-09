@@ -91,6 +91,12 @@ class GetAllVideoAdapter(
                     .into(holder.binding.img)
 
                 holder.binding.txtTime.text = item.duration?.formatAsTime()
+
+                holder.binding.root.setOnClickListener {
+                    onOpenListener?.let {
+                        it(item)
+                    }
+                }
             }
         }
     }
@@ -137,5 +143,11 @@ class GetAllVideoAdapter(
 
     companion object {
         private const val HEADER_ITEM = 123
+    }
+
+    private var onOpenListener: ((MyVideo) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (MyVideo) -> Unit) {
+        onOpenListener = listener
     }
 }

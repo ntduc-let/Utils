@@ -99,7 +99,7 @@ class GetAllFileAdapter(
                                 .error(ExtensionConstants.getIconFile(item.data ?: ""))
                                 .into(holder.binding.img)
                         }
-                        FileType.MUSIC ->{
+                        FileType.MUSIC -> {
                             val image = try {
                                 val mData = MediaMetadataRetriever()
                                 mData.setDataSource(item.data)
@@ -117,13 +117,22 @@ class GetAllFileAdapter(
                                 .into(holder.binding.img)
                         }
                         else -> {
-                            holder.binding.img.setImageResource(ExtensionConstants.getIconFile(item.data ?: ""))
+                            holder.binding.img.setImageResource(
+                                ExtensionConstants.getIconFile(
+                                    item.data ?: ""
+                                )
+                            )
                         }
                     }
                 }
 
                 holder.binding.txtTitle.text = item.displayName
                 holder.binding.txtDescription.text = item.size?.formatBytes()
+                holder.binding.root.setOnClickListener {
+                    onOpenListener?.let {
+                        it(item)
+                    }
+                }
             }
         }
     }
@@ -170,5 +179,11 @@ class GetAllFileAdapter(
 
     companion object {
         private const val HEADER_ITEM = 123
+    }
+
+    private var onOpenListener: ((MyFile) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (MyFile) -> Unit) {
+        onOpenListener = listener
     }
 }

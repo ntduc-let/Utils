@@ -4,10 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import com.ntduc.fileutils.openFile
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
+import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityGetAllFileBinding
 import com.ntduc.utils.file_utils.get_all_file.adapter.GetAllFileAdapter
-import com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity
+import java.io.File
 
 class GetAllFileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGetAllFileBinding
@@ -30,6 +32,17 @@ class GetAllFileActivity : AppCompatActivity() {
     private fun init() {
         initView()
         initData()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        adapter.setOnOpenListener {
+            if (it.data != null && File(it.data!!).exists()) {
+                openFile(File(it.data!!), "com.ntduc.utils.provider")
+            } else {
+                shortToast("File does not exists")
+            }
+        }
     }
 
     private fun initData() {
@@ -56,7 +69,7 @@ class GetAllFileActivity : AppCompatActivity() {
         adapter = GetAllFileAdapter(this)
         binding.rcvList.adapter = adapter
         binding.rcvList.setHasFixedSize(true)
-        val layoutManager: StickyHeadersLinearLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
+        val layoutManager: StickyHeadersLinearLayoutManager<GetAllFileAdapter> =
             StickyHeadersLinearLayoutManager(this)
         binding.rcvList.layoutManager = layoutManager
     }

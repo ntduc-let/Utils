@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.ntduc.fileutils.openFile
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersGridLayoutManager
+import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityGetAllImageBinding
 import com.ntduc.utils.file_utils.get_all_image.adapter.GetAllImageAdapter
 import com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity
+import java.io.File
 
 class GetAllImageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGetAllImageBinding
@@ -31,6 +34,17 @@ class GetAllImageActivity : AppCompatActivity() {
     private fun init() {
         initView()
         initData()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        adapter.setOnOpenListener {
+            if (it.myFile?.data != null && File(it.myFile!!.data!!).exists()) {
+                openFile(File(it.myFile!!.data!!), "com.ntduc.utils.provider")
+            } else {
+                shortToast("File does not exists")
+            }
+        }
     }
 
     private fun initData() {
@@ -57,7 +71,7 @@ class GetAllImageActivity : AppCompatActivity() {
         adapter = GetAllImageAdapter(this)
         binding.rcvList.adapter = adapter
         binding.rcvList.setHasFixedSize(true)
-        val layoutManager: StickyHeadersGridLayoutManager<RecyclerViewStickyActivity.MyAdapter> =
+        val layoutManager: StickyHeadersGridLayoutManager<GetAllImageAdapter> =
             StickyHeadersGridLayoutManager(this, 3)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
