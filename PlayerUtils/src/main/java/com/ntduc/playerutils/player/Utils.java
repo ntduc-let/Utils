@@ -295,9 +295,9 @@ class Utils {
 
     //
     public enum Orientation {
-        VIDEO(0, R.string.video_orientation_video),
-        SYSTEM(1, R.string.video_orientation_system),
-        UNSPECIFIED(2, R.string.video_orientation_system);
+        VIDEO(0, R.string.video_orientation_video),            //Chế độ xoay theo hướng của Video
+        SYSTEM(1, R.string.video_orientation_system),                       //Chế độ xoay theo hướng của thiệt bị
+        UNSPECIFIED(2, R.string.video_orientation_system);     //Chưa xác định (Lần đầu chạy)
 
         public final int value;
         public final int description;
@@ -308,7 +308,7 @@ class Utils {
         }
     }
 
-    //Xoay màn hình Activity
+    //Xoay Activity
     @SuppressLint("SourceLockedOrientationActivity")
     public static void setOrientation(Activity activity, Orientation orientation) {
         switch (orientation) {

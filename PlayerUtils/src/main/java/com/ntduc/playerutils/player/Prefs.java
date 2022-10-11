@@ -79,35 +79,57 @@ class Prefs {
     public Prefs(Context context) {
         mContext = context;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        loadSavedPreferences();
-        loadPositions();
+
+        //Load SharedPreferences
+        loadSavedPreferences();     //Load SharedPreferences của Video
+        loadPositions();            //Load position của Video
     }
 
+    //Load SharedPreferences của Video
     private void loadSavedPreferences() {
+        //URI Video
         if (mSharedPreferences.contains(PREF_KEY_MEDIA_URI))
             mediaUri = Uri.parse(mSharedPreferences.getString(PREF_KEY_MEDIA_URI, null));
+
+        //Type Video
         if (mSharedPreferences.contains(PREF_KEY_MEDIA_TYPE))
             mediaType = mSharedPreferences.getString(PREF_KEY_MEDIA_TYPE, null);
-        brightness = mSharedPreferences.getInt(PREF_KEY_BRIGHTNESS, brightness);
-        firstRun = mSharedPreferences.getBoolean(PREF_KEY_FIRST_RUN, firstRun);
+
+        brightness = mSharedPreferences.getInt(PREF_KEY_BRIGHTNESS, brightness);    //Độ sáng Video
+        firstRun = mSharedPreferences.getBoolean(PREF_KEY_FIRST_RUN, firstRun);     //Lần đầu chạy Video này?
+
+        //???
         if (mSharedPreferences.contains(PREF_KEY_SUBTITLE_URI))
             subtitleUri = Uri.parse(mSharedPreferences.getString(PREF_KEY_SUBTITLE_URI, null));
+
+        //???
         if (mSharedPreferences.contains(PREF_KEY_AUDIO_TRACK_ID))
             audioTrackId = mSharedPreferences.getString(PREF_KEY_AUDIO_TRACK_ID, audioTrackId);
+
+        //???
         if (mSharedPreferences.contains(PREF_KEY_SUBTITLE_TRACK_ID))
             subtitleTrackId = mSharedPreferences.getString(PREF_KEY_SUBTITLE_TRACK_ID, subtitleTrackId);
+
+        //Kiểu kích thước Video
         if (mSharedPreferences.contains(PREF_KEY_RESIZE_MODE))
             resizeMode = mSharedPreferences.getInt(PREF_KEY_RESIZE_MODE, resizeMode);
-        orientation = Utils.Orientation.values()[mSharedPreferences.getInt(PREF_KEY_ORIENTATION, orientation.value)];
-        scale = mSharedPreferences.getFloat(PREF_KEY_SCALE, scale);
+
+        orientation = Utils.Orientation.values()[mSharedPreferences.getInt(PREF_KEY_ORIENTATION, orientation.value)];   //Chế độ xoay của Video
+        scale = mSharedPreferences.getFloat(PREF_KEY_SCALE, scale);     //Tỉ lệ zoom Video
+
+        //???
         if (mSharedPreferences.contains(PREF_KEY_SCOPE_URI))
             scopeUri = Uri.parse(mSharedPreferences.getString(PREF_KEY_SCOPE_URI, null));
-        askScope = mSharedPreferences.getBoolean(PREF_KEY_ASK_SCOPE, askScope);
-        speed = mSharedPreferences.getFloat(PREF_KEY_SPEED, speed);
-        loadUserPreferences();
+
+        askScope = mSharedPreferences.getBoolean(PREF_KEY_ASK_SCOPE, askScope);     //???
+        speed = mSharedPreferences.getFloat(PREF_KEY_SPEED, speed);                 //Tốc độ phát Video
+
+        loadUserPreferences();  //Load SharedPreferences các action của user
     }
 
+    //Load SharedPreferences các action của user
     public void loadUserPreferences() {
+        //???
         autoPiP = mSharedPreferences.getBoolean(PREF_KEY_AUTO_PIP, autoPiP);
         tunneling = mSharedPreferences.getBoolean(PREF_KEY_TUNNELING, tunneling);
         skipSilence = mSharedPreferences.getBoolean(PREF_KEY_SKIP_SILENCE, skipSilence);
@@ -117,12 +139,14 @@ class Prefs {
         decoderPriority = Integer.parseInt(mSharedPreferences.getString(PREF_KEY_DECODER_PRIORITY, String.valueOf(decoderPriority)));
     }
 
+    //Lưu information Video
     public void updateMedia(final Context context, final Uri uri, final String type) {
         mediaUri = uri;
         mediaType = type;
-        updateSubtitle(null);
-        updateMeta(null, null, AspectRatioFrameLayout.RESIZE_MODE_FIT, 1.f, 1.f);
+        updateSubtitle(null);   //Cập nhật không có phụ đề
+        updateMeta(null, null, AspectRatioFrameLayout.RESIZE_MODE_FIT, 1.f, 1.f);   //Update metadata Video
 
+        //update type Video trước khi lưu
         if (mediaType != null && mediaType.endsWith("/*")) {
             mediaType = null;
         }
@@ -133,6 +157,7 @@ class Prefs {
             }
         }
 
+        //???
         if (persistentMode) {
             final SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
             if (mediaUri == null)
@@ -211,6 +236,7 @@ class Prefs {
         }
     }
 
+    //Load position của Video
     private void loadPositions() {
         try {
             FileInputStream fis = mContext.openFileInput("positions");

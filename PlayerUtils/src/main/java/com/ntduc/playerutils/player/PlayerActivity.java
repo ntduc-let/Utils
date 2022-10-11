@@ -222,16 +222,16 @@ public class PlayerActivity extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Xoay màn hình về trạng thái trước đó
+        // Xoay màn hình càng sớm càng tốt, trước khi inflater để tránh gặp trục trặc với animation khởi tạo activity
         // Rotate ASAP, before super/inflating to avoid glitches with activity launch animation
-        mPrefs = new Prefs(this);
-        Utils.setOrientation(this, mPrefs.orientation);
+        mPrefs = new Prefs(this);                       //Load SharedPreferences
+        Utils.setOrientation(this, mPrefs.orientation); //Xoay Activity
 
         super.onCreate(savedInstanceState);
 
-        //Kiểm tra nhà sản xuất phần cứng để sử dụng layout phù hợp (Android 9)
-        if (Build.VERSION.SDK_INT == 28
-                && Build.MANUFACTURER.equalsIgnoreCase("xiaomi")
+        //Kiểm tra nhà sản xuất phần cứng để sử dụng layout phù hợp
+        if (Build.VERSION.SDK_INT == 28 //Android 9
+                && Build.MANUFACTURER.equalsIgnoreCase("xiaomi")    //Hãng Xiaomi
                 && (Build.DEVICE.equalsIgnoreCase("oneday") || Build.DEVICE.equalsIgnoreCase("once"))) {
             setContentView(R.layout.activity_player_textureview);
         } else {
@@ -242,10 +242,10 @@ public class PlayerActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 31) {
             Window window = getWindow();
             if (window != null) {
-                window.setDecorFitsSystemWindows(false);
+                window.setDecorFitsSystemWindows(false);    //???
                 WindowInsetsController windowInsetsController = window.getInsetsController();
                 if (windowInsetsController != null) {
-                    // Từ Android 12 trở lên, BEHAVIOR_DEFAULT cho phép các cử chỉ hệ thống mà không có thanh hệ thống hiển thị
+                    // Từ Android 12 trở lên, BEHAVIOR_DEFAULT cho phép các cử chỉ hệ thống mà không hiển thị thanh hệ thống
                     // On Android 12 BEHAVIOR_DEFAULT allows system gestures without visible system bars
                     windowInsetsController.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_DEFAULT);
                 }
@@ -282,6 +282,8 @@ public class PlayerActivity extends Activity {
                 handleSubtitles(uri);
             } else {
                 Bundle bundle = launchIntent.getExtras();
+
+                //???
                 if (bundle != null) {
                     apiAccess = bundle.containsKey(API_POSITION) || bundle.containsKey(API_RETURN_RESULT) || bundle.containsKey(API_TITLE)
                             || bundle.containsKey(API_SUBS) || bundle.containsKey(API_SUBS_ENABLE);
@@ -291,8 +293,9 @@ public class PlayerActivity extends Activity {
                     apiTitle = bundle.getString(API_TITLE);
                 }
 
-                mPrefs.updateMedia(this, uri, type);
+                mPrefs.updateMedia(this, uri, type);    //Lưu information Video
 
+                //???
                 if (bundle != null) {
                     Uri defaultSub = null;
                     Parcelable[] subsEnable = bundle.getParcelableArray(API_SUBS_ENABLE);
@@ -329,17 +332,19 @@ public class PlayerActivity extends Activity {
             focusPlay = true;
         }
 
-        //Xét View
+        //Xét Main View
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         playerView = findViewById(R.id.video_view);
+
+        //Xét Control View
         exoPlayPause = findViewById(R.id.exo_play_pause);
         loadingProgressBar = findViewById(R.id.loading);
 
-        playerView.setShowNextButton(false);
-        playerView.setShowPreviousButton(false);
-        playerView.setShowFastForwardButton(false);
-        playerView.setShowRewindButton(false);
+        playerView.setShowNextButton(false);            //Ẩn nút Next
+        playerView.setShowPreviousButton(false);        //Ẩn nút Previous
+        playerView.setShowFastForwardButton(false);     //Ẩn nút Fast Forward (Tua 15s)
+        playerView.setShowRewindButton(true);          //Ẩn nút Rewind  (Back 5s)
 
         playerView.setRepeatToggleModes(Player.REPEAT_MODE_ONE);
 
