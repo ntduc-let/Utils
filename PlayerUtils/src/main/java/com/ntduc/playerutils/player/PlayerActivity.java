@@ -317,10 +317,12 @@ public class PlayerActivity extends Activity {
                     }
                 }
 
+                //???
                 if (apiSubs.isEmpty()) {
                     searchSubtitles();
                 }
 
+                //???
                 if (bundle != null) {
                     intentReturnResult = bundle.getBoolean(API_RETURN_RESULT);
 
@@ -344,15 +346,16 @@ public class PlayerActivity extends Activity {
         playerView.setShowNextButton(false);            //Ẩn nút Next
         playerView.setShowPreviousButton(false);        //Ẩn nút Previous
         playerView.setShowFastForwardButton(false);     //Ẩn nút Fast Forward (Tua 15s)
-        playerView.setShowRewindButton(true);          //Ẩn nút Rewind  (Back 5s)
+        playerView.setShowRewindButton(false);          //Ẩn nút Rewind  (Back 5s)
 
-        playerView.setRepeatToggleModes(Player.REPEAT_MODE_ONE);
+        playerView.setRepeatToggleModes(Player.REPEAT_MODE_ONE);    //Xét chế độ Repeat
 
-        playerView.setControllerHideOnTouch(false);
-        playerView.setControllerAutoShow(true);
+        playerView.setControllerHideOnTouch(false);     //Khóa Controller Video khi giữ
+        playerView.setControllerAutoShow(true);         //Show Controller Video khi vừa vào?
 
-        ((DoubleTapPlayerView) playerView).setDoubleTapEnabled(false);
+        ((DoubleTapPlayerView) playerView).setDoubleTapEnabled(false);  //Ẩn chế độ Double Tap
 
+        //Xét Event TimeBar
         timeBar = playerView.findViewById(R.id.exo_progress);
         timeBar.addListener(new TimeBar.OnScrubListener() {
             @Override
@@ -506,6 +509,7 @@ public class PlayerActivity extends Activity {
             return true;
         });
 
+        //???
         controlView = playerView.findViewById(R.id.exo_controller);
         controlView.setOnApplyWindowInsetsListener((view, windowInsets) -> {
             if (windowInsets != null) {
@@ -556,9 +560,12 @@ public class PlayerActivity extends Activity {
             }
             return windowInsets;
         });
-        timeBar.setAdMarkerColor(Color.argb(0x00, 0xFF, 0xFF, 0xFF));
-        timeBar.setPlayedAdMarkerColor(Color.argb(0x98, 0xFF, 0xFF, 0xFF));
 
+        //Xét color TimeBar
+        timeBar.setAdMarkerColor(Color.argb(0x00, 0xFF, 0xFF, 0xFF));           //Xét color TimeBar đã play
+        timeBar.setPlayedAdMarkerColor(Color.argb(0x98, 0xFF, 0xFF, 0xFF));     //Xét color TimeBar chưa play
+
+        //???
         try {
             CustomDefaultTrackNameProvider customDefaultTrackNameProvider = new CustomDefaultTrackNameProvider(getResources());
             final Field field = StyledPlayerControlView.class.getDeclaredField("trackNameProvider");
@@ -583,6 +590,7 @@ public class PlayerActivity extends Activity {
         //Thiết lập btn pause/play video
         exoPlayPause.setOnClickListener(view -> dispatchPlayPause());
 
+        //Ngăn các thao tác double tap trong controller
         // Prevent double tap actions in controller
         findViewById(R.id.exo_bottom_bar).setOnTouchListener((v, event) -> true);
         //titleView.setOnTouchListener((v, event) -> true);
