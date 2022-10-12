@@ -1,20 +1,18 @@
-package com.ntduc.playerutils.player.dtpv.youtube.views;
+package com.ntduc.playerutils.player.dtpv.youtube.views
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.util.Consumer;
-
-import com.ntduc.playerutils.R;
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.util.Consumer
+import com.ntduc.playerutils.R
 
 /**
  * Layout group which handles the icon animation while forwarding and rewinding.
@@ -24,260 +22,176 @@ import com.ntduc.playerutils.R;
  *
  * Used by [YouTubeOverlay][com.github.vkay94.dtpv.youtube.YouTubeOverlay].
  */
-public final class SecondsView extends ConstraintLayout {
+@SuppressLint("CutPasteId")
+class SecondsView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
+    private var cycleDuration = 750L
+    private var seconds = 0
+    private var isForward = true
+    private var icon: Int
+    private var animate: Boolean
+    private var firstAnimator: ValueAnimator? = null
+    private var secondAnimator: ValueAnimator? = null
+    private var thirdAnimator: ValueAnimator? = null
+    private var fourthAnimator: ValueAnimator? = null
+    private var fifthAnimator: ValueAnimator? = null
 
-    private long cycleDuration;
-    private int seconds;
-    private boolean isForward;
-    private int icon;
-    private boolean animate;
-
-    private final ValueAnimator firstAnimator;
-    private final ValueAnimator secondAnimator;
-    private final ValueAnimator thirdAnimator;
-    private final ValueAnimator fourthAnimator;
-    private final ValueAnimator fifthAnimator;
-
-    public SecondsView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-
-        cycleDuration = 750L;
-        seconds = 0;
-        isForward = true;
-        icon = R.drawable.ic_play_triangle;
-        animate = false;
-
-        LayoutInflater.from(context).inflate(R.layout.yt_seconds_view, this, true);
-
-        firstAnimator = new CustomValueAnimator(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.icon_1).setAlpha(0f);
-                findViewById(R.id.icon_2).setAlpha(0f);
-                findViewById(R.id.icon_3).setAlpha(0f);
-            }
-        }, new Consumer<Float>() {
-            @Override
-            public void accept(Float aFloat) {
-                findViewById(R.id.icon_1).setAlpha(aFloat);
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                if (animate)
-                    secondAnimator.start();
-            }
-        });
-
-        secondAnimator = new CustomValueAnimator(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.icon_1).setAlpha(1f);
-                findViewById(R.id.icon_2).setAlpha(0f);
-                findViewById(R.id.icon_3).setAlpha(0f);
-            }
-        }, new Consumer<Float>() {
-            @Override
-            public void accept(Float aFloat) {
-                findViewById(R.id.icon_2).setAlpha(aFloat);
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                if (animate)
-                    thirdAnimator.start();
-            }
-        });
-
-        thirdAnimator = new CustomValueAnimator(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.icon_1).setAlpha(1f);
-                findViewById(R.id.icon_2).setAlpha(1f);
-                findViewById(R.id.icon_3).setAlpha(0f);
-            }
-        }, new Consumer<Float>() {
-            @Override
-            public void accept(Float aFloat) {
-                findViewById(R.id.icon_1).setAlpha(1f - findViewById(R.id.icon_3).getAlpha());
-                findViewById(R.id.icon_3).setAlpha(aFloat);
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                if (animate)
-                    fourthAnimator.start();
-            }
-        });
-
-        fourthAnimator = new CustomValueAnimator(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.icon_1).setAlpha(0f);
-                findViewById(R.id.icon_2).setAlpha(1f);
-                findViewById(R.id.icon_3).setAlpha(1f);
-            }
-        }, new Consumer<Float>() {
-            @Override
-            public void accept(Float aFloat) {
-                findViewById(R.id.icon_2).setAlpha(1f - aFloat);
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                if (animate)
-                    fifthAnimator.start();
-            }
-        });
-
-        fifthAnimator = new CustomValueAnimator(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.icon_1).setAlpha(0f);
-                findViewById(R.id.icon_2).setAlpha(0f);
-                findViewById(R.id.icon_3).setAlpha(1f);
-            }
-        }, new Consumer<Float>() {
-            @Override
-            public void accept(Float aFloat) {
-                findViewById(R.id.icon_3).setAlpha(1f - aFloat);
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                if (animate)
-                    firstAnimator.start();
-            }
-        });
+    init {
+        icon = R.drawable.ic_play_triangle
+        animate = false
+        LayoutInflater.from(context).inflate(R.layout.yt_seconds_view, this, true)
+        firstAnimator = CustomValueAnimator({
+            findViewById<View>(R.id.icon_1).alpha = 0f
+            findViewById<View>(R.id.icon_2).alpha = 0f
+            findViewById<View>(R.id.icon_3).alpha = 0f
+        },
+            { aFloat ->
+                findViewById<View>(R.id.icon_1).alpha = aFloat ?: 0f
+            }) { if (animate) secondAnimator?.start() }
+        secondAnimator = CustomValueAnimator({
+            findViewById<View>(R.id.icon_1).alpha = 1f
+            findViewById<View>(R.id.icon_2).alpha = 0f
+            findViewById<View>(R.id.icon_3).alpha = 0f
+        },
+            { aFloat ->
+                findViewById<View>(R.id.icon_2).alpha = aFloat ?: 0f
+            }) { if (animate) thirdAnimator?.start() }
+        thirdAnimator = CustomValueAnimator({
+            findViewById<View>(R.id.icon_1).alpha = 1f
+            findViewById<View>(R.id.icon_2).alpha = 1f
+            findViewById<View>(R.id.icon_3).alpha = 0f
+        }, { aFloat ->
+            findViewById<View>(R.id.icon_1).alpha = 1f - findViewById<View>(R.id.icon_3).alpha
+            findViewById<View>(R.id.icon_3).alpha = aFloat ?: 0f
+        }) { if (animate) fourthAnimator?.start() }
+        fourthAnimator = CustomValueAnimator({
+            findViewById<View>(R.id.icon_1).alpha = 0f
+            findViewById<View>(R.id.icon_2).alpha = 1f
+            findViewById<View>(R.id.icon_3).alpha = 1f
+        },
+            { aFloat ->
+                findViewById<View>(R.id.icon_2).alpha = 1f - (aFloat ?: 0f)
+            }) { if (animate) fifthAnimator?.start() }
+        fifthAnimator = CustomValueAnimator({
+            findViewById<View>(R.id.icon_1).alpha = 0f
+            findViewById<View>(R.id.icon_2).alpha = 0f
+            findViewById<View>(R.id.icon_3).alpha = 1f
+        },
+            { aFloat ->
+                findViewById<View>(R.id.icon_3).alpha = 1f - (aFloat ?: 0f)
+            }) { if (animate) firstAnimator?.start() }
     }
 
     /**
      * Defines the duration for a full cycle of the triangle animation.
      * Each animation step takes 20% of it.
      */
-
-    public final long getCycleDuration() {
-        return cycleDuration;
+    fun getCycleDuration(): Long {
+        return cycleDuration
     }
 
-    public final void setCycleDuration(long value) {
-        firstAnimator.setDuration(value / (long)5);
-        secondAnimator.setDuration(value / (long)5);
-        thirdAnimator.setDuration(value / (long)5);
-        fourthAnimator.setDuration(value / (long)5);
-        fifthAnimator.setDuration(value / (long)5);
-        cycleDuration = value;
+    fun setCycleDuration(value: Long) {
+        firstAnimator?.duration = value / 5L
+        secondAnimator?.duration = value / 5L
+        thirdAnimator?.duration = value / 5L
+        fourthAnimator?.duration = value / 5L
+        fifthAnimator?.duration = value / 5L
+        cycleDuration = value
     }
 
     /**
      * Sets the `TextView`'s seconds text according to the device`s language.
      */
-
-    public final int getSeconds() {
-        return seconds;
+    fun getSeconds(): Int {
+        return seconds
     }
 
-    public final void setSeconds(int value) {
-        TextView textView = findViewById(R.id.tv_seconds);
-        textView.setText(getContext().getResources().getQuantityString(
-                R.plurals.quick_seek_x_second, value, value
-        ));
-        seconds = value;
+    fun setSeconds(value: Int) {
+        val textView = findViewById<TextView>(R.id.tv_seconds)
+        textView.text = context.resources.getQuantityString(
+            R.plurals.quick_seek_x_second, value, value
+        )
+        seconds = value
     }
 
     /**
      * Mirrors the triangles depending on what kind of type should be used (forward/rewind).
      */
-
-    public final boolean isForward() {
-        return isForward;
+    fun isForward(): Boolean {
+        return isForward
     }
 
-    public final void setForward(boolean value) {
-        LinearLayout linearLayout = findViewById(R.id.triangle_container);
-        linearLayout.setRotation(value ? 0f : 180f);
-        isForward = value;
+    fun setForward(value: Boolean) {
+        val linearLayout = findViewById<LinearLayout>(R.id.triangle_container)
+        linearLayout.rotation = if (value) 0f else 180f
+        isForward = value
     }
 
-    public final TextView getTextView() {
-        return (TextView)findViewById(R.id.tv_seconds);
+    fun getTextView(): TextView {
+        return findViewById<View>(R.id.tv_seconds) as TextView
     }
 
-    public final int getIcon() {
-        return icon;
+    fun getIcon(): Int {
+        return icon
     }
 
-    public final void setIcon(int value) {
+    fun setIcon(value: Int) {
         if (value > 0) {
-            ((ImageView)findViewById(R.id.icon_1)).setImageResource(value);
-            ((ImageView)findViewById(R.id.icon_2)).setImageResource(value);
-            ((ImageView)findViewById(R.id.icon_3)).setImageResource(value);
+            (findViewById<View>(R.id.icon_1) as ImageView).setImageResource(value)
+            (findViewById<View>(R.id.icon_2) as ImageView).setImageResource(value)
+            (findViewById<View>(R.id.icon_3) as ImageView).setImageResource(value)
         }
-        icon = value;
+        icon = value
     }
 
     /**
      * Starts the triangle animation
      */
-    public final void start() {
-        stop();
-        animate = true;
-        firstAnimator.start();
+    fun start() {
+        stop()
+        animate = true
+        firstAnimator?.start()
     }
 
     /**
      * Stops the triangle animation
      */
-    public final void stop() {
-        animate = false;
-        firstAnimator.cancel();
-        secondAnimator.cancel();
-        thirdAnimator.cancel();
-        fourthAnimator.cancel();
-        fifthAnimator.cancel();
-        reset();
+    fun stop() {
+        animate = false
+        firstAnimator?.cancel()
+        secondAnimator?.cancel()
+        thirdAnimator?.cancel()
+        fourthAnimator?.cancel()
+        fifthAnimator?.cancel()
+        reset()
     }
 
-    private final void reset() {
-        findViewById(R.id.icon_1).setAlpha(0f);
-        findViewById(R.id.icon_2).setAlpha(0f);
-        findViewById(R.id.icon_3).setAlpha(0f);
+    private fun reset() {
+        findViewById<View>(R.id.icon_1).alpha = 0f
+        findViewById<View>(R.id.icon_2).alpha = 0f
+        findViewById<View>(R.id.icon_3).alpha = 0f
     }
 
-
-    private final class CustomValueAnimator extends ValueAnimator {
-        public CustomValueAnimator(Runnable start, Consumer<Float> update, Runnable end) {
-            setDuration(getCycleDuration() / (long)5);
-            setFloatValues(0f, 1f);
-
-            addUpdateListener(new AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    update.accept((Float)animation.getAnimatedValue());
-                }
-            });
-
-            addListener(new AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    start.run();
+    private inner class CustomValueAnimator(
+        start: Runnable,
+        update: Consumer<Float?>,
+        end: Runnable
+    ) : ValueAnimator() {
+        init {
+            duration = getCycleDuration() / 5L
+            setFloatValues(0f, 1f)
+            addUpdateListener { animation -> update.accept(animation.animatedValue as Float) }
+            addListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                    start.run()
                 }
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    end.run();
+                override fun onAnimationEnd(animation: Animator) {
+                    end.run()
                 }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            });
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            })
         }
     }
 }
