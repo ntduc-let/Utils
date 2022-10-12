@@ -1,33 +1,24 @@
-package com.ntduc.playerutils.player.dtpv.youtube;
+package com.ntduc.playerutils.player.dtpv.youtube
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DimenRes;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.TextViewCompat;
-
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.SeekParameters;
-import com.ntduc.playerutils.R;
-import com.ntduc.playerutils.player.PlayerActivity;
-import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView;
-import com.ntduc.playerutils.player.dtpv.PlayerDoubleTapListener;
-import com.ntduc.playerutils.player.dtpv.SeekListener;
-import com.ntduc.playerutils.player.dtpv.youtube.views.CircleClipTapView;
-import com.ntduc.playerutils.player.dtpv.youtube.views.SecondsView;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.TextView
+import androidx.annotation.*
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SeekParameters
+import com.ntduc.playerutils.R
+import com.ntduc.playerutils.player.PlayerActivity
+import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
+import com.ntduc.playerutils.player.dtpv.PlayerDoubleTapListener
+import com.ntduc.playerutils.player.dtpv.SeekListener
+import com.ntduc.playerutils.player.dtpv.youtube.views.CircleClipTapView
+import com.ntduc.playerutils.player.dtpv.youtube.views.SecondsView
 
 /**
  * Overlay for [DoubleTapPlayerView] to create a similar UI/UX experience like the official
@@ -37,120 +28,91 @@ import com.ntduc.playerutils.player.dtpv.youtube.views.SecondsView;
  * which can't be accomplished with the regular Android Ripple (I didn't find any options in the
  * documentation ...).
  */
-public final class YouTubeOverlay extends ConstraintLayout implements PlayerDoubleTapListener {
-
-    private final AttributeSet attrs;
-
-    public YouTubeOverlay(@NonNull Context context) {
-        this(context, null);
+class YouTubeOverlay(context: Context, private val attrs: AttributeSet?) :
+    ConstraintLayout(context, attrs), PlayerDoubleTapListener {
+    constructor(context: Context) : this(context, null) {
         // Hide overlay initially when added programmatically
-        setVisibility(View.INVISIBLE);
+        visibility = View.INVISIBLE
     }
 
-    public YouTubeOverlay(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        this.attrs = attrs;
-        playerViewRef = -1;
-
-        LayoutInflater.from(context).inflate(R.layout.yt_overlay, this, true);
-
-        // Initialize UI components
-        initializeAttributes();
-        ((SecondsView)findViewById(R.id.seconds_view)).setForward(true);
-        changeConstraints(true);
-
-        // This code snippet is executed when the circle scale animation is finished
-        ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).setPerformAtEnd(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (performListener != null)
-                            performListener.onAnimationEnd();
-
-                        SecondsView secondsView = findViewById(R.id.seconds_view);
-                        secondsView.setVisibility(View.INVISIBLE);
-                        secondsView.setSeconds(0);
-                        secondsView.stop();
-                    }
-                }
-        );
-    }
-
-    private int playerViewRef;
+    private var playerViewRef: Int
 
     // Player behaviors
-    private DoubleTapPlayerView playerView;
-    private ExoPlayer player;
+    private var playerView: DoubleTapPlayerView? = null
+    private var player: ExoPlayer? = null
 
     /**
      * Sets all optional XML attributes and defaults
      */
-    private void initializeAttributes() {
+    private fun initializeAttributes() {
         if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs,
-                    R.styleable.YouTubeOverlay, 0, 0);
+            val a = context.obtainStyledAttributes(
+                attrs,
+                R.styleable.YouTubeOverlay, 0, 0
+            )
 
             // PlayerView => see onAttachToWindow
-            playerViewRef = a.getResourceId(R.styleable.YouTubeOverlay_yt_playerView, -1);
+            playerViewRef = a.getResourceId(R.styleable.YouTubeOverlay_yt_playerView, -1)
 
             // Durations
-            setAnimationDuration((long)a.getInt(
-                    R.styleable.YouTubeOverlay_yt_animationDuration, 650));
-
+            setAnimationDuration(
+                a.getInt(
+                    R.styleable.YouTubeOverlay_yt_animationDuration, 650
+                ).toLong()
+            )
             seekSeconds = a.getInt(
-                    R.styleable.YouTubeOverlay_yt_seekSeconds, 10);
-
-            setIconAnimationDuration((long)a.getInt(
-                    R.styleable.YouTubeOverlay_yt_iconAnimationDuration, 750));
+                R.styleable.YouTubeOverlay_yt_seekSeconds, 10
+            )
+            iconAnimationDuration = a.getInt(
+                R.styleable.YouTubeOverlay_yt_iconAnimationDuration, 750
+            ).toLong()
 
             // Arc size
-            setArcSize((float)a.getDimensionPixelSize(
-                    R.styleable.YouTubeOverlay_yt_arcSize,
-                    getContext().getResources().getDimensionPixelSize(R.dimen.dtpv_yt_arc_size))
-            );
+            arcSize = a.getDimensionPixelSize(
+                R.styleable.YouTubeOverlay_yt_arcSize,
+                context.resources.getDimensionPixelSize(R.dimen.dtpv_yt_arc_size)
+            ).toFloat()
 
             // Colors
-            setTapCircleColor(a.getColor(
+            tapCircleColorInt(
+                a.getColor(
                     R.styleable.YouTubeOverlay_yt_tapCircleColor,
-                    ContextCompat.getColor(getContext(), R.color.dtpv_yt_tap_circle_color))
-            );
-
-            setCircleBackgroundColor(a.getColor(
-                    R.styleable.YouTubeOverlay_yt_backgroundCircleColor,
-                    ContextCompat.getColor(getContext(), R.color.dtpv_yt_background_circle_color))
-            );
+                    ContextCompat.getColor(context, R.color.dtpv_yt_tap_circle_color)
+                )
+            )
+            circleBackgroundColor = a.getColor(
+                R.styleable.YouTubeOverlay_yt_backgroundCircleColor,
+                ContextCompat.getColor(context, R.color.dtpv_yt_background_circle_color)
+            )
 
             // Seconds TextAppearance
-            setTextAppearance(a.getResourceId(
-                    R.styleable.YouTubeOverlay_yt_textAppearance,
-                    R.style.YTOSecondsTextAppearance)
-            );
-
-            this.setIcon(a.getResourceId(
-                    R.styleable.YouTubeOverlay_yt_icon,
-                    R.drawable.ic_play_triangle)
-            );
-
-            a.recycle();
+            textAppearance = a.getResourceId(
+                R.styleable.YouTubeOverlay_yt_textAppearance,
+                R.style.YTOSecondsTextAppearance
+            )
+            icon = a.getResourceId(
+                R.styleable.YouTubeOverlay_yt_icon,
+                R.drawable.ic_play_triangle
+            )
+            a.recycle()
         } else {
             // Set defaults
-            setArcSize((float)getContext().getResources().getDimensionPixelSize(R.dimen.dtpv_yt_arc_size));
-            setTapCircleColor(ContextCompat.getColor(getContext(), R.color.dtpv_yt_tap_circle_color));
-            setCircleBackgroundColor(ContextCompat.getColor(getContext(), R.color.dtpv_yt_background_circle_color));
-            setAnimationDuration(650L);
-            setIconAnimationDuration(750L);
-            seekSeconds = 10;
-            setTextAppearance(R.style.YTOSecondsTextAppearance);
+            arcSize = context.resources.getDimensionPixelSize(R.dimen.dtpv_yt_arc_size).toFloat()
+            tapCircleColorInt(ContextCompat.getColor(context, R.color.dtpv_yt_tap_circle_color))
+            circleBackgroundColor =
+                ContextCompat.getColor(context, R.color.dtpv_yt_background_circle_color)
+            setAnimationDuration(650L)
+            iconAnimationDuration = 750L
+            seekSeconds = 10
+            textAppearance = R.style.YTOSecondsTextAppearance
         }
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
 
         // If the PlayerView is set by XML then call the corresponding setter method
-        if (playerViewRef != -1)
-            playerView((DoubleTapPlayerView)((View)getParent()).findViewById(playerViewRef));
+        if (playerViewRef != -1) playerView((parent as View).findViewById<View>(playerViewRef) as DoubleTapPlayerView)
     }
 
     /**
@@ -160,9 +122,9 @@ public final class YouTubeOverlay extends ConstraintLayout implements PlayerDoub
      *
      * @param playerView PlayerView which triggers the event
      */
-    public YouTubeOverlay playerView(DoubleTapPlayerView playerView) {
-        this.playerView = playerView;
-        return this;
+    fun playerView(playerView: DoubleTapPlayerView?): YouTubeOverlay {
+        this.playerView = playerView
+        return this
     }
 
     /**
@@ -172,148 +134,139 @@ public final class YouTubeOverlay extends ConstraintLayout implements PlayerDoub
      *
      * @param player PlayerView which triggers the event
      */
-    public YouTubeOverlay player(ExoPlayer player) {
-        this.player = player;
-        return this;
+    fun player(player: ExoPlayer?): YouTubeOverlay {
+        this.player = player
+        return this
     }
 
-        /*
+    /*
         Properties
      */
-
-    private SeekListener seekListener;
+    private var seekListener: SeekListener? = null
 
     /**
      * Optional: Sets a listener to observe whether double tap reached the start / end of the video
      */
-    public YouTubeOverlay seekListener(SeekListener listener) {
-        seekListener = listener;
-        return this;
+    fun seekListener(listener: SeekListener?): YouTubeOverlay {
+        seekListener = listener
+        return this
     }
 
-    private PerformListener performListener;
+    private var performListener: PerformListener? = null
 
     /**
      * Sets a listener to execute some code before and after the animation
      * (for example UI changes (hide and show views etc.))
      */
-    public YouTubeOverlay performListener(PerformListener listener) {
-        performListener = listener;
-        return this;
+    fun performListener(listener: PerformListener?): YouTubeOverlay {
+        performListener = listener
+        return this
     }
 
     /**
      * Forward / rewind duration on a tap in seconds.
      */
-    private int seekSeconds;
-    public final int getSeekSeconds() {
-        return seekSeconds;
-    }
+    var seekSeconds = 0
+        private set
 
-    public YouTubeOverlay seekSeconds(int seconds) {
-        seekSeconds = seconds;
-        return this;
+    fun seekSeconds(seconds: Int): YouTubeOverlay {
+        seekSeconds = seconds
+        return this
     }
 
     /**
      * Color of the scaling circle on touch feedback.
      */
-    public int getTapCircleColor() {
-        return ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).getCircleColor();
+    fun getTapCircleColor(): Int {
+        return (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).circleColor
     }
 
-    private void setTapCircleColor(int value) {
-        ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).setCircleColor(value);
+    private fun setTapCircleColor(value: Int) {
+        (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).circleColor = value
     }
 
-    public YouTubeOverlay tapCircleColorRes(@ColorRes int resId) {
-        setTapCircleColor(ContextCompat.getColor(getContext(), resId));
-        return this;
+    fun tapCircleColorRes(@ColorRes resId: Int): YouTubeOverlay {
+        setTapCircleColor(ContextCompat.getColor(context, resId))
+        return this
     }
 
-    public YouTubeOverlay tapCircleColorInt(@ColorInt int color) {
-        setTapCircleColor(color);
-        return this;
+    fun tapCircleColorInt(@ColorInt color: Int): YouTubeOverlay {
+        setTapCircleColor(color)
+        return this
     }
 
     /**
      * Color of the clipped background circle
      */
-    public final int getCircleBackgroundColor() {
-        return ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).getCircleBackgroundColor();
+    var circleBackgroundColor: Int
+        get() = (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).circleBackgroundColor
+        private set(value) {
+            (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).circleBackgroundColor =
+                value
+        }
+
+    fun circleBackgroundColorRes(@ColorRes resId: Int): YouTubeOverlay {
+        circleBackgroundColor = ContextCompat.getColor(context, resId)
+        return this
     }
 
-    private final void setCircleBackgroundColor(int value) {
-        ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).setCircleBackgroundColor(value);
-    }
-
-    public YouTubeOverlay circleBackgroundColorRes(@ColorRes int resId) {
-        setCircleBackgroundColor(ContextCompat.getColor(getContext(), resId));
-        return this;
-    }
-
-    public YouTubeOverlay circleBackgroundColorInt(@ColorInt int color) {
-        setCircleBackgroundColor(color);
-        return this;
+    fun circleBackgroundColorInt(@ColorInt color: Int): YouTubeOverlay {
+        circleBackgroundColor = color
+        return this
     }
 
     /**
      * Duration of the circle scaling animation / speed in milliseconds.
      * The overlay keeps visible until the animation finishes.
      */
-    private long animationDuration;
-    public final long getAnimationDuration() {
-        return ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).getAnimationDuration();
+    private val animationDuration: Long = 0
+    fun getAnimationDuration(): Long {
+        return (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).animationDuration
     }
 
-    private void setAnimationDuration(long value) {
-        ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).setAnimationDuration(value);
+    private fun setAnimationDuration(value: Long) {
+        (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).animationDuration =
+            value
     }
 
-    public YouTubeOverlay animationDuration(long duration) {
-        setAnimationDuration(duration);
-        return this;
+    fun animationDuration(duration: Long): YouTubeOverlay {
+        setAnimationDuration(duration)
+        return this
     }
 
     /**
      * Size of the arc which will be clipped from the background circle.
      * The greater the value the more roundish the shape becomes
      */
-    private float arcSize;
-    public final float getArcSize() {
-        return ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).getArcSize();
+    var arcSize: Float
+        get() = (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).getArcSize()
+        private set(value) {
+            (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).setArcSize(value)
+        }
+
+    fun arcSize(@DimenRes resId: Int): YouTubeOverlay {
+        arcSize = context.resources.getDimension(resId)
+        return this
     }
 
-    private void setArcSize(float value) {
-        ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).setArcSize(value);
-    }
-
-    public YouTubeOverlay arcSize(@DimenRes int resId) {
-        setArcSize(getContext().getResources().getDimension(resId));
-        return this;
-    }
-
-    public YouTubeOverlay arcSize(float px) {
-        setArcSize(px);
-        return this;
+    fun arcSize(px: Float): YouTubeOverlay {
+        arcSize = px
+        return this
     }
 
     /**
      * Duration the icon animation (fade in + fade out) for a full cycle in milliseconds.
      */
-    private long iconAnimationDuration = 750;
-    public final long getIconAnimationDuration() {
-        return ((SecondsView)findViewById(R.id.seconds_view)).getCycleDuration();
-    }
+    var iconAnimationDuration: Long = 750
+        get() = (findViewById<View>(R.id.seconds_view) as SecondsView).getCycleDuration()
+        private set(value) {
+            (findViewById<View>(R.id.seconds_view) as SecondsView).setCycleDuration(value)
+            field = value
+        }
 
-    private void setIconAnimationDuration(long value) {
-        ((SecondsView)findViewById(R.id.seconds_view)).setCycleDuration(value);
-        iconAnimationDuration = value;
-    }
-
-    public YouTubeOverlay iconAnimationDuration(long duration) {
-        setIconAnimationDuration(duration);
-        return this;
+    fun iconAnimationDuration(duration: Long): YouTubeOverlay {
+        iconAnimationDuration = duration
+        return this
     }
 
     /**
@@ -323,37 +276,53 @@ public final class YouTubeOverlay extends ConstraintLayout implements PlayerDoub
      * Keep in mind that padding on the left and right of the drawable will be rendered which
      * could result in additional space between the three icons.
      */
-    private int icon;
-    public final int getIcon() {
-        return ((SecondsView)findViewById(R.id.seconds_view)).getIcon();
-    }
+    var icon = 0
+        get() = (findViewById<View>(R.id.seconds_view) as SecondsView).getIcon()
+        private set(value) {
+            (findViewById<View>(R.id.seconds_view) as SecondsView).setIcon(value)
+            field = value
+        }
 
-    private void setIcon(int value) {
-        ((SecondsView)findViewById(R.id.seconds_view)).setIcon(value);
-        this.icon = value;
-    }
-
-    public YouTubeOverlay icon(@DrawableRes int resId) {
-        setIcon(resId);
-        return this;
+    fun icon(@DrawableRes resId: Int): YouTubeOverlay {
+        icon = resId
+        return this
     }
 
     /**
      * Text appearance of the *xx seconds* text.
      */
-    private int textAppearance;
-    public final int getTextAppearance() {
-        return textAppearance;
+    var textAppearance = 0
+        private set(value) {
+            TextViewCompat.setTextAppearance(
+                (findViewById<View>(R.id.seconds_view) as SecondsView).getTextView(),
+                value
+            )
+            field = value
+        }
+
+    init {
+        playerViewRef = -1
+        LayoutInflater.from(context).inflate(R.layout.yt_overlay, this, true)
+
+        // Initialize UI components
+        initializeAttributes()
+        (findViewById<View>(R.id.seconds_view) as SecondsView).setForward(true)
+        changeConstraints(true)
+
+        // This code snippet is executed when the circle scale animation is finished
+        (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).performAtEnd =
+            Runnable {
+                if (performListener != null) performListener!!.onAnimationEnd()
+                val secondsView = findViewById<SecondsView>(R.id.seconds_view)
+                secondsView.visibility = View.INVISIBLE
+                secondsView.setSeconds(0)
+                secondsView.stop()
+            }
     }
 
-    private final void setTextAppearance(int value) {
-        TextViewCompat.setTextAppearance(((SecondsView)findViewById(R.id.seconds_view)).getTextView(), value);
-        textAppearance = value;
-    }
-
-    public final YouTubeOverlay textAppearance(@StyleRes int resId) {
-        setTextAppearance(resId);
-        return this;
+    fun textAppearance(@StyleRes resId: Int): YouTubeOverlay {
+        textAppearance = resId
+        return this
     }
 
     /**
@@ -361,102 +330,84 @@ public final class YouTubeOverlay extends ConstraintLayout implements PlayerDoub
      *
      * In case of you'd like to change some specific attributes of the TextView in runtime.
      */
-    public final TextView getSecondsTextView() {
-        return ((SecondsView)findViewById(R.id.seconds_view)).getTextView();
-    }
+    val secondsTextView: TextView
+        get() = (findViewById<View>(R.id.seconds_view) as SecondsView).getTextView()
 
-    @Override
-    public void onDoubleTapStarted(float posX, float posY) {
-
-        if (PlayerActivity.locked)
-            return;
-
-        if (player != null && player.getCurrentPosition() >= 0L && playerView != null && playerView.getWidth() > 0) {
-            if (posX >= playerView.getWidth() * 0.35 && posX <= playerView.getWidth() * 0.65) {
-                if (player.isPlaying()) {
-                    player.pause();
+    override fun onDoubleTapStarted(posX: Float, posY: Float) {
+        if (PlayerActivity.locked) return
+        if (player != null && player!!.currentPosition >= 0L && playerView != null && playerView!!.width > 0) {
+            if (posX >= playerView!!.width * 0.35 && posX <= playerView!!.width * 0.65) {
+                if (player!!.isPlaying) {
+                    player!!.pause()
                 } else {
-                    player.play();
-                    if (playerView.isControllerFullyVisible())
-                        playerView.hideController();
+                    player!!.play()
+                    if (playerView!!.isControllerFullyVisible) playerView!!.hideController()
                 }
-                return;
+                return
             }
         }
 
         //super.onDoubleTapStarted(posX, posY);
     }
 
-    @Override
-    public void onDoubleTapProgressUp(float posX, float posY) {
-
-        if (PlayerActivity.locked)
-            return;
+    override fun onDoubleTapProgressUp(posX: Float, posY: Float) {
+        if (PlayerActivity.locked) return
 
         // Check first whether forwarding/rewinding is "valid"
-        if (player == null || player.getMediaItemCount() < 1 || player.getCurrentPosition() < 0 || playerView == null || playerView.getWidth() < 0)
-            return;
-
-        long current = player.getCurrentPosition();
+        if (player == null || player!!.mediaItemCount < 1 || player!!.currentPosition < 0 || playerView == null || playerView!!.width < 0) return
+        val current = player!!.currentPosition
         // Rewind and start of the video (+ 0.5 sec tolerance)
-        if (posX < playerView.getWidth() * 0.35 && current <= 500)
-            return;
+        if (posX < playerView!!.width * 0.35 && current <= 500) return
 
         // Forward and end of the video (- 0.5 sec tolerance)
-        if (posX > playerView.getWidth() * 0.65 && current >= (player.getDuration() - 500))
-            return;
+        if (posX > playerView!!.width * 0.65 && current >= player!!.duration - 500) return
 
         // YouTube behavior: show overlay on MOTION_UP
         // But check whether the first double tap is in invalid area
-        if (getVisibility() != View.VISIBLE) {
-            if (posX < playerView.getWidth() * 0.35 || posX > playerView.getWidth() * 0.65) {
-                if (performListener != null)
-                    performListener.onAnimationStart();
-                SecondsView secondsView = findViewById(R.id.seconds_view);
-                secondsView.setVisibility(View.VISIBLE);
-                secondsView.start();
-            } else
-                return;
+        if (visibility != View.VISIBLE) {
+            if (posX < playerView!!.width * 0.35 || posX > playerView!!.width * 0.65) {
+                if (performListener != null) performListener!!.onAnimationStart()
+                val secondsView = findViewById<SecondsView>(R.id.seconds_view)
+                secondsView.visibility = View.VISIBLE
+                secondsView.start()
+            } else return
         }
-
-        if (posX < playerView.getWidth() * 0.35) {
+        if (posX < playerView!!.width * 0.35) {
 
             // First time tap or switched
-            SecondsView secondsView = findViewById(R.id.seconds_view);
+            val secondsView = findViewById<SecondsView>(R.id.seconds_view)
             if (secondsView.isForward()) {
-                changeConstraints(false);
-                secondsView.setForward(false);
-                secondsView.setSeconds(0);
+                changeConstraints(false)
+                secondsView.setForward(false)
+                secondsView.setSeconds(0)
             }
 
             // Cancel ripple and start new without triggering overlay disappearance
             // (resetting instead of ending)
-            ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).resetAnimation(new Runnable() {
-                @Override
-                public void run() {
-                    ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).updatePosition(posX, posY);
-                }
-            });
-            rewinding();
-        } else if (posX > playerView.getWidth() * 0.65) {
+            (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).resetAnimation {
+                (findViewById<View>(
+                    R.id.circle_clip_tap_view
+                ) as CircleClipTapView).updatePosition(posX, posY)
+            }
+            rewinding()
+        } else if (posX > playerView!!.width * 0.65) {
 
             // First time tap or switched
-            SecondsView secondsView = findViewById(R.id.seconds_view);
+            val secondsView = findViewById<SecondsView>(R.id.seconds_view)
             if (!secondsView.isForward()) {
-                changeConstraints(true);
-                secondsView.setForward(true);
-                secondsView.setSeconds(0);
+                changeConstraints(true)
+                secondsView.setForward(true)
+                secondsView.setSeconds(0)
             }
 
             // Cancel ripple and start new without triggering overlay disappearance
             // (resetting instead of ending)
-            ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).resetAnimation(new Runnable() {
-                @Override
-                public void run() {
-                    ((CircleClipTapView)findViewById(R.id.circle_clip_tap_view)).updatePosition(posX, posY);
-                }
-            });
-            forwarding();
+            (findViewById<View>(R.id.circle_clip_tap_view) as CircleClipTapView).resetAnimation {
+                (findViewById<View>(
+                    R.id.circle_clip_tap_view
+                ) as CircleClipTapView).updatePosition(posX, posY)
+            }
+            forwarding()
         } else {
             // Middle area tapped: do nothing
             //
@@ -473,68 +424,65 @@ public final class YouTubeOverlay extends ConstraintLayout implements PlayerDoub
      *
      * @param newPosition desired position
      */
-    private void seekToPosition(long newPosition) {
-        if (player == null || playerView == null)
-            return;
-
-        player.setSeekParameters(SeekParameters.EXACT);
+    private fun seekToPosition(newPosition: Long) {
+        if (player == null || playerView == null) return
+        player!!.setSeekParameters(SeekParameters.EXACT)
 
         // Start of the video reached
         if (newPosition <= 0) {
-            player.seekTo(0);
-
-            if (seekListener != null)
-                seekListener.onVideoStartReached();
-            return;
+            player!!.seekTo(0)
+            if (seekListener != null) seekListener!!.onVideoStartReached()
+            return
         }
 
         // End of the video reached
-        long total = player.getDuration();
+        val total = player!!.duration
         if (newPosition >= total) {
-            player.seekTo(total);
-
-            if (seekListener != null)
-                seekListener.onVideoEndReached();
-            return;
+            player!!.seekTo(total)
+            if (seekListener != null) seekListener!!.onVideoEndReached()
+            return
         }
 
         // Otherwise
-        playerView.keepInDoubleTapMode();
-        player.seekTo(newPosition);
+        playerView!!.keepInDoubleTapMode()
+        player!!.seekTo(newPosition)
     }
 
-    private void forwarding() {
-        SecondsView secondsView = findViewById(R.id.seconds_view);
-        secondsView.setSeconds(secondsView.getSeconds() + seekSeconds);
-        seekToPosition(player != null ? player.getCurrentPosition() + (long)(this.seekSeconds * 1000) : null);
+    private fun forwarding() {
+        val secondsView = findViewById<SecondsView>(R.id.seconds_view)
+        secondsView.setSeconds(secondsView.getSeconds() + seekSeconds)
+        seekToPosition((if (player != null) player!!.currentPosition + (seekSeconds * 1000).toLong() else null)!!)
     }
 
-    private void rewinding() {
-        SecondsView secondsView = findViewById(R.id.seconds_view);
-        secondsView.setSeconds(secondsView.getSeconds() + seekSeconds);
-        seekToPosition(player != null ? player.getCurrentPosition() - (long)(this.seekSeconds * 1000) : null);
+    private fun rewinding() {
+        val secondsView = findViewById<SecondsView>(R.id.seconds_view)
+        secondsView.setSeconds(secondsView.getSeconds() + seekSeconds)
+        seekToPosition((if (player != null) player!!.currentPosition - (seekSeconds * 1000).toLong() else null)!!)
     }
 
-    private void changeConstraints(boolean forward) {
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone((ConstraintLayout)findViewById(R.id.root_constraint_layout));
-        SecondsView secondsView = findViewById(R.id.seconds_view);
+    private fun changeConstraints(forward: Boolean) {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(findViewById<View>(R.id.root_constraint_layout) as ConstraintLayout)
+        val secondsView = findViewById<SecondsView>(R.id.seconds_view)
         if (forward) {
-            constraintSet.clear(secondsView.getId(), ConstraintSet.START);
-            constraintSet.connect(secondsView.getId(), ConstraintSet.END,
-                    ConstraintSet.PARENT_ID, ConstraintSet.END);
+            constraintSet.clear(secondsView.id, ConstraintSet.START)
+            constraintSet.connect(
+                secondsView.id, ConstraintSet.END,
+                ConstraintSet.PARENT_ID, ConstraintSet.END
+            )
         } else {
-            constraintSet.clear(secondsView.getId(), ConstraintSet.END);
-            constraintSet.connect(secondsView.getId(), ConstraintSet.START,
-                    ConstraintSet.PARENT_ID, ConstraintSet.START);
+            constraintSet.clear(secondsView.id, ConstraintSet.END)
+            constraintSet.connect(
+                secondsView.id, ConstraintSet.START,
+                ConstraintSet.PARENT_ID, ConstraintSet.START
+            )
         }
         //secondsView.start();
-        constraintSet.applyTo((ConstraintLayout)findViewById(R.id.root_constraint_layout));
+        constraintSet.applyTo(findViewById<View>(R.id.root_constraint_layout) as ConstraintLayout)
     }
 
-    public interface PerformListener {
-        void onAnimationStart();
-
-        void onAnimationEnd();
+    interface PerformListener {
+        fun onAnimationStart()
+        fun onAnimationEnd()
     }
 }
