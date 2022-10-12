@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 class keyListener implements DialogInterface.OnKeyListener {
     private WeakReference<ChooserDialog> _c;
@@ -32,70 +33,68 @@ class keyListener implements DialogInterface.OnKeyListener {
         if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
 
         if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
-            if (_c.get()._newFolderView != null && _c.get()._newFolderView.getVisibility() == VISIBLE) {
-                _c.get()._newFolderView.setVisibility(GONE);
+            if (_c.get().get_newFolderView() != null && Objects.requireNonNull(_c.get().get_newFolderView()).getVisibility() == VISIBLE) {
+                Objects.requireNonNull(_c.get().get_newFolderView()).setVisibility(GONE);
                 return true;
             }
-            _c.get()._onBackPressed.onBackPressed(_c.get()._alertDialog);
+            Objects.requireNonNull(_c.get().get_onBackPressed()).onBackPressed(_c.get().get_alertDialog());
             return true;
         }
 
-        if (!_c.get()._enableDpad) return true;
+        if (!_c.get().get_enableDpad()) return true;
 
-        if (!_c.get()._list.hasFocus()) {
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_DPAD_UP:
-                    if (_c.get()._neutralBtn == null) {
-                        return false;
-                    }
-                    if (_c.get()._neutralBtn.hasFocus() || _c.get()._negativeBtn.hasFocus()
-                        || _c.get()._positiveBtn.hasFocus()) {
-                        if (_c.get()._options != null && _c.get()._options.getVisibility() == VISIBLE) {
-                            _c.get()._options.requestFocus(
-                                _c.get()._neutralBtn.hasFocus() ? View.FOCUS_RIGHT : View.FOCUS_LEFT);
-                            return true;
-                        } else if (_c.get()._newFolderView != null
-                            && _c.get()._newFolderView.getVisibility() == VISIBLE) {
-                            _c.get()._newFolderView.requestFocus(View.FOCUS_LEFT);
-                            return true;
-                        } else {
-                            _c.get()._list.requestFocus();
-                            _c.get().lastSelected = true;
-                            return true;
-                        }
-                    }
-                    if (_c.get()._options != null && _c.get()._options.hasFocus()) {
-                        _c.get()._list.requestFocus();
-                        _c.get().lastSelected = true;
+        if (!Objects.requireNonNull(_c.get().get_list()).hasFocus()) {
+            if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                if (_c.get().get_neutralBtn() == null) {
+                    return false;
+                }
+                if (Objects.requireNonNull(_c.get().get_neutralBtn()).hasFocus() || Objects.requireNonNull(_c.get().get_negativeBtn()).hasFocus()
+                        || Objects.requireNonNull(_c.get().get_positiveBtn()).hasFocus()) {
+                    if (_c.get().get_options() != null && Objects.requireNonNull(_c.get().get_options()).getVisibility() == VISIBLE) {
+                        Objects.requireNonNull(_c.get().get_options()).requestFocus(
+                                Objects.requireNonNull(_c.get().get_neutralBtn()).hasFocus() ? View.FOCUS_RIGHT : View.FOCUS_LEFT);
+                        return true;
+                    } else if (_c.get().get_newFolderView() != null
+                            && Objects.requireNonNull(_c.get().get_newFolderView()).getVisibility() == VISIBLE) {
+                        Objects.requireNonNull(_c.get().get_newFolderView()).requestFocus(View.FOCUS_LEFT);
+                        return true;
+                    } else {
+                        Objects.requireNonNull(_c.get().get_list()).requestFocus();
+                        _c.get().setLastSelected(true);
                         return true;
                     }
-                    break;
-                default:
-                    return false;
+                }
+                if (_c.get().get_options() != null && Objects.requireNonNull(_c.get().get_options()).hasFocus()) {
+                    Objects.requireNonNull(_c.get().get_list()).requestFocus();
+                    _c.get().setLastSelected(true);
+                    return true;
+                }
+            } else {
+                return false;
             }
         }
 
-        if (_c.get()._list.hasFocus()) {
+        if (Objects.requireNonNull(_c.get().get_list()).hasFocus()) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_LEFT:
-                    _c.get()._onBackPressed.onBackPressed(_c.get()._alertDialog);
-                    _c.get().lastSelected = false;
+                    Objects.requireNonNull(_c.get().get_onBackPressed()).onBackPressed(_c.get().get_alertDialog());
+                    _c.get().setLastSelected(false);
                     return true;
                 case KeyEvent.KEYCODE_DPAD_RIGHT:
-                    _c.get()._list.performItemClick(_c.get()._list, _c.get()._list.getSelectedItemPosition(),
-                        _c.get()._list.getSelectedItemId());
-                    _c.get().lastSelected = false;
+                    Objects.requireNonNull(_c.get().get_list()).performItemClick(_c.get().get_list(), Objects.requireNonNull(_c.get().get_list()).getSelectedItemPosition(),
+                        Objects.requireNonNull(_c.get().get_list()).getSelectedItemId());
+                    _c.get().setLastSelected(false);
                     return true;
                 case KeyEvent.KEYCODE_DPAD_DOWN:
-                    if (_c.get().lastSelected) {
-                        _c.get().lastSelected = false;
-                        if (_c.get()._options != null && _c.get()._options.getVisibility() == VISIBLE) {
-                            _c.get()._options.requestFocus();
+                    if (_c.get().getLastSelected()) {
+                        _c.get().setLastSelected(false);
+                        if (_c.get().get_options() != null && Objects.requireNonNull(_c.get().get_options()).getVisibility() == VISIBLE) {
+                            Objects.requireNonNull(_c.get().get_options()).requestFocus();
                         } else {
-                            if (_c.get()._neutralBtn.getVisibility() == VISIBLE) {
-                                _c.get()._neutralBtn.requestFocus();
+                            if (Objects.requireNonNull(_c.get().get_neutralBtn()).getVisibility() == VISIBLE) {
+                                Objects.requireNonNull(_c.get().get_neutralBtn()).requestFocus();
                             } else {
-                                _c.get()._negativeBtn.requestFocus();
+                                Objects.requireNonNull(_c.get().get_negativeBtn()).requestFocus();
                             }
                         }
                         return true;
