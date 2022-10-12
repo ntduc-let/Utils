@@ -1,13 +1,13 @@
-package com.ntduc.playerutils.player.dtpv;
+package com.ntduc.playerutils.player.dtpv
 
-public interface SeekListener {
+interface SeekListener {
     /**
      * Called when video start reached during rewinding
      */
-    void onVideoStartReached();
+    fun onVideoStartReached()
 
     /**
      * Called when video end reached during forwarding
      */
-    void onVideoEndReached();
+    fun onVideoEndReached()
 }
