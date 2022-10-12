@@ -15,7 +15,7 @@ import com.ntduc.playerutils.player.CustomStyledPlayerView
 /**
  * Custom player class for Double-Tapping listening
  */
-class DoubleTapPlayerView constructor(
+class DoubleTapPlayerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

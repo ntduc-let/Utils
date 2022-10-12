@@ -1,66 +1,49 @@
-package com.ntduc.playerutils.player;
+package com.ntduc.playerutils.player
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.net.Uri;
+import android.content.ContentResolver
+import android.content.Context
+import android.net.Uri
+import com.google.android.exoplayer2.util.MimeTypes
+import androidx.documentfile.provider.DocumentFile
+import com.ibm.icu.text.CharsetDetector
+import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
+import com.google.android.exoplayer2.C
+import java.io.*
+import java.lang.Exception
+import java.lang.NullPointerException
+import java.nio.charset.StandardCharsets
+import java.util.*
 
-import androidx.documentfile.provider.DocumentFile;
-
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.util.MimeTypes;
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-class SubtitleUtils {
-
-    public static String getSubtitleMime(Uri uri) {
-        final String path = uri.getPath();
-        if (path.endsWith(".ssa") || path.endsWith(".ass")) {
-            return MimeTypes.TEXT_SSA;
+internal object SubtitleUtils {
+    fun getSubtitleMime(uri: Uri): String {
+        val path = uri.path
+        return if (path!!.endsWith(".ssa") || path.endsWith(".ass")) {
+            MimeTypes.TEXT_SSA
         } else if (path.endsWith(".vtt")) {
-            return MimeTypes.TEXT_VTT;
-        } else if (path.endsWith(".ttml") ||  path.endsWith(".xml") || path.endsWith(".dfxp")) {
-            return MimeTypes.APPLICATION_TTML;
+            MimeTypes.TEXT_VTT
+        } else if (path.endsWith(".ttml") || path.endsWith(".xml") || path.endsWith(".dfxp")) {
+            MimeTypes.APPLICATION_TTML
         } else {
-            return MimeTypes.APPLICATION_SUBRIP;
+            MimeTypes.APPLICATION_SUBRIP
         }
     }
 
-    public static String getSubtitleLanguage(Uri uri) {
-        final String path = uri.getPath().toLowerCase();
-
+    fun getSubtitleLanguage(uri: Uri): String? {
+        val path = uri.path!!.lowercase(Locale.getDefault())
         if (path.endsWith(".srt")) {
-            int last = path.lastIndexOf(".");
-            int prev = last;
-
-            for (int i = last; i >= 0; i--) {
-                prev = path.indexOf(".", i);
-                if (prev != last)
-                    break;
+            val last = path.lastIndexOf(".")
+            var prev = last
+            for (i in last downTo 0) {
+                prev = path.indexOf(".", i)
+                if (prev != last) break
             }
-
-            int len = last - prev;
-
-            if (len >= 2 && len <= 6) {
+            val len = last - prev
+            if (len in 2..6) {
                 // TODO: Validate lang
-                return path.substring(prev + 1, last);
+                return path.substring(prev + 1, last)
             }
         }
-
-        return null;
+        return null
     }
 
     /*
@@ -80,294 +63,282 @@ class SubtitleUtils {
         return null;
     }
     */
-
-    public static DocumentFile findUriInScope(Context context, Uri scope, Uri uri) {
-        DocumentFile treeUri = DocumentFile.fromTreeUri(context, scope);
-        String[] trailScope = getTrailFromUri(scope);
-        String[] trailVideo = getTrailFromUri(uri);
-
-        for (int i = 0; i < trailVideo.length; i++) {
-            if (i < trailScope.length) {
-                if (!trailScope[i].equals(trailVideo[i]))
-                    break;
+    fun findUriInScope(context: Context?, scope: Uri, uri: Uri): DocumentFile? {
+        var treeUri = DocumentFile.fromTreeUri(context!!, scope)
+        val trailScope = getTrailFromUri(scope)
+        val trailVideo = getTrailFromUri(uri)
+        for (i in trailVideo.indices) {
+            if (i < trailScope.size) {
+                if (trailScope[i] != trailVideo[i]) break
             } else {
-                treeUri = treeUri.findFile(trailVideo[i]);
-                if (treeUri == null)
-                    break;
+                treeUri = treeUri!!.findFile(trailVideo[i])
+                if (treeUri == null) break
             }
-            if (i + 1 == trailVideo.length)
-                return treeUri;
+            if (i + 1 == trailVideo.size) return treeUri
         }
-        return null;
+        return null
     }
 
-    public static DocumentFile findDocInScope(DocumentFile scope, DocumentFile doc) {
-        if (doc == null || scope == null)
-            return null;
-        for (DocumentFile file : scope.listFiles()) {
-            if (file.isDirectory()) {
-                final DocumentFile ret = findDocInScope(file, doc);
-                if (ret != null)
-                    return ret;
+    fun findDocInScope(scope: DocumentFile?, doc: DocumentFile?): DocumentFile? {
+        if (doc == null || scope == null) return null
+        for (file in scope.listFiles()) {
+            if (file.isDirectory) {
+                val ret = findDocInScope(file, doc)
+                if (ret != null) return ret
             } else {
                 //if (doc.length() == file.length() && doc.lastModified() == file.lastModified() && doc.getName().equals(file.getName())) {
                 // lastModified is zero when opened from Solid Explorer
-                final String docName = doc.getName();
-                final String fileName = file.getName();
+                val docName = doc.name
+                val fileName = file.name
                 if (docName == null || fileName == null) {
-                    continue;
+                    continue
                 }
-                if (doc.length() == file.length() && docName.equals(fileName)) {
-                    return file;
+                if (doc.length() == file.length() && docName == fileName) {
+                    return file
                 }
             }
         }
-        return null;
+        return null
     }
 
-    public static String getTrailPathFromUri(Uri uri) {
-        String path = uri.getPath();
-        String[] array = path.split(":");
-        if (array.length > 1) {
-            return array[array.length - 1];
+    fun getTrailPathFromUri(uri: Uri): String {
+        val path = uri.path
+        val array = path!!.split(":").toTypedArray()
+        return if (array.size > 1) {
+            array[array.size - 1]
         } else {
-            return path;
+            path
         }
     }
 
-    public static String[] getTrailFromUri(Uri uri) {
-        if ("org.courville.nova.provider".equals(uri.getHost()) && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
-            String path = uri.getPath();
-            if (path.startsWith("/external_files/")) {
-                return path.substring("/external_files/".length()).split("/");
+    fun getTrailFromUri(uri: Uri): Array<String> {
+        if ("org.courville.nova.provider" == uri.host && ContentResolver.SCHEME_CONTENT == uri.scheme) {
+            val path = uri.path
+            if (path!!.startsWith("/external_files/")) {
+                return path.substring("/external_files/".length).split("/").toTypedArray()
             }
         }
-        return getTrailPathFromUri(uri).split("/");
+        return getTrailPathFromUri(uri).split("/").toTypedArray()
     }
 
-    private static String getFileBaseName(String name) {
-        if (name.indexOf(".") > 0)
-            return name.substring(0, name.lastIndexOf("."));
-        return name;
+    private fun getFileBaseName(name: String?): String {
+        return if (name!!.indexOf(".") > 0) name.substring(0, name.lastIndexOf(".")) else name
     }
 
-    public static DocumentFile findSubtitle(DocumentFile video) {
-        DocumentFile dir = video.getParentFile();
-        return findSubtitle(video, dir);
+    fun findSubtitle(video: DocumentFile): DocumentFile? {
+        val dir = video.parentFile
+        return findSubtitle(video, dir)
     }
 
-    public static DocumentFile findSubtitle(DocumentFile video, DocumentFile dir) {
-        String videoName = getFileBaseName(video.getName());
-        int videoFiles = 0;
-
-        if (dir == null || !dir.isDirectory())
-            return null;
-
-        List<DocumentFile> candidates = new ArrayList<>();
-
-        for (DocumentFile file : dir.listFiles()) {
-            if (file.getName().startsWith("."))
-                continue;
-            if (isSubtitleFile(file))
-                candidates.add(file);
-            if (isVideoFile(file))
-                videoFiles++;
+    fun findSubtitle(video: DocumentFile, dir: DocumentFile?): DocumentFile? {
+        val videoName = getFileBaseName(video.name)
+        var videoFiles = 0
+        if (dir == null || !dir.isDirectory) return null
+        val candidates: MutableList<DocumentFile> = ArrayList()
+        for (file in dir.listFiles()) {
+            if (file.name!!.startsWith(".")) continue
+            if (isSubtitleFile(file)) candidates.add(file)
+            if (isVideoFile(file)) videoFiles++
         }
-
-        if (videoFiles == 1 && candidates.size() == 1) {
-            return candidates.get(0);
+        if (videoFiles == 1 && candidates.size == 1) {
+            return candidates[0]
         }
-
-        if (candidates.size() >= 1) {
-            for (DocumentFile candidate : candidates) {
-                if (candidate.getName().startsWith(videoName + '.')) {
-                    return candidate;
+        if (candidates.size >= 1) {
+            for (candidate in candidates) {
+                if (candidate.name!!.startsWith("$videoName.")) {
+                    return candidate
                 }
             }
         }
-
-        return null;
+        return null
     }
 
-    public static DocumentFile findNext(DocumentFile video) {
-        DocumentFile dir = video.getParentFile();
-        return findNext(video, dir);
+    fun findNext(video: DocumentFile): DocumentFile? {
+        val dir = video.parentFile
+        return findNext(video, dir)
     }
 
-    public static DocumentFile findNext(DocumentFile video, DocumentFile dir) {
-        DocumentFile list[] = dir.listFiles();
+    fun findNext(video: DocumentFile, dir: DocumentFile?): DocumentFile? {
+        val list = dir!!.listFiles()
         try {
-            Arrays.sort(list, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-        } catch (NullPointerException e) {
-            return null;
+            Arrays.sort(list) { a: DocumentFile, b: DocumentFile ->
+                a.name!!
+                    .compareTo(b.name!!, ignoreCase = true)
+            }
+        } catch (e: NullPointerException) {
+            return null
         }
-
-        final String videoName = video.getName();
-        boolean matchFound = false;
-
-        for (DocumentFile file : list) {
-            if (file.getName().equals(videoName)) {
-                matchFound = true;
+        val videoName = video.name
+        var matchFound = false
+        for (file in list) {
+            if (file.name == videoName) {
+                matchFound = true
             } else if (matchFound) {
                 if (isVideoFile(file)) {
-                    return file;
+                    return file
                 }
             }
         }
-
-        return null;
+        return null
     }
 
-    public static boolean isVideoFile(DocumentFile file) {
-        return file.isFile() && file.getType().startsWith("video/");
+    fun isVideoFile(file: DocumentFile): Boolean {
+        return file.isFile && file.type!!.startsWith("video/")
     }
 
-    public static boolean isSubtitleFile(DocumentFile file) {
-        if (!file.isFile())
-            return false;
-        final String name = file.getName().toLowerCase();
-        return name.endsWith(".srt") || name.endsWith(".ssa") || name.endsWith(".ass")
-                || name.endsWith(".vtt") || name.endsWith(".ttml");
+    fun isSubtitleFile(file: DocumentFile): Boolean {
+        if (!file.isFile) return false
+        val name = file.name!!.lowercase(Locale.getDefault())
+        return (name.endsWith(".srt") || name.endsWith(".ssa") || name.endsWith(".ass")
+                || name.endsWith(".vtt") || name.endsWith(".ttml"))
     }
 
-    public static boolean isSubtitle(Uri uri, String mimeType) {
+    fun isSubtitle(uri: Uri?, mimeType: String?): Boolean {
         if (mimeType != null) {
-            for (String mime : Utils.supportedMimeTypesSubtitle) {
-                if (mimeType.equals(mime)) {
-                    return true;
+            for (mime in Utils.supportedMimeTypesSubtitle) {
+                if (mimeType == mime) {
+                    return true
                 }
             }
-            if (mimeType.equals("text/plain") || mimeType.equals("text/x-ssa") || mimeType.equals("application/octet-stream") ||
-                    mimeType.equals("application/ass") || mimeType.equals("application/ssa") || mimeType.equals("application/vtt")) {
-                return true;
+            if (mimeType == "text/plain" || mimeType == "text/x-ssa" || mimeType == "application/octet-stream" || mimeType == "application/ass" || mimeType == "application/ssa" || mimeType == "application/vtt") {
+                return true
             }
         }
         if (uri != null) {
             if (Utils.isSupportedNetworkUri(uri)) {
-                String path = uri.getPath();
+                var path = uri.path
                 if (path != null) {
-                    path = path.toLowerCase();
-                    for (String extension : Utils.supportedExtensionsSubtitle) {
-                        if (path.endsWith("." + extension)) {
-                            return true;
+                    path = path.lowercase(Locale.getDefault())
+                    for (extension in Utils.supportedExtensionsSubtitle) {
+                        if (path.endsWith(".$extension")) {
+                            return true
                         }
                     }
                 }
             }
         }
-        return false;
+        return false
     }
 
-    public static void clearCache(Context context) {
+    fun clearCache(context: Context) {
         try {
-            for (File file : context.getCacheDir().listFiles()) {
-                if (file.isFile()) {
-                    file.delete();
+            if (context.cacheDir.listFiles() == null) return
+            for (file in context.cacheDir.listFiles()!!) {
+                if (file.isFile) {
+                    file.delete()
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    public static Uri convertToUTF(PlayerActivity activity, Uri subtitleUri) {
+    fun convertToUTF(activity: PlayerActivity, subtitleUri: Uri): Uri? {
         try {
-            String scheme = subtitleUri.getScheme();
-            if (scheme != null && scheme.toLowerCase().startsWith("http")) {
-                List<Uri> urls = new ArrayList<>();
-                urls.add(subtitleUri);
-                SubtitleFetcher subtitleFetcher = new SubtitleFetcher(activity, urls);
-                subtitleFetcher.start();
-                return null;
+            val scheme = subtitleUri.scheme
+            return if (scheme != null && scheme.lowercase(Locale.getDefault()).startsWith("http")) {
+                val urls: MutableList<Uri> = ArrayList()
+                urls.add(subtitleUri)
+                val subtitleFetcher = SubtitleFetcher(activity, urls)
+                subtitleFetcher.start()
+                null
             } else {
-                InputStream inputStream = activity.getContentResolver().openInputStream(subtitleUri);
-                return convertInputStreamToUTF(activity, subtitleUri, inputStream);
+                val inputStream = activity.contentResolver.openInputStream(subtitleUri)
+                convertInputStreamToUTF(activity, subtitleUri, inputStream)
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return subtitleUri;
+        return subtitleUri
     }
 
-    public static Uri convertInputStreamToUTF(Context context, Uri subtitleUri, InputStream inputStream) {
+    fun convertInputStreamToUTF(
+        context: Context,
+        subtitleUri: Uri?,
+        inputStream: InputStream?
+    ): Uri? {
+        var subtitleUri = subtitleUri
         try {
-            final CharsetDetector detector = new CharsetDetector();
-            final BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-            detector.setText(bufferedInputStream);
-            final CharsetMatch charsetMatch = detector.detect();
-
-            if (!StandardCharsets.UTF_8.displayName().equals(charsetMatch.getName())) {
-                String filename = subtitleUri.getPath();
-                filename = filename.substring(filename.lastIndexOf("/") + 1);
-                final File file = new File(context.getCacheDir(), filename);
-                final BufferedReader bufferedReader = new BufferedReader(charsetMatch.getReader());
-                final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-                char[] buffer = new char[512];
-                int num;
-                int pass = 0;
-                boolean success = true;
-                while ((num = bufferedReader.read(buffer)) != -1) {
-                    bufferedWriter.write(buffer, 0, num);
-                    pass++;
-                    if (pass * 512 > 2_000_000) {
-                        success = false;
-                        break;
+            val detector = CharsetDetector()
+            val bufferedInputStream = BufferedInputStream(inputStream)
+            detector.setText(bufferedInputStream)
+            val charsetMatch = detector.detect()
+            if (StandardCharsets.UTF_8.displayName() != charsetMatch.name) {
+                var filename = subtitleUri!!.path
+                filename = filename!!.substring(filename.lastIndexOf("/") + 1)
+                val file = File(context.cacheDir, filename)
+                val bufferedReader = BufferedReader(charsetMatch.reader)
+                val bufferedWriter = BufferedWriter(FileWriter(file))
+                val buffer = CharArray(512)
+                var num: Int
+                var pass = 0
+                var success = true
+                while (bufferedReader.read(buffer).also { num = it } != -1) {
+                    bufferedWriter.write(buffer, 0, num)
+                    pass++
+                    if (pass * 512 > 2000000) {
+                        success = false
+                        break
                     }
                 }
-                bufferedWriter.close();
-                bufferedReader.close();
-                if (success) {
-                    subtitleUri = Uri.fromFile(file);
+                bufferedWriter.close()
+                bufferedReader.close()
+                subtitleUri = if (success) {
+                    Uri.fromFile(file)
                 } else {
-                    subtitleUri = null;
+                    null
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-        return subtitleUri;
+        return subtitleUri
     }
 
-    public static MediaItem.SubtitleConfiguration buildSubtitle(Context context, Uri uri, String subtitleName, boolean selected) {
-        final String subtitleMime = SubtitleUtils.getSubtitleMime(uri);
-        final String subtitleLanguage = SubtitleUtils.getSubtitleLanguage(uri);
-        if (subtitleLanguage == null && subtitleName == null)
-            subtitleName = Utils.getFileName(context, uri);
-
-        MediaItem.SubtitleConfiguration.Builder subtitleConfigurationBuilder = new MediaItem.SubtitleConfiguration.Builder(uri)
-                .setMimeType(subtitleMime)
-                .setLanguage(subtitleLanguage)
-                .setRoleFlags(C.ROLE_FLAG_SUBTITLE)
-                .setLabel(subtitleName);
+    fun buildSubtitle(
+        context: Context,
+        uri: Uri,
+        subtitleName: String?,
+        selected: Boolean
+    ): SubtitleConfiguration {
+        var subtitleName = subtitleName
+        val subtitleMime = getSubtitleMime(uri)
+        val subtitleLanguage = getSubtitleLanguage(uri)
+        if (subtitleLanguage == null && subtitleName == null) subtitleName =
+            Utils.getFileName(context, uri)
+        val subtitleConfigurationBuilder = SubtitleConfiguration.Builder(uri)
+            .setMimeType(subtitleMime)
+            .setLanguage(subtitleLanguage)
+            .setRoleFlags(C.ROLE_FLAG_SUBTITLE)
+            .setLabel(subtitleName)
         if (selected) {
-            subtitleConfigurationBuilder.setSelectionFlags(C.SELECTION_FLAG_DEFAULT);
+            subtitleConfigurationBuilder.setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
         }
-        return subtitleConfigurationBuilder.build();
+        return subtitleConfigurationBuilder.build()
     }
 
-    public static float normalizeFontScale(float fontScale, boolean small) {
+    fun normalizeFontScale(fontScale: Float, small: Boolean): Float {
         // https://bbc.github.io/subtitle-guidelines/#Presentation-font-size
-        float newScale;
         // ¯\_(ツ)_/¯
-        if (fontScale > 1.01f) {
+        val newScale: Float = if (fontScale > 1.01f) {
             if (fontScale >= 1.99f) {
                 // 2.0
-                newScale = (small ? 1.15f : 1.2f);
+                if (small) 1.15f else 1.2f
             } else {
                 // 1.5
-                newScale = (small ? 1.0f : 1.1f);
+                if (small) 1.0f else 1.1f
             }
         } else if (fontScale < 0.99f) {
             if (fontScale <= 0.26f) {
                 // 0.25
-                newScale = (small ? 0.65f : 0.8f);
+                if (small) 0.65f else 0.8f
             } else {
                 // 0.5
-                newScale = (small ? 0.75f : 0.9f);
+                if (small) 0.75f else 0.9f
             }
         } else {
-            newScale = (small ? 0.85f : 1.0f);
+            if (small) 0.85f else 1.0f
         }
-        return newScale;
+        return newScale
     }
 }

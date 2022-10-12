@@ -1,77 +1,73 @@
-package com.ntduc.playerutils.player;
+package com.ntduc.playerutils.player
 
-import android.content.Context;
-import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
+import android.content.Context
+import android.graphics.Rect
+import android.util.AttributeSet
+import android.view.MotionEvent
+import kotlin.jvm.JvmOverloads
+import com.google.android.exoplayer2.ui.DefaultTimeBar
+import java.lang.IllegalArgumentException
+import java.lang.reflect.InvocationTargetException
+import kotlin.math.abs
 
-import androidx.annotation.Nullable;
+class CustomDefaultTimeBar @JvmOverloads constructor(
+    context: Context?,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    timebarAttrs: AttributeSet? = attrs,
+    defStyleRes: Int = 0
+) : DefaultTimeBar(
+    context!!, attrs, defStyleAttr, timebarAttrs, defStyleRes
+) {
+    var scrubberBar: Rect? = null
+    private var scrubbing = false
+    private var scrubbingStartX = 0
 
-import com.google.android.exoplayer2.ui.DefaultTimeBar;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-public class CustomDefaultTimeBar extends DefaultTimeBar {
-
-    Rect scrubberBar;
-    private boolean scrubbing;
-    private int scrubbingStartX;
-
-    public CustomDefaultTimeBar(Context context) {
-        this(context, null);
-    }
-
-    public CustomDefaultTimeBar(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public CustomDefaultTimeBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, attrs);
-    }
-
-    public CustomDefaultTimeBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr, @Nullable AttributeSet timebarAttrs) {
-        this(context, attrs, defStyleAttr, timebarAttrs, 0);
-    }
-
-    public CustomDefaultTimeBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr, @Nullable AttributeSet timebarAttrs, int defStyleRes) {
-        super(context, attrs, defStyleAttr, timebarAttrs, defStyleRes);
+    init {
         try {
-            Field field = DefaultTimeBar.class.getDeclaredField("scrubberBar");
-            field.setAccessible(true);
-            scrubberBar = (Rect) field.get(this);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            val field = DefaultTimeBar::class.java.getDeclaredField("scrubberBar")
+            field.isAccessible = true
+            scrubberBar = field[this] as Rect
+        } catch (e: NoSuchFieldException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && scrubberBar != null) {
-            scrubbing = false;
-            scrubbingStartX = (int)event.getX();
-            final int distanceFromScrubber = Math.abs(scrubberBar.right - scrubbingStartX);
-            if (distanceFromScrubber > Utils.dpToPx(24))
-                return true;
-            else
-                scrubbing = true;
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN && scrubberBar != null) {
+            scrubbing = false
+            scrubbingStartX = event.x.toInt()
+            val distanceFromScrubber = abs(scrubberBar!!.right - scrubbingStartX)
+            scrubbing = if (distanceFromScrubber > Utils.dpToPx(24)) return true else true
         }
-        if (!scrubbing && event.getAction() == MotionEvent.ACTION_MOVE && scrubberBar != null) {
-            final int distanceFromStart = Math.abs(((int)event.getX()) - scrubbingStartX);
+        if (!scrubbing && event.action == MotionEvent.ACTION_MOVE && scrubberBar != null) {
+            val distanceFromStart = abs(event.x.toInt() - scrubbingStartX)
             if (distanceFromStart > Utils.dpToPx(6)) {
-                scrubbing = true;
+                scrubbing = true
                 try {
-                    final Method method = DefaultTimeBar.class.getDeclaredMethod("startScrubbing", long.class);
-                    method.setAccessible(true);
-                    method.invoke(this, (long) 0);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    val method = DefaultTimeBar::class.java.getDeclaredMethod(
+                        "startScrubbing",
+                        Long::class.javaPrimitiveType
+                    )
+                    method.isAccessible = true
+                    method.invoke(this, 0L)
+                } catch (e: NoSuchMethodException) {
+                    e.printStackTrace()
+                } catch (e: SecurityException) {
+                    e.printStackTrace()
+                } catch (e: IllegalAccessException) {
+                    e.printStackTrace()
+                } catch (e: IllegalArgumentException) {
+                    e.printStackTrace()
+                } catch (e: InvocationTargetException) {
+                    e.printStackTrace()
                 }
             } else {
-                return true;
+                return true
             }
         }
-        return super.onTouchEvent(event);
+        return super.onTouchEvent(event)
     }
 }

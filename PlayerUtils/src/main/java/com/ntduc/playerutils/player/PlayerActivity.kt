@@ -1,2314 +1,2263 @@
-package com.ntduc.playerutils.player;
+package com.ntduc.playerutils.player
 
-import static android.content.pm.PackageManager.FEATURE_EXPANDED_PICTURE_IN_PICTURE;
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
+import android.annotation.TargetApi
+import android.app.*
+import android.content.*
+import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.Icon
+import android.hardware.display.DisplayManager
+import android.media.AudioManager
+import android.media.audiofx.AudioEffect
+import android.media.audiofx.LoudnessEnhancer
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Process
+import android.provider.DocumentsContract
+import android.provider.Settings
+import com.ntduc.playerutils.player.Utils.toggleSystemUi
+import com.ntduc.playerutils.player.Utils.setOrientation
+import com.ntduc.playerutils.player.Utils.isTvBox
+import com.ntduc.playerutils.player.Utils.moviesFolderUri
+import com.ntduc.playerutils.player.SubtitleUtils.isSubtitle
+import com.ntduc.playerutils.player.SubtitleUtils.buildSubtitle
+import com.ntduc.playerutils.player.Utils.isPiPSupported
+import com.ntduc.playerutils.player.Utils.showText
+import com.ntduc.playerutils.player.Utils.getNextOrientation
+import com.ntduc.playerutils.player.Utils.dpToPx
+import com.ntduc.playerutils.player.Utils.setViewParams
+import com.ntduc.playerutils.player.Utils.setViewMargins
+import com.ntduc.playerutils.player.Utils.adjustVolume
+import com.ntduc.playerutils.player.Utils.formatMilisSign
+import com.ntduc.playerutils.player.Utils.formatMilis
+import com.ntduc.playerutils.player.SubtitleUtils.clearCache
+import com.ntduc.playerutils.player.SubtitleUtils.convertToUTF
+import com.ntduc.playerutils.player.Utils.isSupportedNetworkUri
+import com.ntduc.playerutils.player.Utils.fileExists
+import com.ntduc.playerutils.player.Utils.deviceLanguages
+import com.ntduc.playerutils.player.Utils.getFileName
+import com.ntduc.playerutils.player.Utils.markChapters
+import com.ntduc.playerutils.player.Utils.isPortrait
+import com.ntduc.playerutils.player.Utils.switchFrameRate
+import com.ntduc.playerutils.player.Utils.alternativeChooser
+import com.ntduc.playerutils.player.Utils.getSystemComponent
+import com.ntduc.playerutils.player.Utils.getRational
+import com.ntduc.playerutils.player.Utils.isTablet
+import com.ntduc.playerutils.player.SubtitleUtils.normalizeFontScale
+import com.ntduc.playerutils.player.Utils.isProgressiveContainerUri
+import com.ntduc.playerutils.player.SubtitleFinder.Companion.isUriCompatible
+import com.ntduc.playerutils.player.SubtitleUtils.findUriInScope
+import com.ntduc.playerutils.player.SubtitleUtils.findDocInScope
+import com.ntduc.playerutils.player.SubtitleUtils.findSubtitle
+import com.ntduc.playerutils.player.SubtitleUtils.findNext
+import com.ntduc.playerutils.player.Utils.isDeletable
+import com.ntduc.playerutils.player.Utils.setButtonEnabled
+import com.ntduc.playerutils.player.Utils.normalizeScaleFactor
+import android.support.v4.media.session.MediaSessionCompat
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay
+import com.google.android.exoplayer2.ui.StyledPlayerControlView
+import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
+import com.google.android.exoplayer2.ui.TimeBar
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.StyledPlayerView.ControllerVisibilityListener
+import com.getkeepsafe.taptargetview.TapTargetView
+import com.getkeepsafe.taptargetview.TapTarget
+import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay.PerformListener
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
+import com.google.android.exoplayer2.extractor.ts.TsExtractor
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import android.support.v4.media.MediaMetadataCompat
+import android.text.TextUtils
+import android.util.Base64
+import android.util.Rational
+import android.util.TypedValue
+import android.view.*
+import android.view.accessibility.CaptioningManager
+import android.widget.*
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.exoplayer2.ui.DefaultTimeBar
+import kotlin.jvm.JvmOverloads
+import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.exoplayer2.source.TrackGroup
+import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.ui.SubtitleView
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.exoplayer2.ui.CaptionStyleCompat
+import androidx.documentfile.provider.DocumentFile
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.audio.AudioAttributes
+import com.ntduc.playerutils.R
+import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
+import java.io.File
+import java.lang.Exception
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
+import java.lang.RuntimeException
+import java.lang.reflect.InvocationTargetException
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AppOpsManager;
-import android.app.PendingIntent;
-import android.app.PictureInPictureParams;
-import android.app.RemoteAction;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.UriPermission;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.Icon;
-import android.hardware.display.DisplayManager;
-import android.media.AudioManager;
-import android.media.audiofx.AudioEffect;
-import android.media.audiofx.LoudnessEnhancer;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.provider.DocumentsContract;
-import android.provider.Settings;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.text.TextUtils;
-import android.util.Base64;
-import android.util.DisplayMetrics;
-import android.util.Rational;
-import android.util.TypedValue;
-import android.view.HapticFeedbackConstants;
-import android.view.InputDevice;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
-import android.view.accessibility.CaptioningManager;
-import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.documentfile.provider.DocumentFile;
-
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.RenderersFactory;
-import com.google.android.exoplayer2.SeekParameters;
-import com.google.android.exoplayer2.Tracks;
-import com.google.android.exoplayer2.audio.AudioAttributes;
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
-import com.google.android.exoplayer2.extractor.ts.TsExtractor;
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
-import com.google.android.exoplayer2.source.TrackGroup;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.CaptionStyleCompat;
-import com.google.android.exoplayer2.ui.DefaultTimeBar;
-import com.google.android.exoplayer2.ui.StyledPlayerControlView;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.ui.SubtitleView;
-import com.google.android.exoplayer2.ui.TimeBar;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
-import com.google.android.exoplayer2.util.MimeTypes;
-import com.google.android.material.snackbar.Snackbar;
-import com.ntduc.playerutils.R;
-import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView;
-import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay;
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-public class PlayerActivity extends Activity {
-
-    private PlayerListener playerListener;
-    private BroadcastReceiver mReceiver;
-    private AudioManager mAudioManager;
-    private MediaSessionCompat mediaSession;
-    private DefaultTrackSelector trackSelector;
-    public static LoudnessEnhancer loudnessEnhancer;
-
-    public CustomStyledPlayerView playerView;
-    public static ExoPlayer player;
-    private YouTubeOverlay youTubeOverlay;
-
-    private Object mPictureInPictureParamsBuilder;
-
-    public Prefs mPrefs;
-    public BrightnessControl mBrightnessControl;
-    public static boolean haveMedia;
-    private boolean videoLoading;
-    public static boolean controllerVisible;
-    public static boolean controllerVisibleFully;
-    public static Snackbar snackbar;
-    private ExoPlaybackException errorToShow;
-    public static int boostLevel = 0;
-    private boolean isScaling = false;
-    private boolean isScaleStarting = false;
-    private float scaleFactor = 1.0f;
-
-    private static final int REQUEST_CHOOSER_VIDEO = 1;
-    private static final int REQUEST_CHOOSER_SUBTITLE = 2;
-    private static final int REQUEST_CHOOSER_SCOPE_DIR = 10;
-    private static final int REQUEST_CHOOSER_VIDEO_MEDIASTORE = 20;
-    private static final int REQUEST_CHOOSER_SUBTITLE_MEDIASTORE = 21;
-    private static final int REQUEST_SETTINGS = 100;
-    private static final int REQUEST_SYSTEM_CAPTIONS = 200;
-    public static final int CONTROLLER_TIMEOUT = 3500;
-    private static final String ACTION_MEDIA_CONTROL = "media_control";
-    private static final String EXTRA_CONTROL_TYPE = "control_type";
-    private static final int REQUEST_PLAY = 1;
-    private static final int REQUEST_PAUSE = 2;
-    private static final int CONTROL_TYPE_PLAY = 1;
-    private static final int CONTROL_TYPE_PAUSE = 2;
-
-    private CoordinatorLayout coordinatorLayout;
-    private TextView titleView;
-    private ImageButton buttonOpen;
-    private ImageButton buttonPiP;
-    private ImageButton buttonAspectRatio;
-    private ImageButton buttonRotation;
-    private ImageButton exoSettings;
-    private ImageButton exoPlayPause;
-    private ProgressBar loadingProgressBar;
-    private StyledPlayerControlView controlView;
-    private CustomDefaultTimeBar timeBar;
-
-    private boolean restoreOrientationLock;
-    private boolean restorePlayState;
-    private boolean restorePlayStateAllowed;
-    private boolean play;
-    private float subtitlesScale;
-    private boolean isScrubbing;
-    private boolean scrubbingNoticeable;
-    private long scrubbingStart;
-    public boolean frameRendered;
-    private boolean alive;
-    public static boolean focusPlay = false;
-    private Uri nextUri;
-    private static boolean isTvBox;
-    public static boolean locked = false;
-    private Thread nextUriThread;
-    public Thread frameRateSwitchThread;
-    public Thread chaptersThread;
-    private long lastScrubbingPosition;
-    public static long[] chapterStarts;
-
-    public static boolean restoreControllerTimeout = false;
-    public static boolean shortControllerTimeout = false;
-
-    final Rational rationalLimitWide = new Rational(239, 100);
-    final Rational rationalLimitTall = new Rational(100, 239);
-
-    static final String API_POSITION = "position";
-    static final String API_DURATION = "duration";
-    static final String API_RETURN_RESULT = "return_result";
-    static final String API_SUBS = "subs";
-    static final String API_SUBS_ENABLE = "subs.enable";
-    static final String API_SUBS_NAME = "subs.name";
-    static final String API_TITLE = "title";
-    static final String API_END_BY = "end_by";
-    boolean apiAccess;
-    String apiTitle;
-    List<MediaItem.SubtitleConfiguration> apiSubs = new ArrayList<>();
-    boolean intentReturnResult;
-    boolean playbackFinished;
-
-    DisplayManager displayManager;
-    DisplayManager.DisplayListener displayListener;
-    SubtitleFinder subtitleFinder;
-
-    Runnable barsHider = () -> {
+class PlayerActivity : Activity() {
+    private var playerListener: PlayerListener? = null
+    private var mReceiver: BroadcastReceiver? = null
+    private var mAudioManager: AudioManager? = null
+    private var mediaSession: MediaSessionCompat? = null
+    private var trackSelector: DefaultTrackSelector? = null
+    var playerView: CustomStyledPlayerView? = null
+    private var youTubeOverlay: YouTubeOverlay? = null
+    private var mPictureInPictureParamsBuilder: Any? = null
+    var mPrefs: Prefs? = null
+    var mBrightnessControl: BrightnessControl? = null
+    private var videoLoading = false
+    private var errorToShow: ExoPlaybackException? = null
+    private var isScaling = false
+    private var isScaleStarting = false
+    private var scaleFactor = 1.0f
+    private var coordinatorLayout: CoordinatorLayout? = null
+    private var titleView: TextView? = null
+    private var buttonOpen: ImageButton? = null
+    private var buttonPiP: ImageButton? = null
+    private var buttonAspectRatio: ImageButton? = null
+    private var buttonRotation: ImageButton? = null
+    private var exoSettings: ImageButton? = null
+    private var exoPlayPause: ImageButton? = null
+    private var loadingProgressBar: ProgressBar? = null
+    private var controlView: StyledPlayerControlView? = null
+    private var timeBar: CustomDefaultTimeBar? = null
+    private var restoreOrientationLock = false
+    private var restorePlayState = false
+    private var restorePlayStateAllowed = false
+    private var play = false
+    private var subtitlesScale = 0f
+    private var isScrubbing = false
+    private var scrubbingNoticeable = false
+    private var scrubbingStart: Long = 0
+    var frameRendered = false
+    private var alive = false
+    private var nextUri: Uri? = null
+    private var nextUriThread: Thread? = null
+    var frameRateSwitchThread: Thread? = null
+    var chaptersThread: Thread? = null
+    private var lastScrubbingPosition: Long = 0
+    val rationalLimitWide = Rational(239, 100)
+    val rationalLimitTall = Rational(100, 239)
+    var apiAccess = false
+    var apiTitle: String? = null
+    var apiSubs: MutableList<SubtitleConfiguration> = ArrayList()
+    var intentReturnResult = false
+    var playbackFinished = false
+    var displayManager: DisplayManager? = null
+    var displayListener: DisplayManager.DisplayListener? = null
+    var subtitleFinder: SubtitleFinder? = null
+    var barsHider = Runnable {
         if (playerView != null && !controllerVisible) {
-            Utils.toggleSystemUi(PlayerActivity.this, playerView, false);
+            toggleSystemUi(this@PlayerActivity, playerView!!, false)
         }
-    };
+    }
 
+    @SuppressLint("PrivateResource")
     @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         // Xoay màn hình càng sớm càng tốt, trước khi inflater để tránh gặp trục trặc với animation khởi tạo activity
         // Rotate ASAP, before super/inflating to avoid glitches with activity launch animation
-        mPrefs = new Prefs(this);                       //Load SharedPreferences
-        Utils.setOrientation(this, mPrefs.orientation); //Xoay Activity
-
-        super.onCreate(savedInstanceState);
+        mPrefs = Prefs(this) //Load SharedPreferences
+        setOrientation(this, mPrefs!!.orientation) //Xoay Activity
+        super.onCreate(savedInstanceState)
 
         //Kiểm tra nhà sản xuất phần cứng để sử dụng layout phù hợp
         if (Build.VERSION.SDK_INT == 28 //Android 9
-                && Build.MANUFACTURER.equalsIgnoreCase("xiaomi")    //Hãng Xiaomi
-                && (Build.DEVICE.equalsIgnoreCase("oneday") || Build.DEVICE.equalsIgnoreCase("once"))) {
-            setContentView(R.layout.activity_player_textureview);
+            && Build.MANUFACTURER.equals("xiaomi", ignoreCase = true) //Hãng Xiaomi
+            && (Build.DEVICE.equals("oneday", ignoreCase = true) || Build.DEVICE.equals(
+                "once",
+                ignoreCase = true
+            ))
+        ) {
+            setContentView(R.layout.activity_player_textureview)
         } else {
-            setContentView(R.layout.activity_player);
+            setContentView(R.layout.activity_player)
         }
 
         //Đối với >= Android 12
         if (Build.VERSION.SDK_INT >= 31) {
-            Window window = getWindow();
+            val window = window
             if (window != null) {
-                window.setDecorFitsSystemWindows(false);    //???
-                WindowInsetsController windowInsetsController = window.getInsetsController();
+                window.setDecorFitsSystemWindows(false) //???
+                val windowInsetsController = window.insetsController
                 if (windowInsetsController != null) {
                     // Từ Android 12 trở lên, BEHAVIOR_DEFAULT cho phép các cử chỉ hệ thống mà không hiển thị thanh hệ thống
                     // On Android 12 BEHAVIOR_DEFAULT allows system gestures without visible system bars
-                    windowInsetsController.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_DEFAULT);
+                    windowInsetsController.systemBarsBehavior =
+                        WindowInsetsController.BEHAVIOR_DEFAULT
                 }
             }
         }
 
         //Bật darkmode đối với TV Box
-        isTvBox = Utils.isTvBox(this);
+        isTvBox = isTvBox(this)
         if (isTvBox) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
-
-        final Intent launchIntent = getIntent();
-        final String action = launchIntent.getAction();
-        final String type = launchIntent.getType();
-
-        if ("com.ntduc.playerutils.player.action.SHORTCUT_VIDEOS".equals(action)) {
-            openFile(Utils.getMoviesFolderUri());
-        } else if (Intent.ACTION_SEND.equals(action) && "text/plain".equals(type)) {
-            String text = launchIntent.getStringExtra(Intent.EXTRA_TEXT);
+        val launchIntent = intent
+        val action = launchIntent.action
+        val type = launchIntent.type
+        if ("com.ntduc.playerutils.player.action.SHORTCUT_VIDEOS" == action) {
+            openFile(moviesFolderUri)
+        } else if (Intent.ACTION_SEND == action && "text/plain" == type) {
+            val text = launchIntent.getStringExtra(Intent.EXTRA_TEXT)
             if (text != null) {
-                final Uri parsedUri = Uri.parse(text);
-                if (parsedUri.isAbsolute()) {
-                    mPrefs.updateMedia(this, parsedUri, null);
-                    focusPlay = true;
+                val parsedUri = Uri.parse(text)
+                if (parsedUri.isAbsolute) {
+                    mPrefs!!.updateMedia(this, parsedUri, null)
+                    focusPlay = true
                 }
             }
-        } else if (launchIntent.getData() != null) {
-            resetApiAccess();
-            final Uri uri = launchIntent.getData();
+        } else if (launchIntent.data != null) {
+            resetApiAccess()
+            val uri = launchIntent.data
 
             //Kiểm tra video có phụ đề không
-            if (SubtitleUtils.isSubtitle(uri, type)) {
-                handleSubtitles(uri);
+            if (isSubtitle(uri, type)) {
+                handleSubtitles(uri)
             } else {
-                Bundle bundle = launchIntent.getExtras();
+                val bundle = launchIntent.extras
 
                 //???
                 if (bundle != null) {
-                    apiAccess = bundle.containsKey(API_POSITION) || bundle.containsKey(API_RETURN_RESULT) || bundle.containsKey(API_TITLE)
-                            || bundle.containsKey(API_SUBS) || bundle.containsKey(API_SUBS_ENABLE);
+                    apiAccess = (bundle.containsKey(API_POSITION) || bundle.containsKey(
+                        API_RETURN_RESULT
+                    ) || bundle.containsKey(API_TITLE)
+                            || bundle.containsKey(API_SUBS) || bundle.containsKey(API_SUBS_ENABLE))
                     if (apiAccess) {
-                        mPrefs.setPersistent(false);
+                        mPrefs!!.setPersistent(false)
                     }
-                    apiTitle = bundle.getString(API_TITLE);
+                    apiTitle = bundle.getString(API_TITLE)
                 }
-
-                mPrefs.updateMedia(this, uri, type);    //Lưu information Video
+                mPrefs!!.updateMedia(this, uri, type) //Lưu information Video
 
                 //???
                 if (bundle != null) {
-                    Uri defaultSub = null;
-                    Parcelable[] subsEnable = bundle.getParcelableArray(API_SUBS_ENABLE);
-                    if (subsEnable != null && subsEnable.length > 0) {
-                        defaultSub = (Uri) subsEnable[0];
+                    var defaultSub: Uri? = null
+                    val subsEnable = bundle.getParcelableArray(API_SUBS_ENABLE)
+                    if (subsEnable != null && subsEnable.isNotEmpty()) {
+                        defaultSub = subsEnable[0] as Uri
                     }
-
-                    Parcelable[] subs = bundle.getParcelableArray(API_SUBS);
-                    String[] subsName = bundle.getStringArray(API_SUBS_NAME);
-                    if (subs != null && subs.length > 0) {
-                        for (int i = 0; i < subs.length; i++) {
-                            Uri sub = (Uri) subs[i];
-                            String name = null;
-                            if (subsName != null && subsName.length > i) {
-                                name = subsName[i];
+                    val subs = bundle.getParcelableArray(API_SUBS)
+                    val subsName = bundle.getStringArray(API_SUBS_NAME)
+                    if (subs != null && subs.isNotEmpty()) {
+                        for (i in subs.indices) {
+                            val sub = subs[i] as Uri
+                            var name: String? = null
+                            if (subsName != null && subsName.size > i) {
+                                name = subsName[i]
                             }
-                            apiSubs.add(SubtitleUtils.buildSubtitle(this, sub, name, sub.equals(defaultSub)));
+                            apiSubs.add(buildSubtitle(this, sub, name, sub == defaultSub))
                         }
                     }
                 }
 
                 //???
                 if (apiSubs.isEmpty()) {
-                    searchSubtitles();
+                    searchSubtitles()
                 }
 
                 //???
                 if (bundle != null) {
-                    intentReturnResult = bundle.getBoolean(API_RETURN_RESULT);
-
+                    intentReturnResult = bundle.getBoolean(API_RETURN_RESULT)
                     if (bundle.containsKey(API_POSITION)) {
-                        mPrefs.updatePosition((long) bundle.getInt(API_POSITION));
+                        mPrefs!!.updatePosition(bundle.getInt(API_POSITION).toLong())
                     }
                 }
             }
-            focusPlay = true;
+            focusPlay = true
         }
 
         //Xét Main View
-        coordinatorLayout = findViewById(R.id.coordinatorLayout);
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        playerView = findViewById(R.id.video_view);
+        coordinatorLayout = findViewById(R.id.coordinatorLayout)
+        mAudioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        playerView = findViewById(R.id.video_view)
 
         //Xét Control View
-        exoPlayPause = findViewById(R.id.exo_play_pause);
-        loadingProgressBar = findViewById(R.id.loading);
-
-        playerView.setShowNextButton(false);            //Ẩn nút Next
-        playerView.setShowPreviousButton(false);        //Ẩn nút Previous
-        playerView.setShowFastForwardButton(false);     //Ẩn nút Fast Forward (Tua 15s)
-        playerView.setShowRewindButton(false);          //Ẩn nút Rewind  (Back 5s)
-
-        playerView.setRepeatToggleModes(Player.REPEAT_MODE_ONE);    //Xét chế độ Repeat
-
-        playerView.setControllerHideOnTouch(false);     //Khóa Controller Video khi giữ
-        playerView.setControllerAutoShow(true);         //Show Controller Video khi vừa vào?
-
-        ((DoubleTapPlayerView) playerView).setDoubleTapEnabled(false);  //Ẩn chế độ Double Tap
+        exoPlayPause = findViewById(R.id.exo_play_pause)
+        loadingProgressBar = findViewById(R.id.loading)
+        playerView!!.setShowNextButton(false) //Ẩn nút Next
+        playerView!!.setShowPreviousButton(false) //Ẩn nút Previous
+        playerView!!.setShowFastForwardButton(false) //Ẩn nút Fast Forward (Tua 15s)
+        playerView!!.setShowRewindButton(false) //Ẩn nút Rewind  (Back 5s)
+        playerView!!.setRepeatToggleModes(Player.REPEAT_MODE_ONE) //Xét chế độ Repeat
+        playerView!!.controllerHideOnTouch = false //Khóa Controller Video khi giữ
+        playerView!!.controllerAutoShow = true //Show Controller Video khi vừa vào?
+        (playerView as DoubleTapPlayerView?)?.isDoubleTapEnabled = false //Ẩn chế độ Double Tap
 
         //Xét Event TimeBar
-        timeBar = playerView.findViewById(R.id.exo_progress);
-        timeBar.addListener(new TimeBar.OnScrubListener() {
-            @Override
-            public void onScrubStart(TimeBar timeBar, long position) {
+        timeBar = playerView!!.findViewById(R.id.exo_progress)
+        timeBar!!.addListener(object : OnScrubListener {
+            override fun onScrubStart(timeBar: TimeBar, position: Long) {
                 if (player == null) {
-                    return;
+                    return
                 }
-                restorePlayState = player.isPlaying();
+                restorePlayState = player!!.isPlaying
                 if (restorePlayState) {
-                    player.pause();
+                    player!!.pause()
                 }
-                lastScrubbingPosition = position;
-                scrubbingNoticeable = false;
-                isScrubbing = true;
-                frameRendered = true;
-                playerView.setControllerShowTimeoutMs(-1);
-                scrubbingStart = player.getCurrentPosition();
-                player.setSeekParameters(SeekParameters.CLOSEST_SYNC);
-                reportScrubbing(position);
+                lastScrubbingPosition = position
+                scrubbingNoticeable = false
+                isScrubbing = true
+                frameRendered = true
+                playerView!!.controllerShowTimeoutMs = -1
+                scrubbingStart = player!!.currentPosition
+                player!!.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                reportScrubbing(position)
             }
 
-            @Override
-            public void onScrubMove(TimeBar timeBar, long position) {
-                reportScrubbing(position);
-                for (long start : chapterStarts) {
-                    if ((lastScrubbingPosition < start && position >= start) || (lastScrubbingPosition > start && position <= start)) {
-                        playerView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+            override fun onScrubMove(timeBar: TimeBar, position: Long) {
+                reportScrubbing(position)
+                for (start in chapterStarts!!) {
+                    if ((start in ((lastScrubbingPosition + 1)..position)) || (start in (position until lastScrubbingPosition))) {
+                        playerView!!.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                     }
                 }
-                lastScrubbingPosition = position;
+                lastScrubbingPosition = position
             }
 
-            @Override
-            public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
-                playerView.setCustomErrorMessage(null);
-                isScrubbing = false;
+            override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
+                playerView!!.setCustomErrorMessage(null)
+                isScrubbing = false
                 if (restorePlayState) {
-                    restorePlayState = false;
-                    playerView.setControllerShowTimeoutMs(PlayerActivity.CONTROLLER_TIMEOUT);
-                    player.setPlayWhenReady(true);
+                    restorePlayState = false
+                    playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
+                    player!!.playWhenReady = true
                 }
             }
-        });
+        })
 
         //Tạo Btn Open file
-        buttonOpen = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
-        buttonOpen.setImageResource(R.drawable.ic_folder_open_24dp);
-        buttonOpen.setId(View.generateViewId());
-        buttonOpen.setContentDescription(getString(R.string.button_open));
+        buttonOpen = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
+        buttonOpen!!.setImageResource(R.drawable.ic_folder_open_24dp)
+        buttonOpen!!.id = View.generateViewId()
+        buttonOpen!!.contentDescription = getString(R.string.button_open)
 
         //Tải Video
-        buttonOpen.setOnClickListener(view -> openFile(mPrefs.mediaUri));
+        buttonOpen!!.setOnClickListener {
+            openFile(
+                mPrefs!!.mediaUri
+            )
+        }
 
         //Tải phụ đề
-        buttonOpen.setOnLongClickListener(view -> {
-            if (!isTvBox && mPrefs.askScope) {
-                askForScope(true, false);
+        buttonOpen?.setOnLongClickListener {
+            if (!isTvBox && mPrefs!!.askScope) {
+                askForScope(loadSubtitlesOnCancel = true, skipToNextOnCancel = false)
             } else {
-                loadSubtitleFile(mPrefs.mediaUri);
+                loadSubtitleFile(mPrefs!!.mediaUri)
             }
-            return true;
-        });
+            true
+        }
 
         //Thiết lập PIP cho thiết bị hỗ trợ
-        if (Utils.isPiPSupported(this)) {
+        if (isPiPSupported(this)) {
             // TODO: Android 12 improvements:
             // https://developer.android.com/about/versions/12/features/pip-improvements
-            mPictureInPictureParamsBuilder = new PictureInPictureParams.Builder();
-            boolean success = updatePictureInPictureActions(R.drawable.ic_play_arrow_24dp, R.string.exo_controls_play_description, CONTROL_TYPE_PLAY, REQUEST_PLAY);
-
+            mPictureInPictureParamsBuilder = PictureInPictureParams.Builder()
+            val success = updatePictureInPictureActions(
+                R.drawable.ic_play_arrow_24dp,
+                R.string.exo_controls_play_description,
+                CONTROL_TYPE_PLAY,
+                REQUEST_PLAY
+            )
             if (success) {
-                buttonPiP = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
-                buttonPiP.setContentDescription(getString(R.string.button_pip));
-                buttonPiP.setImageResource(R.drawable.ic_picture_in_picture_alt_24dp);
-
-                buttonPiP.setOnClickListener(view -> enterPiP());
+                buttonPiP = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
+                buttonPiP?.contentDescription = getString(R.string.button_pip)
+                buttonPiP?.setImageResource(R.drawable.ic_picture_in_picture_alt_24dp)
+                buttonPiP?.setOnClickListener { enterPiP() }
             }
         }
 
         //Thiết lập btn Zoom In/Out
-        buttonAspectRatio = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
-        buttonAspectRatio.setId(Integer.MAX_VALUE - 100);
-        buttonAspectRatio.setContentDescription(getString(R.string.button_crop));
-        updatebuttonAspectRatioIcon();
-        buttonAspectRatio.setOnClickListener(view -> {
-            playerView.setScale(1.f);
-            if (playerView.getResizeMode() == AspectRatioFrameLayout.RESIZE_MODE_FIT) {
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-                Utils.showText(playerView, getString(R.string.video_resize_crop));
+        buttonAspectRatio = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
+        buttonAspectRatio!!.id = Int.MAX_VALUE - 100
+        buttonAspectRatio!!.contentDescription = getString(R.string.button_crop)
+        updatebuttonAspectRatioIcon()
+        buttonAspectRatio!!.setOnClickListener {
+            playerView!!.setScale(1f)
+            if (playerView!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_FIT) {
+                playerView!!.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                showText(playerView!!, getString(R.string.video_resize_crop))
             } else {
                 // Default mode
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
-                Utils.showText(playerView, getString(R.string.video_resize_fit));
+                playerView!!.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT)
+                showText(playerView!!, getString(R.string.video_resize_fit))
             }
-            updatebuttonAspectRatioIcon();
-            resetHideCallbacks();
-        });
+            updatebuttonAspectRatioIcon()
+            resetHideCallbacks()
+        }
         if (isTvBox && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            buttonAspectRatio.setOnLongClickListener(v -> {
-                scaleStart();
-                updatebuttonAspectRatioIcon();
-                return true;
-            });
+            buttonAspectRatio!!.setOnLongClickListener { v: View? ->
+                scaleStart()
+                updatebuttonAspectRatioIcon()
+                true
+            }
         }
 
         //Thiết lập btn Xoay màn hình
-        buttonRotation = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
-        buttonRotation.setContentDescription(getString(R.string.button_rotate));
-        updateButtonRotation();
-        buttonRotation.setOnClickListener(view -> {
-            mPrefs.orientation = Utils.getNextOrientation(mPrefs.orientation);
-            Utils.setOrientation(PlayerActivity.this, mPrefs.orientation);
-            updateButtonRotation();
-            Utils.showText(playerView, getString(mPrefs.orientation.description), 2500);
-            resetHideCallbacks();
-        });
+        buttonRotation = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
+        buttonRotation!!.contentDescription = getString(R.string.button_rotate)
+        updateButtonRotation()
+        buttonRotation!!.setOnClickListener { view: View? ->
+            mPrefs!!.orientation = getNextOrientation(
+                mPrefs!!.orientation
+            )
+            setOrientation(this@PlayerActivity, mPrefs!!.orientation)
+            updateButtonRotation()
+            showText(playerView!!, getString(mPrefs!!.orientation.description), 2500)
+            resetHideCallbacks()
+        }
 
         //Thiết lập Background và title video cho màn Play
-        final int titleViewPaddingHorizontal = Utils.dpToPx(14);
-        final int titleViewPaddingVertical = getResources().getDimensionPixelOffset(R.dimen.exo_styled_bottom_bar_time_padding);
-        FrameLayout centerView = playerView.findViewById(R.id.exo_controls_background);
-        titleView = new TextView(this);
-        titleView.setBackgroundResource(R.color.ui_controls_background);
-        titleView.setTextColor(Color.WHITE);
-        titleView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        titleView.setPadding(titleViewPaddingHorizontal, titleViewPaddingVertical, titleViewPaddingHorizontal, titleViewPaddingVertical);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        titleView.setVisibility(View.GONE);
-        titleView.setMaxLines(1);
-        titleView.setEllipsize(TextUtils.TruncateAt.END);
-        titleView.setTextDirection(View.TEXT_DIRECTION_LOCALE);
-        centerView.addView(titleView);
+        val titleViewPaddingHorizontal = dpToPx(14)
+        val titleViewPaddingVertical =
+            resources.getDimensionPixelOffset(R.dimen.exo_styled_bottom_bar_time_padding)
+        val centerView = playerView!!.findViewById<FrameLayout>(R.id.exo_controls_background)
+        titleView = TextView(this)
+        titleView!!.setBackgroundResource(R.color.ui_controls_background)
+        titleView!!.setTextColor(Color.WHITE)
+        titleView!!.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        titleView!!.setPadding(
+            titleViewPaddingHorizontal,
+            titleViewPaddingVertical,
+            titleViewPaddingHorizontal,
+            titleViewPaddingVertical
+        )
+        titleView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+        titleView!!.visibility = View.GONE
+        titleView!!.maxLines = 1
+        titleView!!.ellipsize = TextUtils.TruncateAt.END
+        titleView!!.textDirection = View.TEXT_DIRECTION_LOCALE
+        centerView.addView(titleView)
 
         //Gửi video
-        titleView.setOnLongClickListener(view -> {
+        titleView!!.setOnLongClickListener { view: View? ->
             // Prevent FileUriExposedException
-            if (mPrefs.mediaUri != null && ContentResolver.SCHEME_FILE.equals(mPrefs.mediaUri.getScheme())) {
-                return false;
+            if (mPrefs!!.mediaUri != null && ContentResolver.SCHEME_FILE == mPrefs!!.mediaUri!!.scheme) {
+                return@setOnLongClickListener false
             }
-
-            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, mPrefs.mediaUri);
-            if (mPrefs.mediaType == null)
-                shareIntent.setType("video/*");
-            else
-                shareIntent.setType(mPrefs.mediaType);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.putExtra(Intent.EXTRA_STREAM, mPrefs!!.mediaUri)
+            if (mPrefs!!.mediaType == null) shareIntent.type = "video/*" else shareIntent.type =
+                mPrefs!!.mediaType
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             // Start without intent chooser to allow any target to be set as default
-            startActivity(shareIntent);
-
-            return true;
-        });
+            startActivity(shareIntent)
+            true
+        }
 
         //???
-        controlView = playerView.findViewById(R.id.exo_controller);
-        controlView.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+        controlView = playerView!!.findViewById(R.id.exo_controller)
+        controlView!!.setOnApplyWindowInsetsListener { view: View, windowInsets: WindowInsets? ->
             if (windowInsets != null) {
                 if (Build.VERSION.SDK_INT >= 31) {
-                    boolean visibleBars = windowInsets.isVisible(WindowInsets.Type.statusBars());
+                    val visibleBars = windowInsets.isVisible(WindowInsets.Type.statusBars())
                     if (visibleBars && !controllerVisible) {
-                        playerView.postDelayed(barsHider, 2500);
+                        playerView!!.postDelayed(barsHider, 2500)
                     } else {
-                        playerView.removeCallbacks(barsHider);
+                        playerView!!.removeCallbacks(barsHider)
                     }
                 }
-
-                view.setPadding(0, windowInsets.getSystemWindowInsetTop(),
-                        0, windowInsets.getSystemWindowInsetBottom());
-
-                int insetLeft = windowInsets.getSystemWindowInsetLeft();
-                int insetRight = windowInsets.getSystemWindowInsetRight();
-
-                int paddingLeft = 0;
-                int marginLeft = insetLeft;
-
-                int paddingRight = 0;
-                int marginRight = insetRight;
-
-                if (Build.VERSION.SDK_INT >= 28 && windowInsets.getDisplayCutout() != null) {
-                    if (windowInsets.getDisplayCutout().getSafeInsetLeft() == insetLeft) {
-                        paddingLeft = insetLeft;
-                        marginLeft = 0;
+                view.setPadding(
+                    0, windowInsets.systemWindowInsetTop,
+                    0, windowInsets.systemWindowInsetBottom
+                )
+                val insetLeft = windowInsets.systemWindowInsetLeft
+                val insetRight = windowInsets.systemWindowInsetRight
+                var paddingLeft = 0
+                var marginLeft = insetLeft
+                var paddingRight = 0
+                var marginRight = insetRight
+                if (Build.VERSION.SDK_INT >= 28 && windowInsets.displayCutout != null) {
+                    if (windowInsets.displayCutout!!.safeInsetLeft == insetLeft) {
+                        paddingLeft = insetLeft
+                        marginLeft = 0
                     }
-                    if (windowInsets.getDisplayCutout().getSafeInsetRight() == insetRight) {
-                        paddingRight = insetRight;
-                        marginRight = 0;
+                    if (windowInsets.displayCutout!!.safeInsetRight == insetRight) {
+                        paddingRight = insetRight
+                        marginRight = 0
                     }
                 }
-
-                Utils.setViewParams(titleView, paddingLeft + titleViewPaddingHorizontal, titleViewPaddingVertical, paddingRight + titleViewPaddingHorizontal, titleViewPaddingVertical,
-                        marginLeft, windowInsets.getSystemWindowInsetTop(), marginRight, 0);
-
-                Utils.setViewParams(findViewById(R.id.exo_bottom_bar), paddingLeft, 0, paddingRight, 0,
-                        marginLeft, 0, marginRight, 0);
-
-                findViewById(R.id.exo_progress).setPadding(windowInsets.getSystemWindowInsetLeft(), 0,
-                        windowInsets.getSystemWindowInsetRight(), 0);
-
-                Utils.setViewMargins(findViewById(R.id.exo_error_message), 0, windowInsets.getSystemWindowInsetTop() / 2, 0, getResources().getDimensionPixelSize(R.dimen.exo_error_message_margin_bottom) + windowInsets.getSystemWindowInsetBottom() / 2);
-
-                windowInsets.consumeSystemWindowInsets();
+                setViewParams(
+                    titleView!!,
+                    paddingLeft + titleViewPaddingHorizontal,
+                    titleViewPaddingVertical,
+                    paddingRight + titleViewPaddingHorizontal,
+                    titleViewPaddingVertical,
+                    marginLeft,
+                    windowInsets.systemWindowInsetTop,
+                    marginRight,
+                    0
+                )
+                setViewParams(
+                    findViewById(R.id.exo_bottom_bar), paddingLeft, 0, paddingRight, 0,
+                    marginLeft, 0, marginRight, 0
+                )
+                findViewById<View>(R.id.exo_progress).setPadding(
+                    windowInsets.systemWindowInsetLeft, 0,
+                    windowInsets.systemWindowInsetRight, 0
+                )
+                setViewMargins(
+                    findViewById(R.id.exo_error_message),
+                    0,
+                    windowInsets.systemWindowInsetTop / 2,
+                    0,
+                    resources.getDimensionPixelSize(
+                        R.dimen.exo_error_message_margin_bottom
+                    ) + windowInsets.systemWindowInsetBottom / 2
+                )
+                windowInsets.consumeSystemWindowInsets()
             }
-            return windowInsets;
-        });
+            windowInsets!!
+        }
 
         //Xét color TimeBar
-        timeBar.setAdMarkerColor(Color.argb(0x00, 0xFF, 0xFF, 0xFF));           //Xét color TimeBar đã play
-        timeBar.setPlayedAdMarkerColor(Color.argb(0x98, 0xFF, 0xFF, 0xFF));     //Xét color TimeBar chưa play
+        timeBar!!.setAdMarkerColor(Color.argb(0x00, 0xFF, 0xFF, 0xFF)) //Xét color TimeBar đã play
+        timeBar!!.setPlayedAdMarkerColor(
+            Color.argb(
+                0x98,
+                0xFF,
+                0xFF,
+                0xFF
+            )
+        ) //Xét color TimeBar chưa play
 
         //???
         try {
-            CustomDefaultTrackNameProvider customDefaultTrackNameProvider = new CustomDefaultTrackNameProvider(getResources());
-            final Field field = StyledPlayerControlView.class.getDeclaredField("trackNameProvider");
-            field.setAccessible(true);
-            field.set(controlView, customDefaultTrackNameProvider);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            val customDefaultTrackNameProvider = CustomDefaultTrackNameProvider(resources)
+            val field = StyledPlayerControlView::class.java.getDeclaredField("trackNameProvider")
+            field.isAccessible = true
+            field[controlView] = customDefaultTrackNameProvider
+        } catch (e: NoSuchFieldException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
         }
 
         //Thiết lập btn xóa video
-        findViewById(R.id.delete).setOnClickListener(view -> askDeleteMedia());
+        findViewById<View>(R.id.delete).setOnClickListener { view: View? -> askDeleteMedia() }
 
         //Thiết lập btn next video
-        findViewById(R.id.next).setOnClickListener(view -> {
-            if (!isTvBox && mPrefs.askScope) {
-                askForScope(false, true);
+        findViewById<View>(R.id.next).setOnClickListener { view: View? ->
+            if (!isTvBox && mPrefs!!.askScope) {
+                askForScope(false, true)
             } else {
-                skipToNext();
+                skipToNext()
             }
-        });
+        }
 
         //Thiết lập btn pause/play video
-        exoPlayPause.setOnClickListener(view -> dispatchPlayPause());
+        exoPlayPause!!.setOnClickListener { dispatchPlayPause() }
 
         //Ngăn các thao tác double tap trong controller
         // Prevent double tap actions in controller
-        findViewById(R.id.exo_bottom_bar).setOnTouchListener((v, event) -> true);
+        findViewById<View>(R.id.exo_bottom_bar).setOnTouchListener { _: View?, _: MotionEvent? -> true }
         //titleView.setOnTouchListener((v, event) -> true);
-
-        playerListener = new PlayerListener();
+        playerListener = PlayerListener()
 
         //Thiết lập độ sáng
-        mBrightnessControl = new BrightnessControl(this);
-        if (mPrefs.brightness >= 0) {
-            mBrightnessControl.currentBrightnessLevel = mPrefs.brightness;
-            mBrightnessControl.setScreenBrightness(mBrightnessControl.levelToBrightness(mBrightnessControl.currentBrightnessLevel));
+        mBrightnessControl = BrightnessControl(this)
+        if (mPrefs!!.brightness >= 0) {
+            mBrightnessControl!!.currentBrightnessLevel = mPrefs!!.brightness
+            mBrightnessControl!!.screenBrightness = mBrightnessControl!!.levelToBrightness(
+                mBrightnessControl!!.currentBrightnessLevel
+            )
         }
-        playerView.setBrightnessControl(mBrightnessControl);
-
-        final LinearLayout exoBasicControls = playerView.findViewById(R.id.exo_basic_controls);
-        final ImageButton exoSubtitle = exoBasicControls.findViewById(R.id.exo_subtitle);
-        exoBasicControls.removeView(exoSubtitle);
-
-        exoSettings = exoBasicControls.findViewById(R.id.exo_settings);
-        exoBasicControls.removeView(exoSettings);
-        final ImageButton exoRepeat = exoBasicControls.findViewById(R.id.exo_repeat_toggle);
-        exoBasicControls.removeView(exoRepeat);
+        playerView!!.setBrightnessControl(mBrightnessControl)
+        val exoBasicControls = playerView!!.findViewById<LinearLayout>(R.id.exo_basic_controls)
+        val exoSubtitle = exoBasicControls.findViewById<ImageButton>(R.id.exo_subtitle)
+        exoBasicControls.removeView(exoSubtitle)
+        exoSettings = exoBasicControls.findViewById(R.id.exo_settings)
+        exoBasicControls.removeView(exoSettings)
+        val exoRepeat = exoBasicControls.findViewById<ImageButton>(R.id.exo_repeat_toggle)
+        exoBasicControls.removeView(exoRepeat)
         //exoBasicControls.setVisibility(View.GONE);
-
-        exoSettings.setOnLongClickListener(view -> {
+        exoSettings!!.setOnLongClickListener {
             //askForScope(false, false);
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivityForResult(intent, REQUEST_SETTINGS);
-            return true;
-        });
-
-        exoSubtitle.setOnLongClickListener(v -> {
-            enableRotation();
-            safelyStartActivityForResult(new Intent(Settings.ACTION_CAPTIONING_SETTINGS), REQUEST_SYSTEM_CAPTIONS);
-            return true;
-        });
-
-        updateButtons(false);
-
-        final HorizontalScrollView horizontalScrollView = (HorizontalScrollView) getLayoutInflater().inflate(R.layout.controls, null);
-        final LinearLayout controls = horizontalScrollView.findViewById(R.id.controls);
-
-        controls.addView(buttonOpen);
-        controls.addView(exoSubtitle);
-        controls.addView(buttonAspectRatio);
-        if (Utils.isPiPSupported(this) && buttonPiP != null) {
-            controls.addView(buttonPiP);
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivityForResult(intent, REQUEST_SETTINGS)
+            true
         }
-        if (mPrefs.repeatToggle) {
-            controls.addView(exoRepeat);
+        exoSubtitle.setOnLongClickListener { v: View? ->
+            enableRotation()
+            safelyStartActivityForResult(
+                Intent(Settings.ACTION_CAPTIONING_SETTINGS),
+                REQUEST_SYSTEM_CAPTIONS
+            )
+            true
+        }
+        updateButtons(false)
+        val horizontalScrollView =
+            layoutInflater.inflate(R.layout.controls, null) as HorizontalScrollView
+        val controls = horizontalScrollView.findViewById<LinearLayout>(R.id.controls)
+        controls.addView(buttonOpen)
+        controls.addView(exoSubtitle)
+        controls.addView(buttonAspectRatio)
+        if (isPiPSupported(this) && buttonPiP != null) {
+            controls.addView(buttonPiP)
+        }
+        if (mPrefs!!.repeatToggle) {
+            controls.addView(exoRepeat)
         }
         if (!isTvBox) {
-            controls.addView(buttonRotation);
+            controls.addView(buttonRotation)
         }
-        controls.addView(exoSettings);
-
-        exoBasicControls.addView(horizontalScrollView);
-
+        controls.addView(exoSettings)
+        exoBasicControls.addView(horizontalScrollView)
         if (Build.VERSION.SDK_INT > 23) {
-            horizontalScrollView.setOnScrollChangeListener((view, i, i1, i2, i3) -> resetHideCallbacks());
+            horizontalScrollView.setOnScrollChangeListener { view: View?, i: Int, i1: Int, i2: Int, i3: Int -> resetHideCallbacks() }
         }
-
-        playerView.setControllerVisibilityListener(new StyledPlayerView.ControllerVisibilityListener() {
-            @Override
-            public void onVisibilityChanged(int visibility) {
-                controllerVisible = visibility == View.VISIBLE;
-                controllerVisibleFully = playerView.isControllerFullyVisible();
-
-                if (PlayerActivity.restoreControllerTimeout) {
-                    restoreControllerTimeout = false;
-                    if (player == null || !player.isPlaying()) {
-                        playerView.setControllerShowTimeoutMs(-1);
-                    } else {
-                        playerView.setControllerShowTimeoutMs(PlayerActivity.CONTROLLER_TIMEOUT);
-                    }
-                }
-
-                // https://developer.android.com/training/system-ui/immersive
-                Utils.toggleSystemUi(PlayerActivity.this, playerView, visibility == View.VISIBLE);
-                if (visibility == View.VISIBLE) {
-                    // Because when using dpad controls, focus resets to first item in bottom controls bar
-                    findViewById(R.id.exo_play_pause).requestFocus();
-                }
-
-                if (controllerVisible && playerView.isControllerFullyVisible()) {
-                    if (mPrefs.firstRun) {
-                        TapTargetView.showFor(PlayerActivity.this,
-                                TapTarget.forView(buttonOpen, getString(R.string.onboarding_open_title), getString(R.string.onboarding_open_description))
-                                        .outerCircleColor(R.color.green)
-                                        .targetCircleColor(R.color.white)
-                                        .titleTextSize(22)
-                                        .titleTextColor(R.color.white)
-                                        .descriptionTextSize(14)
-                                        .cancelable(true),
-                                new TapTargetView.Listener() {
-                                    @Override
-                                    public void onTargetClick(TapTargetView view) {
-                                        super.onTargetClick(view);
-                                        buttonOpen.performClick();
-                                    }
-                                });
-                        // TODO: Explain gestures?
-                        //  "Use vertical and horizontal gestures to change brightness, volume and seek in video"
-                        mPrefs.markFirstRun();
-                    }
-                    if (errorToShow != null) {
-                        showError(errorToShow);
-                        errorToShow = null;
-                    }
+        playerView!!.setControllerVisibilityListener(ControllerVisibilityListener { visibility ->
+            controllerVisible = visibility == View.VISIBLE
+            controllerVisibleFully = playerView!!.isControllerFullyVisible()
+            if (restoreControllerTimeout) {
+                restoreControllerTimeout = false
+                if (player == null || !player!!.isPlaying) {
+                    playerView!!.controllerShowTimeoutMs = -1
+                } else {
+                    playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
                 }
             }
-        });
 
-        youTubeOverlay = findViewById(R.id.youtube_overlay);
-        youTubeOverlay.performListener(new YouTubeOverlay.PerformListener() {
-            @Override
-            public void onAnimationStart() {
-                youTubeOverlay.setAlpha(1.0f);
-                youTubeOverlay.setVisibility(View.VISIBLE);
+            // https://developer.android.com/training/system-ui/immersive
+            toggleSystemUi(this@PlayerActivity, playerView!!, visibility == View.VISIBLE)
+            if (visibility == View.VISIBLE) {
+                // Because when using dpad controls, focus resets to first item in bottom controls bar
+                findViewById<View>(R.id.exo_play_pause).requestFocus()
             }
-
-            @Override
-            public void onAnimationEnd() {
-                youTubeOverlay.animate()
-                        .alpha(0.0f)
-                        .setDuration(300)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                youTubeOverlay.setVisibility(View.GONE);
-                                youTubeOverlay.setAlpha(1.0f);
+            if (controllerVisible && playerView!!.isControllerFullyVisible()) {
+                if (mPrefs!!.firstRun) {
+                    TapTargetView.showFor(this@PlayerActivity,
+                        TapTarget.forView(
+                            buttonOpen, getString(R.string.onboarding_open_title), getString(
+                                R.string.onboarding_open_description
+                            )
+                        )
+                            .outerCircleColor(R.color.green)
+                            .targetCircleColor(R.color.white)
+                            .titleTextSize(22)
+                            .titleTextColor(R.color.white)
+                            .descriptionTextSize(14)
+                            .cancelable(true),
+                        object : TapTargetView.Listener() {
+                            override fun onTargetClick(view: TapTargetView) {
+                                super.onTargetClick(view)
+                                buttonOpen!!.performClick()
                             }
-                        });
+                        })
+                    // TODO: Explain gestures?
+                    //  "Use vertical and horizontal gestures to change brightness, volume and seek in video"
+                    mPrefs!!.markFirstRun()
+                }
+                if (errorToShow != null) {
+                    showError(errorToShow!!)
+                    errorToShow = null
+                }
             }
-        });
+        })
+        youTubeOverlay = findViewById(R.id.youtube_overlay)
+        youTubeOverlay!!.performListener(object : PerformListener {
+            override fun onAnimationStart() {
+                youTubeOverlay!!.alpha = 1.0f
+                youTubeOverlay!!.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd() {
+                youTubeOverlay!!.animate()
+                    .alpha(0.0f)
+                    .setDuration(300)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            youTubeOverlay!!.visibility = View.GONE
+                            youTubeOverlay!!.alpha = 1.0f
+                        }
+                    })
+            }
+        })
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        alive = true;
+    public override fun onStart() {
+        super.onStart()
+        alive = true
         if (!(isTvBox && Build.VERSION.SDK_INT >= 31)) {
-            updateSubtitleStyle(this);
+            updateSubtitleStyle(this)
         }
         if (Build.VERSION.SDK_INT >= 31) {
-            playerView.removeCallbacks(barsHider);
-            Utils.toggleSystemUi(this, playerView, true);
+            playerView!!.removeCallbacks(barsHider)
+            toggleSystemUi(this, playerView!!, true)
         }
-        initializePlayer();
-        updateButtonRotation();
+        initializePlayer()
+        updateButtonRotation()
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        restorePlayStateAllowed = true;
+    public override fun onResume() {
+        super.onResume()
+        restorePlayStateAllowed = true
         if (isTvBox && Build.VERSION.SDK_INT >= 31) {
-            updateSubtitleStyle(this);
+            updateSubtitleStyle(this)
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        savePlayer();
+    override fun onPause() {
+        super.onPause()
+        savePlayer()
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        alive = false;
+    public override fun onStop() {
+        super.onStop()
+        alive = false
         if (Build.VERSION.SDK_INT >= 31) {
-            playerView.removeCallbacks(barsHider);
+            playerView!!.removeCallbacks(barsHider)
         }
-        playerView.setCustomErrorMessage(null);
-        releasePlayer(false);
+        playerView!!.setCustomErrorMessage(null)
+        releasePlayer(false)
     }
 
-    @Override
-    public void onBackPressed() {
-        restorePlayStateAllowed = false;
-        super.onBackPressed();
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        restorePlayStateAllowed = false
+        super.onBackPressed()
     }
 
-    @Override
-    public void finish() {
+    override fun finish() {
         if (intentReturnResult) {
-            Intent intent = new Intent("com.mxtech.intent.result.VIEW");
-            intent.putExtra(API_END_BY, playbackFinished ? "playback_completion" : "user");
+            val intent = Intent("com.mxtech.intent.result.VIEW")
+            intent.putExtra(API_END_BY, if (playbackFinished) "playback_completion" else "user")
             if (!playbackFinished) {
                 if (player != null) {
-                    long duration = player.getDuration();
+                    val duration = player!!.duration
                     if (duration != C.TIME_UNSET) {
-                        intent.putExtra(API_DURATION, (int) player.getDuration());
+                        intent.putExtra(API_DURATION, player!!.duration.toInt())
                     }
-                    if (player.isCurrentMediaItemSeekable()) {
-                        if (mPrefs.persistentMode) {
-                            intent.putExtra(API_POSITION, (int) mPrefs.nonPersitentPosition);
+                    if (player!!.isCurrentMediaItemSeekable) {
+                        if (mPrefs!!.persistentMode) {
+                            intent.putExtra(API_POSITION, mPrefs!!.nonPersitentPosition.toInt())
                         } else {
-                            intent.putExtra(API_POSITION, (int) player.getCurrentPosition());
+                            intent.putExtra(API_POSITION, player!!.currentPosition.toInt())
                         }
                     }
                 }
             }
-            setResult(Activity.RESULT_OK, intent);
+            setResult(RESULT_OK, intent)
         }
-
-        super.finish();
+        super.finish()
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
         if (intent != null) {
-            final String action = intent.getAction();
-            final String type = intent.getType();
-            final Uri uri = intent.getData();
-
-            if (Intent.ACTION_VIEW.equals(action) && uri != null) {
-                if (SubtitleUtils.isSubtitle(uri, type)) {
-                    handleSubtitles(uri);
+            val action = intent.action
+            val type = intent.type
+            val uri = intent.data
+            if (Intent.ACTION_VIEW == action && uri != null) {
+                if (isSubtitle(uri, type)) {
+                    handleSubtitles(uri)
                 } else {
-                    mPrefs.updateMedia(this, uri, type);
-                    searchSubtitles();
+                    mPrefs!!.updateMedia(this, uri, type)
+                    searchSubtitles()
                 }
-                focusPlay = true;
-                initializePlayer();
-            } else if (Intent.ACTION_SEND.equals(action) && "text/plain".equals(type)) {
-                String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+                focusPlay = true
+                initializePlayer()
+            } else if (Intent.ACTION_SEND == action && "text/plain" == type) {
+                val text = intent.getStringExtra(Intent.EXTRA_TEXT)
                 if (text != null) {
-                    final Uri parsedUri = Uri.parse(text);
-                    if (parsedUri.isAbsolute()) {
-                        mPrefs.updateMedia(this, parsedUri, null);
-                        focusPlay = true;
-                        initializePlayer();
+                    val parsedUri = Uri.parse(text)
+                    if (parsedUri.isAbsolute) {
+                        mPrefs!!.updateMedia(this, parsedUri, null)
+                        focusPlay = true
+                        initializePlayer()
                     }
                 }
             }
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_MEDIA_PLAY:
-            case KeyEvent.KEYCODE_MEDIA_PAUSE:
-            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-            case KeyEvent.KEYCODE_BUTTON_SELECT:
-                if (player == null)
-                    break;
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PAUSE, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_BUTTON_SELECT -> {
+                if (player == null) return super.onKeyDown(keyCode, event)
                 if (keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
-                    player.pause();
+                    player!!.pause()
                 } else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
-                    player.play();
-                } else if (player.isPlaying()) {
-                    player.pause();
+                    player!!.play()
+                } else if (player!!.isPlaying) {
+                    player!!.pause()
                 } else {
-                    player.play();
+                    player!!.play()
                 }
-                return true;
-            case KeyEvent.KEYCODE_VOLUME_UP:
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                Utils.adjustVolume(this, mAudioManager, playerView, keyCode == KeyEvent.KEYCODE_VOLUME_UP, event.getRepeatCount() == 0, true);
-                return true;
-            case KeyEvent.KEYCODE_BUTTON_START:
-            case KeyEvent.KEYCODE_BUTTON_A:
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_NUMPAD_ENTER:
-            case KeyEvent.KEYCODE_SPACE:
-                if (player == null)
-                    break;
+                return true
+            }
+            KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                adjustVolume(
+                    this,
+                    mAudioManager!!,
+                    playerView!!,
+                    keyCode == KeyEvent.KEYCODE_VOLUME_UP,
+                    event.repeatCount == 0,
+                    true
+                )
+                return true
+            }
+            KeyEvent.KEYCODE_BUTTON_START, KeyEvent.KEYCODE_BUTTON_A, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_NUMPAD_ENTER, KeyEvent.KEYCODE_SPACE -> {
+                if (player == null) return super.onKeyDown(keyCode, event)
                 if (!controllerVisibleFully) {
-                    if (player.isPlaying()) {
-                        player.pause();
+                    if (player!!.isPlaying) {
+                        player!!.pause()
                     } else {
-                        player.play();
+                        player!!.play()
                     }
-                    return true;
+                    return true
                 }
-                break;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-            case KeyEvent.KEYCODE_BUTTON_L2:
-            case KeyEvent.KEYCODE_MEDIA_REWIND:
-                if (!controllerVisibleFully || keyCode == KeyEvent.KEYCODE_MEDIA_REWIND) {
-                    if (player == null)
-                        break;
-                    playerView.removeCallbacks(playerView.textClearRunnable);
-                    long pos = player.getCurrentPosition();
-                    if (playerView.keySeekStart == -1) {
-                        playerView.keySeekStart = pos;
-                    }
-                    long seekTo = pos - 10_000;
-                    if (seekTo < 0)
-                        seekTo = 0;
-                    player.setSeekParameters(SeekParameters.PREVIOUS_SYNC);
-                    player.seekTo(seekTo);
-                    final String message = Utils.formatMilisSign(seekTo - playerView.keySeekStart) + "\n" + Utils.formatMilis(seekTo);
-                    playerView.setCustomErrorMessage(message);
-                    return true;
+            }
+            KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_BUTTON_L2, KeyEvent.KEYCODE_MEDIA_REWIND -> if (!controllerVisibleFully || keyCode == KeyEvent.KEYCODE_MEDIA_REWIND) {
+                if (player == null) return super.onKeyDown(keyCode, event)
+                playerView!!.removeCallbacks(playerView!!.textClearRunnable)
+                val pos = player!!.currentPosition
+                if (playerView!!.keySeekStart == -1L) {
+                    playerView!!.keySeekStart = pos
                 }
-                break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-            case KeyEvent.KEYCODE_BUTTON_R2:
-            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                if (!controllerVisibleFully || keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD) {
-                    if (player == null)
-                        break;
-                    playerView.removeCallbacks(playerView.textClearRunnable);
-                    long pos = player.getCurrentPosition();
-                    if (playerView.keySeekStart == -1) {
-                        playerView.keySeekStart = pos;
-                    }
-                    long seekTo = pos + 10_000;
-                    long seekMax = player.getDuration();
-                    if (seekMax != C.TIME_UNSET && seekTo > seekMax)
-                        seekTo = seekMax;
-                    PlayerActivity.player.setSeekParameters(SeekParameters.NEXT_SYNC);
-                    player.seekTo(seekTo);
-                    final String message = Utils.formatMilisSign(seekTo - playerView.keySeekStart) + "\n" + Utils.formatMilis(seekTo);
-                    playerView.setCustomErrorMessage(message);
-                    return true;
+                var seekTo = pos - 10000
+                if (seekTo < 0) seekTo = 0
+                player!!.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
+                player!!.seekTo(seekTo)
+                val message = """
+                    ${formatMilisSign(seekTo - playerView!!.keySeekStart)}
+                    ${formatMilis(seekTo)}
+                    """.trimIndent()
+                playerView!!.setCustomErrorMessage(message)
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_BUTTON_R2, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> if (!controllerVisibleFully || keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD) {
+                if (player == null) return super.onKeyDown(keyCode, event)
+                playerView!!.removeCallbacks(playerView!!.textClearRunnable)
+                val pos = player!!.currentPosition
+                if (playerView!!.keySeekStart == -1L) {
+                    playerView!!.keySeekStart = pos
                 }
-                break;
-            case KeyEvent.KEYCODE_BACK:
-                if (isTvBox) {
-                    if (controllerVisible && player != null && player.isPlaying()) {
-                        playerView.hideController();
-                        return true;
-                    } else {
-                        onBackPressed();
-                    }
+                var seekTo = pos + 10000
+                val seekMax = player!!.duration
+                if (seekMax != C.TIME_UNSET && seekTo > seekMax) seekTo = seekMax
+                player!!.setSeekParameters(SeekParameters.NEXT_SYNC)
+                player!!.seekTo(seekTo)
+                val message = """
+                    ${formatMilisSign(seekTo - playerView!!.keySeekStart)}
+                    ${formatMilis(seekTo)}
+                    """.trimIndent()
+                playerView!!.setCustomErrorMessage(message)
+                return true
+            }
+            KeyEvent.KEYCODE_BACK -> if (isTvBox) {
+                if (controllerVisible && player != null && player!!.isPlaying) {
+                    playerView!!.hideController()
+                    return true
+                } else {
+                    onBackPressed()
                 }
-                break;
-            default:
-                if (!controllerVisibleFully) {
-                    playerView.showController();
-                    return true;
-                }
-                break;
+            }
+            else -> if (!controllerVisibleFully) {
+                playerView!!.showController()
+                return true
+            }
         }
-        return super.onKeyDown(keyCode, event);
+        return super.onKeyDown(keyCode, event)
     }
 
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP:
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                playerView.postDelayed(playerView.textClearRunnable, CustomStyledPlayerView.MESSAGE_TIMEOUT_KEY);
-                return true;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-            case KeyEvent.KEYCODE_BUTTON_L2:
-            case KeyEvent.KEYCODE_MEDIA_REWIND:
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-            case KeyEvent.KEYCODE_BUTTON_R2:
-            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                if (!isScrubbing) {
-                    playerView.postDelayed(playerView.textClearRunnable, 1000);
-                }
-                break;
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                playerView!!.postDelayed(
+                    playerView!!.textClearRunnable,
+                    CustomStyledPlayerView.MESSAGE_TIMEOUT_KEY.toLong()
+                )
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_BUTTON_L2, KeyEvent.KEYCODE_MEDIA_REWIND, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_BUTTON_R2, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> if (!isScrubbing) {
+                playerView!!.postDelayed(playerView!!.textClearRunnable, 1000)
+            }
         }
-        return super.onKeyUp(keyCode, event);
+        return super.onKeyUp(keyCode, event)
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (isScaling) {
-            final int keyCode = event.getKeyCode();
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_UP:
-                        scale(true);
-                        break;
-                    case KeyEvent.KEYCODE_DPAD_DOWN:
-                        scale(false);
-                        break;
+            val keyCode = event.keyCode
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                when (keyCode) {
+                    KeyEvent.KEYCODE_DPAD_UP -> scale(true)
+                    KeyEvent.KEYCODE_DPAD_DOWN -> scale(false)
                 }
-            } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_UP:
-                    case KeyEvent.KEYCODE_DPAD_DOWN:
-                        break;
-                    default:
-                        if (isScaleStarting) {
-                            isScaleStarting = false;
-                        } else {
-                            scaleEnd();
-                        }
+            } else if (event.action == KeyEvent.ACTION_UP) {
+                when (keyCode) {
+                    KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> {}
+                    else -> if (isScaleStarting) {
+                        isScaleStarting = false
+                    } else {
+                        scaleEnd()
+                    }
                 }
             }
-            return true;
+            return true
         }
-
-        if (isTvBox && !controllerVisibleFully) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                onKeyDown(event.getKeyCode(), event);
-            } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                onKeyUp(event.getKeyCode(), event);
+        return if (isTvBox && !controllerVisibleFully) {
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                onKeyDown(event.keyCode, event)
+            } else if (event.action == KeyEvent.ACTION_UP) {
+                onKeyUp(event.keyCode, event)
             }
-            return true;
+            true
         } else {
-            return super.dispatchKeyEvent(event);
+            super.dispatchKeyEvent(event)
         }
     }
 
-    @Override
-    public boolean onGenericMotionEvent(MotionEvent event) {
-        if (0 != (event.getSource() & InputDevice.SOURCE_CLASS_POINTER)) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_SCROLL:
-                    final float value = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
-                    Utils.adjustVolume(this, mAudioManager, playerView, value > 0.0f, Math.abs(value) > 1.0f, true);
-                    return true;
+    override fun onGenericMotionEvent(event: MotionEvent): Boolean {
+        if (0 != event.source and InputDevice.SOURCE_CLASS_POINTER) {
+            when (event.action) {
+                MotionEvent.ACTION_SCROLL -> {
+                    val value = event.getAxisValue(MotionEvent.AXIS_VSCROLL)
+                    adjustVolume(
+                        this,
+                        mAudioManager!!,
+                        playerView!!,
+                        value > 0.0f,
+                        Math.abs(value) > 1.0f,
+                        true
+                    )
+                    return true
+                }
             }
-        } else if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK &&
-                event.getAction() == MotionEvent.ACTION_MOVE) {
+        } else if (event.source and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK &&
+            event.action == MotionEvent.ACTION_MOVE
+        ) {
             // TODO: This somehow works, but it would use better filtering
-            float value = event.getAxisValue(MotionEvent.AXIS_RZ);
-            for (int i = 0; i < event.getHistorySize(); i++) {
-                float historical = event.getHistoricalAxisValue(MotionEvent.AXIS_RZ, i);
+            var value = event.getAxisValue(MotionEvent.AXIS_RZ)
+            for (i in 0 until event.historySize) {
+                val historical = event.getHistoricalAxisValue(MotionEvent.AXIS_RZ, i)
                 if (Math.abs(historical) > value) {
-                    value = historical;
+                    value = historical
                 }
             }
             if (Math.abs(value) == 1.0f) {
-                Utils.adjustVolume(this, mAudioManager, playerView, value < 0, true, true);
+                adjustVolume(this, mAudioManager!!, playerView!!, value < 0, true, true)
             }
         }
-        return super.onGenericMotionEvent(event);
+        return super.onGenericMotionEvent(event)
     }
 
-    @Override
-    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
-
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (isInPictureInPictureMode) {
             // On Android TV it is required to hide controller in this PIP change callback
-            playerView.hideController();
-            setSubtitleTextSizePiP();
-            playerView.setScale(1.f);
-            mReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (intent == null || !ACTION_MEDIA_CONTROL.equals(intent.getAction()) || player == null) {
-                        return;
+            playerView!!.hideController()
+            setSubtitleTextSizePiP()
+            playerView!!.setScale(1f)
+            mReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent?) {
+                    if (intent == null || ACTION_MEDIA_CONTROL != intent.action || player == null) {
+                        return
                     }
-
-                    switch (intent.getIntExtra(EXTRA_CONTROL_TYPE, 0)) {
-                        case CONTROL_TYPE_PLAY:
-                            player.play();
-                            break;
-                        case CONTROL_TYPE_PAUSE:
-                            player.pause();
-                            break;
+                    when (intent.getIntExtra(EXTRA_CONTROL_TYPE, 0)) {
+                        CONTROL_TYPE_PLAY -> player!!.play()
+                        CONTROL_TYPE_PAUSE -> player!!.pause()
                     }
                 }
-            };
-            registerReceiver(mReceiver, new IntentFilter(ACTION_MEDIA_CONTROL));
+            }
+            registerReceiver(mReceiver, IntentFilter(ACTION_MEDIA_CONTROL))
         } else {
-            setSubtitleTextSize();
-            if (mPrefs.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
-                playerView.setScale(mPrefs.scale);
+            setSubtitleTextSize()
+            if (mPrefs!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
+                playerView!!.setScale(mPrefs!!.scale)
             }
             if (mReceiver != null) {
-                unregisterReceiver(mReceiver);
-                mReceiver = null;
+                unregisterReceiver(mReceiver)
+                mReceiver = null
             }
-            playerView.setControllerAutoShow(true);
+            playerView!!.controllerAutoShow = true
             if (player != null) {
-                if (player.isPlaying())
-                    Utils.toggleSystemUi(this, playerView, false);
-                else
-                    playerView.showController();
+                if (player!!.isPlaying) toggleSystemUi(
+                    this,
+                    playerView!!,
+                    false
+                ) else playerView!!.showController()
             }
         }
     }
 
-    void resetApiAccess() {
-        apiAccess = false;
-        apiTitle = null;
-        apiSubs.clear();
-        mPrefs.setPersistent(true);
+    fun resetApiAccess() {
+        apiAccess = false
+        apiTitle = null
+        apiSubs.clear()
+        mPrefs!!.setPersistent(true)
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             if (restoreOrientationLock) {
-                Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0);
-                restoreOrientationLock = false;
+                Settings.System.putInt(contentResolver, Settings.System.ACCELEROMETER_ROTATION, 0)
+                restoreOrientationLock = false
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
         if (resultCode == RESULT_OK && alive) {
-            releasePlayer();
+            releasePlayer()
         }
-
         if (requestCode == REQUEST_CHOOSER_VIDEO || requestCode == REQUEST_CHOOSER_VIDEO_MEDIASTORE) {
             if (resultCode == RESULT_OK) {
-                resetApiAccess();
-                restorePlayState = false;
-
-                final Uri uri = data.getData();
-
+                resetApiAccess()
+                restorePlayState = false
+                val uri = data?.data ?: return
                 if (requestCode == REQUEST_CHOOSER_VIDEO) {
-                    boolean uriAlreadyTaken = false;
+                    var uriAlreadyTaken = false
 
                     // https://commonsware.com/blog/2020/06/13/count-your-saf-uri-permission-grants.html
-                    final ContentResolver contentResolver = getContentResolver();
-                    for (UriPermission persistedUri : contentResolver.getPersistedUriPermissions()) {
-                        if (persistedUri.getUri().equals(mPrefs.scopeUri)) {
-                            continue;
-                        } else if (persistedUri.getUri().equals(uri)) {
-                            uriAlreadyTaken = true;
+                    val contentResolver = contentResolver
+                    for (persistedUri in contentResolver.persistedUriPermissions) {
+                        if (persistedUri.uri == mPrefs!!.scopeUri) {
+                            continue
+                        } else if (persistedUri.uri == uri) {
+                            uriAlreadyTaken = true
                         } else {
                             try {
-                                contentResolver.releasePersistableUriPermission(persistedUri.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            } catch (SecurityException e) {
-                                e.printStackTrace();
+                                contentResolver.releasePersistableUriPermission(
+                                    persistedUri.uri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                )
+                            } catch (e: SecurityException) {
+                                e.printStackTrace()
                             }
                         }
                     }
-
-                    if (!uriAlreadyTaken && uri != null) {
+                    if (!uriAlreadyTaken) {
                         try {
-                            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        } catch (SecurityException e) {
-                            e.printStackTrace();
+                            contentResolver.takePersistableUriPermission(
+                                uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+                        } catch (e: SecurityException) {
+                            e.printStackTrace()
                         }
                     }
                 }
-
-                mPrefs.setPersistent(true);
-                mPrefs.updateMedia(this, uri, data.getType());
-
+                mPrefs!!.setPersistent(true)
+                mPrefs!!.updateMedia(this, uri, data.type)
                 if (requestCode == REQUEST_CHOOSER_VIDEO) {
-                    searchSubtitles();
+                    searchSubtitles()
                 }
             }
         } else if (requestCode == REQUEST_CHOOSER_SUBTITLE || requestCode == REQUEST_CHOOSER_SUBTITLE_MEDIASTORE) {
             if (resultCode == RESULT_OK) {
-                Uri uri = data.getData();
-
+                val uri = data?.data ?: return
                 if (requestCode == REQUEST_CHOOSER_SUBTITLE) {
                     try {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (SecurityException e) {
-                        e.printStackTrace();
+                        contentResolver.takePersistableUriPermission(
+                            uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    } catch (e: SecurityException) {
+                        e.printStackTrace()
                     }
                 }
-
-                handleSubtitles(uri);
+                handleSubtitles(uri)
             }
         } else if (requestCode == REQUEST_CHOOSER_SCOPE_DIR) {
             if (resultCode == RESULT_OK) {
-                final Uri uri = data.getData();
+                val uri = data?.data ?: return
                 try {
-                    getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    mPrefs.updateScope(uri);
-                    mPrefs.markScopeAsked();
-                    searchSubtitles();
-                } catch (SecurityException e) {
-                    e.printStackTrace();
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                    mPrefs!!.updateScope(uri)
+                    mPrefs!!.markScopeAsked()
+                    searchSubtitles()
+                } catch (e: SecurityException) {
+                    e.printStackTrace()
                 }
             }
         } else if (requestCode == REQUEST_SETTINGS) {
-            mPrefs.loadUserPreferences();
+            mPrefs!!.loadUserPreferences()
         } else {
-            super.onActivityResult(requestCode, resultCode, data);
+            super.onActivityResult(requestCode, resultCode, data)
         }
 
         // Init here because onStart won't follow when app was only paused when file chooser was shown
         // (for example pop-up file chooser on tablets)
         if (resultCode == RESULT_OK && alive) {
-            initializePlayer();
+            initializePlayer()
         }
     }
 
-    private void handleSubtitles(Uri uri) {
+    private fun handleSubtitles(uri: Uri?) {
         // Convert subtitles to UTF-8 if necessary
-        SubtitleUtils.clearCache(this);
-        uri = SubtitleUtils.convertToUTF(this, uri);
-        mPrefs.updateSubtitle(uri);
+        var uri = uri
+        clearCache(this)
+        uri = convertToUTF(this, uri!!)
+        mPrefs!!.updateSubtitle(uri)
     }
 
-    public void initializePlayer() {
-        boolean isNetworkUri = mPrefs.mediaUri != null && Utils.isSupportedNetworkUri(mPrefs.mediaUri);
-        haveMedia = mPrefs.mediaUri != null && (Utils.fileExists(this, mPrefs.mediaUri) || isNetworkUri);
-
+    fun initializePlayer() {
+        val isNetworkUri = mPrefs!!.mediaUri != null && isSupportedNetworkUri(
+            mPrefs!!.mediaUri!!
+        )
+        haveMedia =
+            mPrefs!!.mediaUri != null && (fileExists(this, mPrefs!!.mediaUri!!) || isNetworkUri)
         if (player != null) {
-            player.removeListener(playerListener);
-            player.clearMediaItems();
-            player.release();
-            player = null;
+            player!!.removeListener(playerListener!!)
+            player!!.clearMediaItems()
+            player!!.release()
+            player = null
         }
-
-        trackSelector = new DefaultTrackSelector(this);
-        if (mPrefs.tunneling) {
-            trackSelector.setParameters(trackSelector.buildUponParameters()
+        trackSelector = DefaultTrackSelector(this)
+        if (mPrefs!!.tunneling) {
+            trackSelector!!.setParameters(
+                trackSelector!!.buildUponParameters()
                     .setTunnelingEnabled(true)
-            );
+            )
         }
-        trackSelector.setParameters(trackSelector.buildUponParameters()
-                .setPreferredAudioLanguages(Utils.getDeviceLanguages())
-        );
+        trackSelector!!.setParameters(
+            trackSelector!!.buildUponParameters()
+                .setPreferredAudioLanguages(*deviceLanguages)
+        )
         // https://github.com/google/ExoPlayer/issues/8571
-        DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory()
-                .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS)
-                .setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE);
-        @SuppressLint("WrongConstant") RenderersFactory renderersFactory = new DefaultRenderersFactory(this)
-                .setExtensionRendererMode(mPrefs.decoderPriority);
-
-        ExoPlayer.Builder playerBuilder = new ExoPlayer.Builder(this, renderersFactory)
-                .setTrackSelector(trackSelector)
-                .setMediaSourceFactory(new DefaultMediaSourceFactory(this, extractorsFactory));
-
+        val extractorsFactory = DefaultExtractorsFactory()
+            .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS)
+            .setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE)
+        @SuppressLint("WrongConstant") val renderersFactory: RenderersFactory =
+            DefaultRenderersFactory(this)
+                .setExtensionRendererMode(mPrefs!!.decoderPriority)
+        val playerBuilder = ExoPlayer.Builder(this, renderersFactory)
+            .setTrackSelector(trackSelector!!)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(this, extractorsFactory))
         if (haveMedia && isNetworkUri) {
-            if (mPrefs.mediaUri.getScheme().toLowerCase().startsWith("http")) {
-                HashMap<String, String> headers = new HashMap<>();
-                String userInfo = mPrefs.mediaUri.getUserInfo();
-                if (userInfo != null && userInfo.length() > 0 && userInfo.contains(":")) {
-                    headers.put("Authorization", "Basic " + Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
-                    DefaultHttpDataSource.Factory defaultHttpDataSourceFactory = new DefaultHttpDataSource.Factory();
-                    defaultHttpDataSourceFactory.setDefaultRequestProperties(headers);
-                    playerBuilder.setMediaSourceFactory(new DefaultMediaSourceFactory(defaultHttpDataSourceFactory, extractorsFactory));
+            if (mPrefs!!.mediaUri!!.scheme!!.lowercase(Locale.getDefault()).startsWith("http")) {
+                val headers = HashMap<String, String>()
+                val userInfo = mPrefs!!.mediaUri!!.userInfo
+                if (userInfo != null && userInfo.length > 0 && userInfo.contains(":")) {
+                    headers["Authorization"] =
+                        "Basic " + Base64.encodeToString(userInfo.toByteArray(), Base64.NO_WRAP)
+                    val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
+                    defaultHttpDataSourceFactory.setDefaultRequestProperties(headers)
+                    playerBuilder.setMediaSourceFactory(
+                        DefaultMediaSourceFactory(
+                            defaultHttpDataSourceFactory,
+                            extractorsFactory
+                        )
+                    )
                 }
             }
         }
-
-        player = playerBuilder.build();
-
-        AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setUsage(C.USAGE_MEDIA)
-                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                .build();
-        player.setAudioAttributes(audioAttributes, true);
-
-        if (mPrefs.skipSilence) {
-            player.setSkipSilenceEnabled(true);
+        player = playerBuilder.build()
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+            .build()
+        player!!.setAudioAttributes(audioAttributes, true)
+        if (mPrefs!!.skipSilence) {
+            player!!.skipSilenceEnabled = true
         }
+        youTubeOverlay!!.player(player)
+        playerView!!.player = player
+        mediaSession = MediaSessionCompat(this, getString(R.string.app_name))
+        val mediaSessionConnector = MediaSessionConnector(mediaSession!!)
+        mediaSessionConnector.setPlayer(player)
 
-        youTubeOverlay.player(player);
-        playerView.setPlayer(player);
-
-        mediaSession = new MediaSessionCompat(this, getString(R.string.app_name));
-        MediaSessionConnector mediaSessionConnector = new MediaSessionConnector(mediaSession);
-        mediaSessionConnector.setPlayer(player);
-
-        mediaSessionConnector.setMediaMetadataProvider(player -> {
-            if (mPrefs.mediaUri == null)
-                return null;
-            final String title = Utils.getFileName(PlayerActivity.this, mPrefs.mediaUri);
-            if (title == null)
-                return null;
-            else
-                return new MediaMetadataCompat.Builder()
+        if (mPrefs!!.mediaUri != null) {
+            val title = getFileName(this@PlayerActivity, mPrefs!!.mediaUri!!)
+            if (title != null) {
+                mediaSessionConnector.setMediaMetadataProvider {
+                    return@setMediaMetadataProvider MediaMetadataCompat.Builder()
                         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-                        .build();
-        });
+                        .build()
+                }
+            }
+        }
 
-        playerView.setControllerShowTimeoutMs(-1);
-
-        locked = false;
-
-        chapterStarts = new long[0];
-
+        playerView!!.controllerShowTimeoutMs = -1
+        locked = false
+        chapterStarts = LongArray(0)
         if (haveMedia) {
             if (isNetworkUri) {
-                timeBar.setBufferedColor(DefaultTimeBar.DEFAULT_BUFFERED_COLOR);
+                timeBar!!.setBufferedColor(DefaultTimeBar.DEFAULT_BUFFERED_COLOR)
             } else {
                 // https://github.com/google/ExoPlayer/issues/5765
-                timeBar.setBufferedColor(0x33FFFFFF);
+                timeBar!!.setBufferedColor(0x33FFFFFF)
             }
-
-            playerView.setResizeMode(mPrefs.resizeMode);
-
-            if (mPrefs.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
-                playerView.setScale(mPrefs.scale);
+            playerView!!.resizeMode = mPrefs!!.resizeMode
+            if (mPrefs!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
+                playerView!!.setScale(mPrefs!!.scale)
             } else {
-                playerView.setScale(1.f);
+                playerView!!.setScale(1f)
             }
-            updatebuttonAspectRatioIcon();
-
-            MediaItem.Builder mediaItemBuilder = new MediaItem.Builder()
-                    .setUri(mPrefs.mediaUri)
-                    .setMimeType(mPrefs.mediaType);
-            if (apiAccess && apiSubs.size() > 0) {
-                mediaItemBuilder.setSubtitleConfigurations(apiSubs);
-            } else if (mPrefs.subtitleUri != null && Utils.fileExists(this, mPrefs.subtitleUri)) {
-                MediaItem.SubtitleConfiguration subtitle = SubtitleUtils.buildSubtitle(this, mPrefs.subtitleUri, null, true);
-                mediaItemBuilder.setSubtitleConfigurations(Collections.singletonList(subtitle));
+            updatebuttonAspectRatioIcon()
+            val mediaItemBuilder = MediaItem.Builder()
+                .setUri(mPrefs!!.mediaUri)
+                .setMimeType(mPrefs!!.mediaType)
+            if (apiAccess && apiSubs.size > 0) {
+                mediaItemBuilder.setSubtitleConfigurations(apiSubs)
+            } else if (mPrefs!!.subtitleUri != null && fileExists(this, mPrefs!!.subtitleUri!!)) {
+                val subtitle = buildSubtitle(this, mPrefs!!.subtitleUri!!, null, true)
+                mediaItemBuilder.setSubtitleConfigurations(listOf(subtitle))
             }
-            player.setMediaItem(mediaItemBuilder.build(), mPrefs.getPosition());
-
+            player!!.setMediaItem(mediaItemBuilder.build(), mPrefs!!.position)
             if (loudnessEnhancer != null) {
-                loudnessEnhancer.release();
+                loudnessEnhancer!!.release()
             }
             try {
-                loudnessEnhancer = new LoudnessEnhancer(player.getAudioSessionId());
-            } catch (RuntimeException e) {
-                e.printStackTrace();
+                loudnessEnhancer = LoudnessEnhancer(
+                    player!!.audioSessionId
+                )
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
             }
-
-            notifyAudioSessionUpdate(true);
-
-            videoLoading = true;
-
-            updateLoading(true);
-
-            if (mPrefs.getPosition() == 0L || apiAccess) {
-                play = true;
+            notifyAudioSessionUpdate(true)
+            videoLoading = true
+            updateLoading(true)
+            if (mPrefs!!.position == 0L || apiAccess) {
+                play = true
             }
-
             if (apiTitle != null) {
-                titleView.setText(apiTitle);
+                titleView!!.text = apiTitle
             } else {
-                titleView.setText(Utils.getFileName(this, mPrefs.mediaUri));
+                titleView!!.text = getFileName(this, mPrefs!!.mediaUri!!)
             }
-            titleView.setVisibility(View.VISIBLE);
-
-            updateButtons(true);
-
-            ((DoubleTapPlayerView) playerView).setDoubleTapEnabled(true);
-
+            titleView!!.visibility = View.VISIBLE
+            updateButtons(true)
+            (playerView as DoubleTapPlayerView?)!!.isDoubleTapEnabled = true
             if (!apiAccess) {
                 if (nextUriThread != null) {
-                    nextUriThread.interrupt();
+                    nextUriThread!!.interrupt()
                 }
-                nextUri = null;
-                nextUriThread = new Thread(() -> {
-                    Uri uri = findNext();
-                    if (!Thread.currentThread().isInterrupted()) {
-                        nextUri = uri;
+                nextUri = null
+                nextUriThread = Thread {
+                    val uri = findNext()
+                    if (!Thread.currentThread().isInterrupted) {
+                        nextUri = uri
                     }
-                });
-                nextUriThread.start();
+                }
+                nextUriThread!!.start()
             }
-
-            Utils.markChapters(this, mPrefs.mediaUri, controlView);
-
-            player.setHandleAudioBecomingNoisy(!isTvBox);
-            mediaSession.setActive(true);
+            markChapters(this, mPrefs!!.mediaUri!!, controlView!!)
+            player!!.setHandleAudioBecomingNoisy(!isTvBox)
+            mediaSession!!.isActive = true
         } else {
-            playerView.showController();
+            playerView!!.showController()
         }
-
-        player.addListener(playerListener);
-        player.prepare();
-
+        player!!.addListener(playerListener!!)
+        player!!.prepare()
         if (restorePlayState) {
-            restorePlayState = false;
-            playerView.showController();
-            playerView.setControllerShowTimeoutMs(PlayerActivity.CONTROLLER_TIMEOUT);
-            player.setPlayWhenReady(true);
+            restorePlayState = false
+            playerView!!.showController()
+            playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
+            player!!.playWhenReady = true
         }
     }
 
-    private void savePlayer() {
+    private fun savePlayer() {
         if (player != null) {
-            mPrefs.updateBrightness(mBrightnessControl.currentBrightnessLevel);
-            mPrefs.updateOrientation();
-
+            mPrefs!!.updateBrightness(mBrightnessControl!!.currentBrightnessLevel)
+            mPrefs!!.updateOrientation()
             if (haveMedia) {
                 // Prevent overwriting temporarily inaccessible media position
-                if (player.isCurrentMediaItemSeekable()) {
-                    mPrefs.updatePosition(player.getCurrentPosition());
+                if (player!!.isCurrentMediaItemSeekable) {
+                    mPrefs!!.updatePosition(player!!.currentPosition)
                 }
-                mPrefs.updateMeta(getSelectedTrack(C.TRACK_TYPE_AUDIO),
-                        getSelectedTrack(C.TRACK_TYPE_TEXT),
-                        playerView.getResizeMode(),
-                        playerView.getVideoSurfaceView().getScaleX(),
-                        player.getPlaybackParameters().speed);
+                mPrefs!!.updateMeta(
+                    getSelectedTrack(C.TRACK_TYPE_AUDIO),
+                    getSelectedTrack(C.TRACK_TYPE_TEXT),
+                    playerView!!.resizeMode,
+                    playerView!!.videoSurfaceView!!.scaleX,
+                    player!!.playbackParameters.speed
+                )
             }
         }
     }
 
-    public void releasePlayer() {
-        releasePlayer(true);
-    }
-
-    public void releasePlayer(boolean save) {
+    @JvmOverloads
+    fun releasePlayer(save: Boolean = true) {
         if (save) {
-            savePlayer();
+            savePlayer()
         }
-
         if (player != null) {
-            notifyAudioSessionUpdate(false);
-
-            mediaSession.setActive(false);
-            mediaSession.release();
-
-            if (player.isPlaying() && restorePlayStateAllowed) {
-                restorePlayState = true;
+            notifyAudioSessionUpdate(false)
+            mediaSession!!.isActive = false
+            mediaSession!!.release()
+            if (player!!.isPlaying && restorePlayStateAllowed) {
+                restorePlayState = true
             }
-            player.removeListener(playerListener);
-            player.clearMediaItems();
-            player.release();
-            player = null;
+            player!!.removeListener(playerListener!!)
+            player!!.clearMediaItems()
+            player!!.release()
+            player = null
         }
-        titleView.setVisibility(View.GONE);
-        updateButtons(false);
+        titleView!!.visibility = View.GONE
+        updateButtons(false)
     }
 
-    private class PlayerListener implements Player.Listener {
-        @Override
-        public void onAudioSessionIdChanged(int audioSessionId) {
+    private inner class PlayerListener : Player.Listener {
+        override fun onAudioSessionIdChanged(audioSessionId: Int) {
             if (loudnessEnhancer != null) {
-                loudnessEnhancer.release();
+                loudnessEnhancer!!.release()
             }
             try {
-                loudnessEnhancer = new LoudnessEnhancer(audioSessionId);
-            } catch (RuntimeException e) {
-                e.printStackTrace();
+                loudnessEnhancer = LoudnessEnhancer(audioSessionId)
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
             }
-            notifyAudioSessionUpdate(true);
+            notifyAudioSessionUpdate(true)
         }
 
-        @Override
-        public void onIsPlayingChanged(boolean isPlaying) {
-            playerView.setKeepScreenOn(isPlaying);
-
-            if (Utils.isPiPSupported(PlayerActivity.this)) {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            playerView!!.keepScreenOn = isPlaying
+            if (isPiPSupported(this@PlayerActivity)) {
                 if (isPlaying) {
-                    updatePictureInPictureActions(R.drawable.ic_pause_24dp, R.string.exo_controls_pause_description, CONTROL_TYPE_PAUSE, REQUEST_PAUSE);
+                    updatePictureInPictureActions(
+                        R.drawable.ic_pause_24dp,
+                        R.string.exo_controls_pause_description,
+                        CONTROL_TYPE_PAUSE,
+                        REQUEST_PAUSE
+                    )
                 } else {
-                    updatePictureInPictureActions(R.drawable.ic_play_arrow_24dp, R.string.exo_controls_play_description, CONTROL_TYPE_PLAY, REQUEST_PLAY);
+                    updatePictureInPictureActions(
+                        R.drawable.ic_play_arrow_24dp,
+                        R.string.exo_controls_play_description,
+                        CONTROL_TYPE_PLAY,
+                        REQUEST_PLAY
+                    )
                 }
             }
-
             if (!isScrubbing) {
                 if (isPlaying) {
                     if (shortControllerTimeout) {
-                        playerView.setControllerShowTimeoutMs(CONTROLLER_TIMEOUT / 3);
-                        shortControllerTimeout = false;
-                        restoreControllerTimeout = true;
+                        playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT / 3
+                        shortControllerTimeout = false
+                        restoreControllerTimeout = true
                     } else {
-                        playerView.setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
+                        playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
                     }
                 } else {
-                    playerView.setControllerShowTimeoutMs(-1);
+                    playerView!!.controllerShowTimeoutMs = -1
                 }
             }
-
             if (!isPlaying) {
-                PlayerActivity.locked = false;
+                locked = false
             }
         }
 
         @SuppressLint("SourceLockedOrientationActivity")
-        @Override
-        public void onPlaybackStateChanged(int state) {
-            boolean isNearEnd = false;
-            final long duration = player.getDuration();
+        override fun onPlaybackStateChanged(state: Int) {
+            var isNearEnd = false
+            val duration = player!!.duration
             if (duration != C.TIME_UNSET) {
-                final long position = player.getCurrentPosition();
+                val position = player!!.currentPosition
                 if (position + 4000 >= duration) {
-                    isNearEnd = true;
+                    isNearEnd = true
                 } else {
                     // Last chapter is probably "Credits" chapter
-                    final int chapters = chapterStarts.length;
+                    val chapters = chapterStarts!!.size
                     if (chapters > 1) {
-                        final long lastChapter = chapterStarts[chapters - 1];
+                        val lastChapter = chapterStarts!![chapters - 1]
                         if (duration - lastChapter < duration / 10 && position > lastChapter) {
-                            isNearEnd = true;
+                            isNearEnd = true
                         }
                     }
                 }
             }
-            setEndControlsVisible(haveMedia && (state == Player.STATE_ENDED || isNearEnd));
-
+            setEndControlsVisible(haveMedia && (state == Player.STATE_ENDED || isNearEnd))
             if (state == Player.STATE_READY) {
-                frameRendered = true;
-
+                frameRendered = true
                 if (videoLoading) {
-                    videoLoading = false;
-
-                    if (mPrefs.orientation == Utils.Orientation.UNSPECIFIED) {
-                        mPrefs.orientation = Utils.getNextOrientation(mPrefs.orientation);
-                        Utils.setOrientation(PlayerActivity.this, mPrefs.orientation);
+                    videoLoading = false
+                    if (mPrefs!!.orientation === Utils.Orientation.UNSPECIFIED) {
+                        mPrefs!!.orientation = getNextOrientation(
+                            mPrefs!!.orientation
+                        )
+                        setOrientation(this@PlayerActivity, mPrefs!!.orientation)
                     }
-
-                    final Format format = player.getVideoFormat();
-
+                    val format = player!!.videoFormat
                     if (format != null) {
-                        if (mPrefs.orientation == Utils.Orientation.VIDEO) {
-                            if (Utils.isPortrait(format)) {
-                                PlayerActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                        if (mPrefs!!.orientation === Utils.Orientation.VIDEO) {
+                            if (isPortrait(format)) {
+                                this@PlayerActivity.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
                             } else {
-                                PlayerActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                                this@PlayerActivity.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                             }
-                            updateButtonRotation();
+                            updateButtonRotation()
                         }
-
-                        updateSubtitleViewMargin(format);
+                        updateSubtitleViewMargin(format)
                     }
-
                     if (duration != C.TIME_UNSET && duration > TimeUnit.MINUTES.toMillis(20)) {
-                        timeBar.setKeyTimeIncrement(TimeUnit.MINUTES.toMillis(1));
+                        timeBar!!.setKeyTimeIncrement(TimeUnit.MINUTES.toMillis(1))
                     } else {
-                        timeBar.setKeyCountIncrement(20);
+                        timeBar!!.setKeyCountIncrement(20)
                     }
-
-                    boolean switched = false;
-                    if (mPrefs.frameRateMatching) {
+                    var switched = false
+                    if (mPrefs!!.frameRateMatching) {
                         if (play) {
                             if (displayManager == null) {
-                                displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
+                                displayManager = getSystemService(DISPLAY_SERVICE) as DisplayManager
                             }
                             if (displayListener == null) {
-                                displayListener = new DisplayManager.DisplayListener() {
-                                    @Override
-                                    public void onDisplayAdded(int displayId) {
-
-                                    }
-
-                                    @Override
-                                    public void onDisplayRemoved(int displayId) {
-
-                                    }
-
-                                    @Override
-                                    public void onDisplayChanged(int displayId) {
+                                displayListener = object : DisplayManager.DisplayListener {
+                                    override fun onDisplayAdded(displayId: Int) {}
+                                    override fun onDisplayRemoved(displayId: Int) {}
+                                    override fun onDisplayChanged(displayId: Int) {
                                         if (play) {
-                                            play = false;
-                                            displayManager.unregisterDisplayListener(this);
+                                            play = false
+                                            displayManager!!.unregisterDisplayListener(this)
                                             if (player != null) {
-                                                player.play();
+                                                player!!.play()
                                             }
                                             if (playerView != null) {
-                                                playerView.hideController();
+                                                playerView!!.hideController()
                                             }
                                         }
                                     }
-                                };
+                                }
                             }
-                            displayManager.registerDisplayListener(displayListener, null);
+                            displayManager!!.registerDisplayListener(displayListener, null)
                         }
-                        switched = Utils.switchFrameRate(PlayerActivity.this, mPrefs.mediaUri, play);
+                        switched = switchFrameRate(this@PlayerActivity, mPrefs!!.mediaUri!!, play)
                     }
                     if (!switched) {
                         if (displayManager != null) {
-                            displayManager.unregisterDisplayListener(displayListener);
+                            displayManager!!.unregisterDisplayListener(displayListener)
                         }
                         if (play) {
-                            play = false;
-                            player.play();
-                            playerView.hideController();
+                            play = false
+                            player!!.play()
+                            playerView!!.hideController()
                         }
                     }
-
-                    updateLoading(false);
-
-                    if (mPrefs.speed <= 0.99f || mPrefs.speed >= 1.01f) {
-                        player.setPlaybackSpeed(mPrefs.speed);
+                    updateLoading(false)
+                    if (mPrefs!!.speed <= 0.99f || mPrefs!!.speed >= 1.01f) {
+                        player!!.setPlaybackSpeed(mPrefs!!.speed)
                     }
                     if (!apiAccess) {
-                        setSelectedTracks(mPrefs.subtitleTrackId, mPrefs.audioTrackId);
+                        setSelectedTracks(mPrefs!!.subtitleTrackId, mPrefs!!.audioTrackId)
                     }
                 }
             } else if (state == Player.STATE_ENDED) {
-                playbackFinished = true;
+                playbackFinished = true
                 if (apiAccess) {
-                    finish();
+                    finish()
                 }
             }
         }
 
-        @Override
-        public void onPlayerError(PlaybackException error) {
-            updateLoading(false);
-            if (error instanceof ExoPlaybackException) {
-                final ExoPlaybackException exoPlaybackException = (ExoPlaybackException) error;
+        override fun onPlayerError(error: PlaybackException) {
+            updateLoading(false)
+            if (error is ExoPlaybackException) {
                 if (controllerVisible && controllerVisibleFully) {
-                    showError(exoPlaybackException);
+                    showError(error)
                 } else {
-                    errorToShow = exoPlaybackException;
+                    errorToShow = error
                 }
             }
         }
     }
 
-    private void enableRotation() {
+    private fun enableRotation() {
         try {
-            if (Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION) == 0) {
-                Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 1);
-                restoreOrientationLock = true;
+            if (Settings.System.getInt(
+                    contentResolver,
+                    Settings.System.ACCELEROMETER_ROTATION
+                ) == 0
+            ) {
+                Settings.System.putInt(contentResolver, Settings.System.ACCELEROMETER_ROTATION, 1)
+                restoreOrientationLock = true
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    private void openFile(Uri pickerInitialUri) {
-        final int targetSdkVersion = getApplicationContext().getApplicationInfo().targetSdkVersion;
-        if ((isTvBox && Build.VERSION.SDK_INT >= 30 && targetSdkVersion >= 30 && mPrefs.fileAccess.equals("auto")) || mPrefs.fileAccess.equals("mediastore")) {
-            Intent intent = new Intent(this, MediaStoreChooserActivity.class);
-            startActivityForResult(intent, REQUEST_CHOOSER_VIDEO_MEDIASTORE);
-        } else if ((isTvBox && mPrefs.fileAccess.equals("auto")) || mPrefs.fileAccess.equals("legacy")) {
-            Utils.alternativeChooser(this, pickerInitialUri, true);
+    private fun openFile(pickerInitialUri: Uri?) {
+        var pickerInitialUri = pickerInitialUri
+        val targetSdkVersion = applicationContext.applicationInfo.targetSdkVersion
+        if (isTvBox && Build.VERSION.SDK_INT >= 30 && targetSdkVersion >= 30 && mPrefs!!.fileAccess == "auto" || mPrefs!!.fileAccess == "mediastore") {
+            val intent = Intent(this, MediaStoreChooserActivity::class.java)
+            startActivityForResult(intent, REQUEST_CHOOSER_VIDEO_MEDIASTORE)
+        } else if (isTvBox && mPrefs!!.fileAccess == "auto" || mPrefs!!.fileAccess == "legacy") {
+            alternativeChooser(this, pickerInitialUri, true)
         } else {
-            enableRotation();
-
-            if (pickerInitialUri == null || Utils.isSupportedNetworkUri(pickerInitialUri) || !Utils.fileExists(this, pickerInitialUri)) {
-                pickerInitialUri = Utils.getMoviesFolderUri();
+            enableRotation()
+            if (pickerInitialUri == null || isSupportedNetworkUri(pickerInitialUri) || !fileExists(
+                    this,
+                    pickerInitialUri
+                )
+            ) {
+                pickerInitialUri = moviesFolderUri
             }
-
-            final Intent intent = createBaseFileIntent(Intent.ACTION_OPEN_DOCUMENT, pickerInitialUri);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("video/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, Utils.supportedMimeTypesVideo);
-
+            val intent = createBaseFileIntent(Intent.ACTION_OPEN_DOCUMENT, pickerInitialUri)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "video/*"
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, Utils.supportedMimeTypesVideo)
             if (Build.VERSION.SDK_INT < 30) {
-                final ComponentName systemComponentName = Utils.getSystemComponent(this, intent);
+                val systemComponentName = getSystemComponent(this, intent)
                 if (systemComponentName != null) {
-                    intent.setComponent(systemComponentName);
+                    intent.component = systemComponentName
                 }
             }
-
-            safelyStartActivityForResult(intent, REQUEST_CHOOSER_VIDEO);
+            safelyStartActivityForResult(intent, REQUEST_CHOOSER_VIDEO)
         }
     }
 
-    private void loadSubtitleFile(Uri pickerInitialUri) {
-        Toast.makeText(PlayerActivity.this, R.string.open_subtitles, Toast.LENGTH_SHORT).show();
-        final int targetSdkVersion = getApplicationContext().getApplicationInfo().targetSdkVersion;
-        if ((isTvBox && Build.VERSION.SDK_INT >= 30 && targetSdkVersion >= 30 && mPrefs.fileAccess.equals("auto")) || mPrefs.fileAccess.equals("mediastore")) {
-            Intent intent = new Intent(this, MediaStoreChooserActivity.class);
-            intent.putExtra(MediaStoreChooserActivity.SUBTITLES, true);
-            startActivityForResult(intent, REQUEST_CHOOSER_SUBTITLE_MEDIASTORE);
-        } else if ((isTvBox && mPrefs.fileAccess.equals("auto")) || mPrefs.fileAccess.equals("legacy")) {
-            Utils.alternativeChooser(this, pickerInitialUri, false);
+    private fun loadSubtitleFile(pickerInitialUri: Uri?) {
+        Toast.makeText(this@PlayerActivity, R.string.open_subtitles, Toast.LENGTH_SHORT).show()
+        val targetSdkVersion = applicationContext.applicationInfo.targetSdkVersion
+        if (isTvBox && Build.VERSION.SDK_INT >= 30 && targetSdkVersion >= 30 && mPrefs!!.fileAccess == "auto" || mPrefs!!.fileAccess == "mediastore") {
+            val intent = Intent(this, MediaStoreChooserActivity::class.java)
+            intent.putExtra(MediaStoreChooserActivity.SUBTITLES, true)
+            startActivityForResult(intent, REQUEST_CHOOSER_SUBTITLE_MEDIASTORE)
+        } else if (isTvBox && mPrefs!!.fileAccess == "auto" || mPrefs!!.fileAccess == "legacy") {
+            alternativeChooser(this, pickerInitialUri, false)
         } else {
-            enableRotation();
-
-            final Intent intent = createBaseFileIntent(Intent.ACTION_OPEN_DOCUMENT, pickerInitialUri);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("*/*");
-
-            final String[] supportedMimeTypes = {
-                    MimeTypes.APPLICATION_SUBRIP,
-                    MimeTypes.TEXT_SSA,
-                    MimeTypes.TEXT_VTT,
-                    MimeTypes.APPLICATION_TTML,
-                    "text/*",
-                    "application/octet-stream"
-            };
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, supportedMimeTypes);
-
+            enableRotation()
+            val intent = createBaseFileIntent(Intent.ACTION_OPEN_DOCUMENT, pickerInitialUri)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "*/*"
+            val supportedMimeTypes = arrayOf(
+                MimeTypes.APPLICATION_SUBRIP,
+                MimeTypes.TEXT_SSA,
+                MimeTypes.TEXT_VTT,
+                MimeTypes.APPLICATION_TTML,
+                "text/*",
+                "application/octet-stream"
+            )
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, supportedMimeTypes)
             if (Build.VERSION.SDK_INT < 30) {
-                final ComponentName systemComponentName = Utils.getSystemComponent(this, intent);
+                val systemComponentName = getSystemComponent(this, intent)
                 if (systemComponentName != null) {
-                    intent.setComponent(systemComponentName);
+                    intent.component = systemComponentName
                 }
             }
-
-            safelyStartActivityForResult(intent, REQUEST_CHOOSER_SUBTITLE);
+            safelyStartActivityForResult(intent, REQUEST_CHOOSER_SUBTITLE)
         }
     }
 
-    private void requestDirectoryAccess() {
-        enableRotation();
-        final Intent intent = createBaseFileIntent(Intent.ACTION_OPEN_DOCUMENT_TREE, Utils.getMoviesFolderUri());
-        safelyStartActivityForResult(intent, REQUEST_CHOOSER_SCOPE_DIR);
+    private fun requestDirectoryAccess() {
+        enableRotation()
+        val intent = createBaseFileIntent(Intent.ACTION_OPEN_DOCUMENT_TREE, moviesFolderUri)
+        safelyStartActivityForResult(intent, REQUEST_CHOOSER_SCOPE_DIR)
     }
 
-    private Intent createBaseFileIntent(final String action, final Uri initialUri) {
-        final Intent intent = new Intent(action);
+    private fun createBaseFileIntent(action: String, initialUri: Uri?): Intent {
+        val intent = Intent(action)
 
         // http://stackoverflow.com/a/31334967/1615876
-        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", true)
         if (Build.VERSION.SDK_INT >= 26 && initialUri != null) {
-            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
         }
-
-        return intent;
+        return intent
     }
 
-    void safelyStartActivityForResult(final Intent intent, final int code) {
-        if (intent.resolveActivity(getPackageManager()) == null)
-            showSnack(getText(R.string.error_files_missing).toString(), intent.toString());
-        else
-            startActivityForResult(intent, code);
+    @SuppressLint("QueryPermissionsNeeded")
+    fun safelyStartActivityForResult(intent: Intent, code: Int) {
+        if (intent.resolveActivity(packageManager) == null) showSnack(
+            getText(R.string.error_files_missing).toString(),
+            intent.toString()
+        ) else startActivityForResult(intent, code)
     }
 
-    private TrackGroup getTrackGroupFromFormatId(int trackType, String id) {
-        if ((id == null && trackType == C.TRACK_TYPE_AUDIO) || player == null) {
-            return null;
+    private fun getTrackGroupFromFormatId(trackType: Int, id: String?): TrackGroup? {
+        if (id == null && trackType == C.TRACK_TYPE_AUDIO || player == null) {
+            return null
         }
-        for (Tracks.Group group : player.getCurrentTracks().getGroups()) {
-            if (group.getType() == trackType) {
-                final TrackGroup trackGroup = group.getMediaTrackGroup();
-                final Format format = trackGroup.getFormat(0);
-                if (Objects.equals(id, format.id)) {
-                    return trackGroup;
+        for (group in player!!.currentTracks.groups) {
+            if (group.type == trackType) {
+                val trackGroup = group.mediaTrackGroup
+                val format = trackGroup.getFormat(0)
+                if (id == format.id) {
+                    return trackGroup
                 }
             }
         }
-        return null;
+        return null
     }
 
-    public void setSelectedTracks(final String subtitleId, final String audioId) {
-        if ("#none".equals(subtitleId)) {
+    fun setSelectedTracks(subtitleId: String?, audioId: String?) {
+        if ("#none" == subtitleId) {
             if (trackSelector == null) {
-                return;
+                return
             }
-            trackSelector.setParameters(trackSelector.buildUponParameters().setDisabledTextTrackSelectionFlags(C.SELECTION_FLAG_DEFAULT | C.SELECTION_FLAG_FORCED));
+            trackSelector!!.setParameters(
+                trackSelector!!.buildUponParameters()
+                    .setDisabledTextTrackSelectionFlags(C.SELECTION_FLAG_DEFAULT or C.SELECTION_FLAG_FORCED)
+            )
         }
-
-        TrackGroup subtitleGroup = getTrackGroupFromFormatId(C.TRACK_TYPE_TEXT, subtitleId);
-        TrackGroup audioGroup = getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, audioId);
-
-        TrackSelectionParameters.Builder overridesBuilder = new TrackSelectionParameters.Builder(this);
-        TrackSelectionOverride trackSelectionOverride = null;
-        final List<Integer> tracks = new ArrayList<>();
-        tracks.add(0);
+        val subtitleGroup = getTrackGroupFromFormatId(C.TRACK_TYPE_TEXT, subtitleId)
+        val audioGroup = getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, audioId)
+        val overridesBuilder = TrackSelectionParameters.Builder(this)
+        var trackSelectionOverride: TrackSelectionOverride? = null
+        val tracks: MutableList<Int> = ArrayList()
+        tracks.add(0)
         if (subtitleGroup != null) {
-            trackSelectionOverride = new TrackSelectionOverride(subtitleGroup, tracks);
-            overridesBuilder.addOverride(trackSelectionOverride);
+            trackSelectionOverride = TrackSelectionOverride(subtitleGroup, tracks)
+            overridesBuilder.addOverride(trackSelectionOverride)
         }
         if (audioGroup != null) {
-            trackSelectionOverride = new TrackSelectionOverride(audioGroup, tracks);
-            overridesBuilder.addOverride(trackSelectionOverride);
+            trackSelectionOverride = TrackSelectionOverride(audioGroup, tracks)
+            overridesBuilder.addOverride(trackSelectionOverride)
         }
-
         if (player != null) {
-            TrackSelectionParameters.Builder trackSelectionParametersBuilder = player.getTrackSelectionParameters().buildUpon();
+            val trackSelectionParametersBuilder = player!!.trackSelectionParameters.buildUpon()
             if (trackSelectionOverride != null) {
-                trackSelectionParametersBuilder.setOverrideForType(trackSelectionOverride);
+                trackSelectionParametersBuilder.setOverrideForType(trackSelectionOverride)
             }
-            player.setTrackSelectionParameters(trackSelectionParametersBuilder.build());
+            player!!.trackSelectionParameters = trackSelectionParametersBuilder.build()
         }
     }
 
-    private boolean hasOverrideType(final int trackType) {
-        TrackSelectionParameters trackSelectionParameters = player.getTrackSelectionParameters();
-        for (TrackSelectionOverride override : trackSelectionParameters.overrides.values()) {
-            if (override.getType() == trackType)
-                return true;
+    private fun hasOverrideType(trackType: Int): Boolean {
+        val trackSelectionParameters = player!!.trackSelectionParameters
+        for (override in trackSelectionParameters.overrides.values) {
+            if (override.type == trackType) return true
         }
-        return false;
+        return false
     }
 
-    public String getSelectedTrack(final int trackType) {
+    fun getSelectedTrack(trackType: Int): String? {
         if (player == null) {
-            return null;
+            return null
         }
-        Tracks tracks = player.getCurrentTracks();
+        val tracks = player!!.currentTracks
 
         // Disabled (e.g. selected subtitle "None" - different than default)
         if (!tracks.isTypeSelected(trackType)) {
-            return "#none";
+            return "#none"
         }
 
         // Audio track set to "Auto"
         if (trackType == C.TRACK_TYPE_AUDIO) {
             if (!hasOverrideType(C.TRACK_TYPE_AUDIO)) {
-                return null;
+                return null
             }
         }
-
-        for (Tracks.Group group : tracks.getGroups()) {
-            if (group.isSelected() && group.getType() == trackType) {
-                Format format = group.getMediaTrackGroup().getFormat(0);
-                return format.id;
+        for (group in tracks.groups) {
+            if (group.isSelected && group.type == trackType) {
+                val format = group.mediaTrackGroup.getFormat(0)
+                return format.id
             }
         }
-
-        return null;
+        return null
     }
 
-    void setSubtitleTextSize() {
-        setSubtitleTextSize(getResources().getConfiguration().orientation);
+    fun setSubtitleTextSize() {
+        setSubtitleTextSize(resources.configuration.orientation)
     }
 
-    void setSubtitleTextSize(final int orientation) {
+    fun setSubtitleTextSize(orientation: Int) {
         // Tweak text size as fraction size doesn't work well in portrait
-        final SubtitleView subtitleView = playerView.getSubtitleView();
+        val subtitleView = playerView!!.subtitleView
         if (subtitleView != null) {
-            final float size;
+            val size: Float
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                size = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitlesScale;
+                size = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitlesScale
             } else {
-                DisplayMetrics metrics = getResources().getDisplayMetrics();
-                float ratio = ((float) metrics.heightPixels / (float) metrics.widthPixels);
-                if (ratio < 1)
-                    ratio = 1 / ratio;
-                size = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitlesScale / ratio;
+                val metrics = resources.displayMetrics
+                var ratio = metrics.heightPixels.toFloat() / metrics.widthPixels.toFloat()
+                if (ratio < 1) ratio = 1 / ratio
+                size = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitlesScale / ratio
             }
-
-            subtitleView.setFractionalTextSize(size);
+            subtitleView.setFractionalTextSize(size)
         }
     }
 
-    void updateSubtitleViewMargin() {
+    fun updateSubtitleViewMargin() {
         if (player == null) {
-            return;
+            return
         }
-
-        updateSubtitleViewMargin(player.getVideoFormat());
+        updateSubtitleViewMargin(player!!.videoFormat)
     }
 
     // Set margins to fix PGS aspect as subtitle view is outside of content frame
-    void updateSubtitleViewMargin(Format format) {
+    fun updateSubtitleViewMargin(format: Format?) {
         if (format == null) {
-            return;
+            return
         }
-
-        final Rational aspectVideo = Utils.getRational(format);
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-        final Rational aspectDisplay = new Rational(metrics.widthPixels, metrics.heightPixels);
-
-        int marginHorizontal = 0;
-        int marginVertical = 0;
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (aspectDisplay.floatValue() > aspectVideo.floatValue()) {
+        val aspectVideo = getRational(format)
+        val metrics = resources.displayMetrics
+        val aspectDisplay = Rational(metrics.widthPixels, metrics.heightPixels)
+        var marginHorizontal = 0
+        val marginVertical = 0
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (aspectDisplay.toFloat() > aspectVideo.toFloat()) {
                 // Left & right bars
-                int videoWidth = metrics.heightPixels / aspectVideo.getDenominator() * aspectVideo.getNumerator();
-                marginHorizontal = (metrics.widthPixels - videoWidth) / 2;
+                val videoWidth =
+                    metrics.heightPixels / aspectVideo.denominator * aspectVideo.numerator
+                marginHorizontal = (metrics.widthPixels - videoWidth) / 2
             }
         }
-
-        Utils.setViewParams(playerView.getSubtitleView(), 0, 0, 0, 0,
-                marginHorizontal, marginVertical, marginHorizontal, marginVertical);
+        setViewParams(
+            playerView!!.subtitleView!!, 0, 0, 0, 0,
+            marginHorizontal, marginVertical, marginHorizontal, marginVertical
+        )
     }
 
-    void setSubtitleTextSizePiP() {
-        final SubtitleView subtitleView = playerView.getSubtitleView();
-        if (subtitleView != null)
-            subtitleView.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * 2);
+    fun setSubtitleTextSizePiP() {
+        val subtitleView = playerView!!.subtitleView
+        subtitleView?.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * 2)
     }
 
     @TargetApi(26)
-    boolean updatePictureInPictureActions(final int iconId, final int resTitle, final int controlType, final int requestCode) {
+    fun updatePictureInPictureActions(
+        iconId: Int,
+        resTitle: Int,
+        controlType: Int,
+        requestCode: Int
+    ): Boolean {
         try {
-            final ArrayList<RemoteAction> actions = new ArrayList<>();
-            final PendingIntent intent = PendingIntent.getBroadcast(PlayerActivity.this, requestCode,
-                    new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, controlType), PendingIntent.FLAG_IMMUTABLE);
-            final Icon icon = Icon.createWithResource(PlayerActivity.this, iconId);
-            final String title = getString(resTitle);
-            actions.add(new RemoteAction(icon, title, title, intent));
-            ((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).setActions(actions);
-            setPictureInPictureParams(((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).build());
-            return true;
-        } catch (IllegalStateException e) {
+            val actions = ArrayList<RemoteAction>()
+            val intent = PendingIntent.getBroadcast(
+                this@PlayerActivity,
+                requestCode,
+                Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, controlType),
+                PendingIntent.FLAG_IMMUTABLE
+            )
+            val icon = Icon.createWithResource(this@PlayerActivity, iconId)
+            val title = getString(resTitle)
+            actions.add(RemoteAction(icon, title, title, intent))
+            (mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.setActions(actions)
+            setPictureInPictureParams((mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.build())
+            return true
+        } catch (e: IllegalStateException) {
             // On Samsung devices with Talkback active:
             // Caused by: java.lang.IllegalStateException: setPictureInPictureParams: Device doesn't support picture-in-picture mode.
-            e.printStackTrace();
+            e.printStackTrace()
         }
-        return false;
+        return false
     }
+
+    @get:RequiresApi(api = Build.VERSION_CODES.N)
+    private val isInPip: Boolean
+        get() = if (!isPiPSupported(this)) false else isInPictureInPictureMode
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private boolean isInPip() {
-        if (!Utils.isPiPSupported(this))
-            return false;
-        return isInPictureInPictureMode();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (!isInPip()) {
-            setSubtitleTextSize(newConfig.orientation);
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (!isInPip) {
+            setSubtitleTextSize(newConfig.orientation)
         }
-        updateSubtitleViewMargin();
-
-        updateButtonRotation();
+        updateSubtitleViewMargin()
+        updateButtonRotation()
     }
 
-    void showError(ExoPlaybackException error) {
-        final String errorGeneral = error.getLocalizedMessage();
-        String errorDetailed;
-
-        switch (error.type) {
-            case ExoPlaybackException.TYPE_SOURCE:
-                errorDetailed = error.getSourceException().getLocalizedMessage();
-                break;
-            case ExoPlaybackException.TYPE_RENDERER:
-                errorDetailed = error.getRendererException().getLocalizedMessage();
-                break;
-            case ExoPlaybackException.TYPE_UNEXPECTED:
-                errorDetailed = error.getUnexpectedException().getLocalizedMessage();
-                break;
-            case ExoPlaybackException.TYPE_REMOTE:
-            default:
-                errorDetailed = errorGeneral;
-                break;
+    fun showError(error: ExoPlaybackException) {
+        val errorGeneral = error.localizedMessage
+        val errorDetailed: String? = when (error.type) {
+            ExoPlaybackException.TYPE_SOURCE -> error.sourceException.localizedMessage
+            ExoPlaybackException.TYPE_RENDERER -> error.rendererException.localizedMessage
+            ExoPlaybackException.TYPE_UNEXPECTED -> error.unexpectedException.localizedMessage
+            ExoPlaybackException.TYPE_REMOTE -> errorGeneral
+            else -> errorGeneral
         }
-
-        showSnack(errorGeneral, errorDetailed);
+        showSnack(errorGeneral, errorDetailed)
     }
 
-    void showSnack(final String textPrimary, final String textSecondary) {
-        snackbar = Snackbar.make(coordinatorLayout, textPrimary, Snackbar.LENGTH_LONG);
+    fun showSnack(textPrimary: String?, textSecondary: String?) {
+        snackbar = Snackbar.make(coordinatorLayout!!, textPrimary!!, Snackbar.LENGTH_LONG)
         if (textSecondary != null) {
-            snackbar.setAction(R.string.error_details, v -> {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
-                builder.setMessage(textSecondary);
-                builder.setPositiveButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss());
-                final AlertDialog dialog = builder.create();
-                dialog.show();
-            });
+            snackbar!!.setAction(R.string.error_details) { v: View? ->
+                val builder = AlertDialog.Builder(this@PlayerActivity)
+                builder.setMessage(textSecondary)
+                builder.setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, i: Int -> dialogInterface.dismiss() }
+                val dialog = builder.create()
+                dialog.show()
+            }
         }
-        snackbar.setAnchorView(R.id.exo_bottom_bar);
-        snackbar.show();
+        snackbar!!.setAnchorView(R.id.exo_bottom_bar)
+        snackbar!!.show()
     }
 
-    void reportScrubbing(long position) {
-        final long diff = position - scrubbingStart;
+    fun reportScrubbing(position: Long) {
+        val diff = position - scrubbingStart
         if (Math.abs(diff) > 1000) {
-            scrubbingNoticeable = true;
+            scrubbingNoticeable = true
         }
         if (scrubbingNoticeable) {
-            playerView.clearIcon();
-            playerView.setCustomErrorMessage(Utils.formatMilisSign(diff));
+            playerView!!.clearIcon()
+            playerView!!.setCustomErrorMessage(formatMilisSign(diff))
         }
         if (frameRendered) {
-            frameRendered = false;
-            player.seekTo(position);
+            frameRendered = false
+            player!!.seekTo(position)
         }
     }
 
-    void updateSubtitleStyle(final Context context) {
-        final CaptioningManager captioningManager = (CaptioningManager) getSystemService(Context.CAPTIONING_SERVICE);
-        final SubtitleView subtitleView = playerView.getSubtitleView();
-        final boolean isTablet = Utils.isTablet(context);
-        subtitlesScale = SubtitleUtils.normalizeFontScale(captioningManager.getFontScale(), isTvBox || isTablet);
+    fun updateSubtitleStyle(context: Context?) {
+        val captioningManager = getSystemService(CAPTIONING_SERVICE) as CaptioningManager
+        val subtitleView = playerView!!.subtitleView
+        val isTablet = isTablet(context!!)
+        subtitlesScale = normalizeFontScale(captioningManager.fontScale, isTvBox || isTablet)
         if (subtitleView != null) {
-            final CaptioningManager.CaptionStyle userStyle = captioningManager.getUserStyle();
-            final CaptionStyleCompat userStyleCompat = CaptionStyleCompat.createFromCaptionStyle(userStyle);
-            final CaptionStyleCompat captionStyle = new CaptionStyleCompat(
-                    userStyle.hasForegroundColor() ? userStyleCompat.foregroundColor : Color.WHITE,
-                    userStyle.hasBackgroundColor() ? userStyleCompat.backgroundColor : Color.TRANSPARENT,
-                    userStyle.hasWindowColor() ? userStyleCompat.windowColor : Color.TRANSPARENT,
-                    userStyle.hasEdgeType() ? userStyleCompat.edgeType : CaptionStyleCompat.EDGE_TYPE_OUTLINE,
-                    userStyle.hasEdgeColor() ? userStyleCompat.edgeColor : Color.BLACK,
-                    userStyleCompat.typeface != null ? userStyleCompat.typeface : Typeface.DEFAULT_BOLD);
-            subtitleView.setStyle(captionStyle);
-
-            if (captioningManager.isEnabled()) {
+            val userStyle = captioningManager.userStyle
+            val userStyleCompat = CaptionStyleCompat.createFromCaptionStyle(userStyle)
+            val captionStyle = CaptionStyleCompat(
+                if (userStyle.hasForegroundColor()) userStyleCompat.foregroundColor else Color.WHITE,
+                if (userStyle.hasBackgroundColor()) userStyleCompat.backgroundColor else Color.TRANSPARENT,
+                if (userStyle.hasWindowColor()) userStyleCompat.windowColor else Color.TRANSPARENT,
+                if (userStyle.hasEdgeType()) userStyleCompat.edgeType else CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+                if (userStyle.hasEdgeColor()) userStyleCompat.edgeColor else Color.BLACK,
+                if (userStyleCompat.typeface != null) userStyleCompat.typeface else Typeface.DEFAULT_BOLD
+            )
+            subtitleView.setStyle(captionStyle)
+            if (captioningManager.isEnabled) {
                 // Do not apply embedded style as currently the only supported color style is PrimaryColour
                 // https://github.com/google/ExoPlayer/issues/8435#issuecomment-762449001
                 // This may result in poorly visible text (depending on user's selected edgeColor)
                 // The same can happen with style provided using setStyle but enabling CaptioningManager should be a way to change the behavior
-                subtitleView.setApplyEmbeddedStyles(false);
+                subtitleView.setApplyEmbeddedStyles(false)
             } else {
-                subtitleView.setApplyEmbeddedStyles(true);
+                subtitleView.setApplyEmbeddedStyles(true)
             }
-
-            subtitleView.setBottomPaddingFraction(SubtitleView.DEFAULT_BOTTOM_PADDING_FRACTION * 2f / 3f);
+            subtitleView.setBottomPaddingFraction(SubtitleView.DEFAULT_BOTTOM_PADDING_FRACTION * 2f / 3f)
         }
-        setSubtitleTextSize();
+        setSubtitleTextSize()
     }
 
-    void searchSubtitles() {
-        if (mPrefs.mediaUri == null)
-            return;
-
-        if (Utils.isSupportedNetworkUri(mPrefs.mediaUri) && Utils.isProgressiveContainerUri(mPrefs.mediaUri)) {
-            SubtitleUtils.clearCache(this);
-            if (SubtitleFinder.isUriCompatible(mPrefs.mediaUri)) {
-                subtitleFinder = new SubtitleFinder(PlayerActivity.this, mPrefs.mediaUri);
-                subtitleFinder.start();
+    fun searchSubtitles() {
+        if (mPrefs!!.mediaUri == null) return
+        if (isSupportedNetworkUri(mPrefs!!.mediaUri!!) && isProgressiveContainerUri(
+                mPrefs!!.mediaUri!!
+            )
+        ) {
+            clearCache(this)
+            if (isUriCompatible(mPrefs!!.mediaUri!!)) {
+                subtitleFinder = SubtitleFinder(this@PlayerActivity, mPrefs!!.mediaUri!!)
+                subtitleFinder!!.start()
             }
-            return;
+            return
         }
-
-        if (mPrefs.scopeUri != null || isTvBox) {
-            DocumentFile video = null;
-            File videoRaw = null;
-            final String scheme = mPrefs.mediaUri.getScheme();
-
-            if (mPrefs.scopeUri != null) {
-                if ("com.android.externalstorage.documents".equals(mPrefs.mediaUri.getHost()) ||
-                        "org.courville.nova.provider".equals(mPrefs.mediaUri.getHost())) {
-                    // Fast search based on path in uri
-                    video = SubtitleUtils.findUriInScope(this, mPrefs.scopeUri, mPrefs.mediaUri);
-                } else {
-                    // Slow search based on matching metadata, no path in uri
-                    // Provider "com.android.providers.media.documents" when using "Videos" tab in file picker
-                    DocumentFile fileScope = DocumentFile.fromTreeUri(this, mPrefs.scopeUri);
-                    DocumentFile fileMedia = DocumentFile.fromSingleUri(this, mPrefs.mediaUri);
-                    video = SubtitleUtils.findDocInScope(fileScope, fileMedia);
-                }
-            } else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
-                videoRaw = new File(mPrefs.mediaUri.getSchemeSpecificPart());
-                video = DocumentFile.fromFile(videoRaw);
+        if (mPrefs!!.scopeUri != null || isTvBox) {
+            var video: DocumentFile? = null
+            var videoRaw: File? = null
+            val scheme = mPrefs!!.mediaUri!!.scheme
+            if (mPrefs!!.scopeUri != null) {
+                video =
+                    if ("com.android.externalstorage.documents" == mPrefs!!.mediaUri!!.host || "org.courville.nova.provider" == mPrefs!!.mediaUri!!.host) {
+                        // Fast search based on path in uri
+                        findUriInScope(this, mPrefs!!.scopeUri!!, mPrefs!!.mediaUri!!)
+                    } else {
+                        // Slow search based on matching metadata, no path in uri
+                        // Provider "com.android.providers.media.documents" when using "Videos" tab in file picker
+                        val fileScope = DocumentFile.fromTreeUri(this, mPrefs!!.scopeUri!!)
+                        val fileMedia = DocumentFile.fromSingleUri(this, mPrefs!!.mediaUri!!)
+                        findDocInScope(fileScope, fileMedia)
+                    }
+            } else if (ContentResolver.SCHEME_FILE == scheme) {
+                videoRaw = File(mPrefs!!.mediaUri!!.schemeSpecificPart)
+                video = DocumentFile.fromFile(videoRaw)
             }
-
             if (video != null) {
-                DocumentFile subtitle = null;
-                if (mPrefs.scopeUri != null) {
-                    subtitle = SubtitleUtils.findSubtitle(video);
-                } else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
-                    File parentRaw = videoRaw.getParentFile();
-                    DocumentFile dir = DocumentFile.fromFile(parentRaw);
-                    subtitle = SubtitleUtils.findSubtitle(video, dir);
+                var subtitle: DocumentFile? = null
+                if (mPrefs!!.scopeUri != null) {
+                    subtitle = findSubtitle(video)
+                } else if (ContentResolver.SCHEME_FILE == scheme) {
+                    val parentRaw = videoRaw!!.parentFile ?: return
+                    val dir = DocumentFile.fromFile(parentRaw)
+                    subtitle = findSubtitle(video, dir)
                 }
-
                 if (subtitle != null) {
-                    handleSubtitles(subtitle.getUri());
+                    handleSubtitles(subtitle.uri)
                 }
             }
         }
     }
 
-    Uri findNext() {
+    fun findNext(): Uri? {
         // TODO: Unify with searchSubtitles()
-        if (mPrefs.scopeUri != null || isTvBox) {
-            DocumentFile video = null;
-            File videoRaw = null;
-
-            if (!isTvBox && mPrefs.scopeUri != null) {
-                if ("com.android.externalstorage.documents".equals(mPrefs.mediaUri.getHost())) {
+        if (mPrefs!!.scopeUri != null || isTvBox) {
+            var video: DocumentFile? = null
+            var videoRaw: File? = null
+            if (!isTvBox && mPrefs!!.scopeUri != null) {
+                video = if ("com.android.externalstorage.documents" == mPrefs!!.mediaUri!!.host) {
                     // Fast search based on path in uri
-                    video = SubtitleUtils.findUriInScope(this, mPrefs.scopeUri, mPrefs.mediaUri);
+                    findUriInScope(this, mPrefs!!.scopeUri!!, mPrefs!!.mediaUri!!)
                 } else {
                     // Slow search based on matching metadata, no path in uri
                     // Provider "com.android.providers.media.documents" when using "Videos" tab in file picker
-                    DocumentFile fileScope = DocumentFile.fromTreeUri(this, mPrefs.scopeUri);
-                    DocumentFile fileMedia = DocumentFile.fromSingleUri(this, mPrefs.mediaUri);
-                    video = SubtitleUtils.findDocInScope(fileScope, fileMedia);
+                    val fileScope = DocumentFile.fromTreeUri(this, mPrefs!!.scopeUri!!)
+                    val fileMedia = DocumentFile.fromSingleUri(this, mPrefs!!.mediaUri!!)
+                    findDocInScope(fileScope, fileMedia)
                 }
             } else if (isTvBox) {
-                videoRaw = new File(mPrefs.mediaUri.getSchemeSpecificPart());
-                video = DocumentFile.fromFile(videoRaw);
+                videoRaw = File(mPrefs!!.mediaUri!!.schemeSpecificPart)
+                video = DocumentFile.fromFile(videoRaw)
             }
-
             if (video != null) {
-                DocumentFile next;
-                if (!isTvBox) {
-                    next = SubtitleUtils.findNext(video);
+                val next: DocumentFile? = if (!isTvBox) {
+                    findNext(video)
                 } else {
-                    File parentRaw = videoRaw.getParentFile();
-                    DocumentFile dir = DocumentFile.fromFile(parentRaw);
-                    next = SubtitleUtils.findNext(video, dir);
+                    val parentRaw = videoRaw!!.parentFile
+                    val dir = DocumentFile.fromFile(parentRaw)
+                    findNext(video, dir)
                 }
                 if (next != null) {
-                    return next.getUri();
+                    return next.uri
                 }
             }
         }
-        return null;
+        return null
     }
 
-    void askForScope(boolean loadSubtitlesOnCancel, boolean skipToNextOnCancel) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
-        builder.setMessage(String.format(getString(R.string.request_scope), getString(R.string.app_name)));
-        builder.setPositiveButton(android.R.string.ok, (dialogInterface, i) -> requestDirectoryAccess()
-        );
-        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-            mPrefs.markScopeAsked();
+    fun askForScope(loadSubtitlesOnCancel: Boolean, skipToNextOnCancel: Boolean) {
+        val builder = AlertDialog.Builder(this@PlayerActivity)
+        builder.setMessage(
+            String.format(
+                getString(R.string.request_scope),
+                getString(R.string.app_name)
+            )
+        )
+        builder.setPositiveButton(
+            android.R.string.ok
+        ) { _: DialogInterface?, _: Int -> requestDirectoryAccess() }
+        builder.setNegativeButton(android.R.string.cancel) { _: DialogInterface?, _: Int ->
+            mPrefs!!.markScopeAsked()
             if (loadSubtitlesOnCancel) {
-                loadSubtitleFile(mPrefs.mediaUri);
+                loadSubtitleFile(mPrefs!!.mediaUri)
             }
             if (skipToNextOnCancel) {
-                nextUri = findNext();
+                nextUri = findNext()
                 if (nextUri != null) {
-                    skipToNext();
+                    skipToNext()
                 }
             }
-        });
-        final AlertDialog dialog = builder.create();
-        dialog.show();
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 
-    void resetHideCallbacks() {
-        if (haveMedia && player != null && player.isPlaying()) {
+    fun resetHideCallbacks() {
+        if (haveMedia && player != null && player!!.isPlaying) {
             // Keep controller UI visible - alternative to resetHideCallbacks()
-            playerView.setControllerShowTimeoutMs(PlayerActivity.CONTROLLER_TIMEOUT);
+            playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
         }
     }
 
-    private void updateLoading(final boolean enableLoading) {
+    private fun updateLoading(enableLoading: Boolean) {
         if (enableLoading) {
-            exoPlayPause.setVisibility(View.GONE);
-            loadingProgressBar.setVisibility(View.VISIBLE);
+            exoPlayPause!!.visibility = View.GONE
+            loadingProgressBar!!.visibility = View.VISIBLE
         } else {
-            loadingProgressBar.setVisibility(View.GONE);
-            exoPlayPause.setVisibility(View.VISIBLE);
+            loadingProgressBar!!.visibility = View.GONE
+            exoPlayPause!!.visibility = View.VISIBLE
             if (focusPlay) {
-                focusPlay = false;
-                exoPlayPause.requestFocus();
+                focusPlay = false
+                exoPlayPause!!.requestFocus()
             }
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    protected void onUserLeaveHint() {
-        if (mPrefs != null && mPrefs.autoPiP && player != null && player.isPlaying() && Utils.isPiPSupported(this))
-            enterPiP();
-        else
-            super.onUserLeaveHint();
+    override fun onUserLeaveHint() {
+        if (mPrefs != null && mPrefs!!.autoPiP && player != null && player!!.isPlaying && isPiPSupported(
+                this
+            )
+        ) enterPiP() else super.onUserLeaveHint()
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void enterPiP() {
-        final AppOpsManager appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
-        if (AppOpsManager.MODE_ALLOWED != appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_PICTURE_IN_PICTURE, android.os.Process.myUid(), getPackageName())) {
-            final Intent intent = new Intent("android.settings.PICTURE_IN_PICTURE_SETTINGS", Uri.fromParts("package", getPackageName(), null));
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
+    private fun enterPiP() {
+        val appOpsManager = getSystemService(APP_OPS_SERVICE) as AppOpsManager
+        if (AppOpsManager.MODE_ALLOWED != appOpsManager.checkOpNoThrow(
+                AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
+                Process.myUid(),
+                packageName
+            )
+        ) {
+            val intent = Intent(
+                "android.settings.PICTURE_IN_PICTURE_SETTINGS",
+                Uri.fromParts("package", packageName, null)
+            )
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
             }
-            return;
+            return
         }
-
         if (player == null) {
-            return;
+            return
         }
-
-        playerView.setControllerAutoShow(false);
-        playerView.hideController();
-
-        final Format format = player.getVideoFormat();
-
+        playerView!!.controllerAutoShow = false
+        playerView!!.hideController()
+        val format = player!!.videoFormat
         if (format != null) {
             // https://github.com/google/ExoPlayer/issues/8611
             // TODO: Test/disable on Android 11+
-            final View videoSurfaceView = playerView.getVideoSurfaceView();
-            if (videoSurfaceView instanceof SurfaceView) {
-                ((SurfaceView) videoSurfaceView).getHolder().setFixedSize(format.width, format.height);
+            val videoSurfaceView = playerView!!.videoSurfaceView
+            if (videoSurfaceView is SurfaceView) {
+                videoSurfaceView.holder.setFixedSize(format.width, format.height)
             }
-
-            Rational rational = Utils.getRational(format);
+            var rational = getRational(format)
             if (Build.VERSION.SDK_INT >= 33 &&
-                    getPackageManager().hasSystemFeature(FEATURE_EXPANDED_PICTURE_IN_PICTURE) &&
-                    (rational.floatValue() > rationalLimitWide.floatValue() || rational.floatValue() < rationalLimitTall.floatValue())) {
-                ((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).setExpandedAspectRatio(rational);
+                packageManager.hasSystemFeature(PackageManager.FEATURE_EXPANDED_PICTURE_IN_PICTURE) &&
+                (rational.toFloat() > rationalLimitWide.toFloat() || rational.toFloat() < rationalLimitTall.toFloat())
+            ) {
+                (mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.setExpandedAspectRatio(
+                    rational
+                )
             }
-            if (rational.floatValue() > rationalLimitWide.floatValue())
-                rational = rationalLimitWide;
-            else if (rational.floatValue() < rationalLimitTall.floatValue())
-                rational = rationalLimitTall;
-
-            ((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).setAspectRatio(rational);
+            if (rational.toFloat() > rationalLimitWide.toFloat()) rational =
+                rationalLimitWide else if (rational.toFloat() < rationalLimitTall.toFloat()) rational =
+                rationalLimitTall
+            (mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.setAspectRatio(
+                rational
+            )
         }
-        enterPictureInPictureMode(((PictureInPictureParams.Builder) mPictureInPictureParamsBuilder).build());
+        enterPictureInPictureMode((mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.build())
     }
 
-    void setEndControlsVisible(boolean visible) {
-        final int deleteVisible = (visible && haveMedia && Utils.isDeletable(this, mPrefs.mediaUri)) ? View.VISIBLE : View.INVISIBLE;
-        final int nextVisible = (visible && haveMedia && (nextUri != null || (mPrefs.askScope && !isTvBox))) ? View.VISIBLE : View.INVISIBLE;
-        findViewById(R.id.delete).setVisibility(deleteVisible);
-        findViewById(R.id.next).setVisibility(nextVisible);
+    fun setEndControlsVisible(visible: Boolean) {
+        val deleteVisible = if (visible && haveMedia && isDeletable(
+                this,
+                mPrefs!!.mediaUri!!
+            )
+        ) View.VISIBLE else View.INVISIBLE
+        val nextVisible =
+            if (visible && haveMedia && (nextUri != null || mPrefs!!.askScope && !isTvBox)) View.VISIBLE else View.INVISIBLE
+        findViewById<View>(R.id.delete).visibility = deleteVisible
+        findViewById<View>(R.id.next).visibility = nextVisible
     }
 
-    void askDeleteMedia() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
-        builder.setMessage(getString(R.string.delete_query));
-        builder.setPositiveButton(R.string.delete_confirmation, (dialogInterface, i) -> {
-            releasePlayer();
-            deleteMedia();
+    fun askDeleteMedia() {
+        val builder = AlertDialog.Builder(this@PlayerActivity)
+        builder.setMessage(getString(R.string.delete_query))
+        builder.setPositiveButton(R.string.delete_confirmation) { _: DialogInterface?, _: Int ->
+            releasePlayer()
+            deleteMedia()
             if (nextUri == null) {
-                haveMedia = false;
-                setEndControlsVisible(false);
-                playerView.setControllerShowTimeoutMs(-1);
+                haveMedia = false
+                setEndControlsVisible(false)
+                playerView!!.controllerShowTimeoutMs = -1
             } else {
-                skipToNext();
+                skipToNext()
             }
-        });
-        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-        });
-        final AlertDialog dialog = builder.create();
-        dialog.show();
+        }
+        builder.setNegativeButton(android.R.string.cancel) { _: DialogInterface?, _: Int -> }
+        val dialog = builder.create()
+        dialog.show()
     }
 
-    void deleteMedia() {
+    fun deleteMedia() {
         try {
-            if (ContentResolver.SCHEME_CONTENT.equals(mPrefs.mediaUri.getScheme())) {
-                DocumentsContract.deleteDocument(getContentResolver(), mPrefs.mediaUri);
-            } else if (ContentResolver.SCHEME_FILE.equals(mPrefs.mediaUri.getScheme())) {
-                final File file = new File(mPrefs.mediaUri.getSchemeSpecificPart());
+            if (ContentResolver.SCHEME_CONTENT == mPrefs!!.mediaUri!!.scheme) {
+                DocumentsContract.deleteDocument(contentResolver, mPrefs!!.mediaUri!!)
+            } else if (ContentResolver.SCHEME_FILE == mPrefs!!.mediaUri!!.scheme) {
+                val file = File(mPrefs!!.mediaUri!!.schemeSpecificPart)
                 if (file.canWrite()) {
-                    file.delete();
+                    file.delete()
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    private void dispatchPlayPause() {
-        if (player == null)
-            return;
-
-        @Player.State int state = player.getPlaybackState();
-        String methodName;
-        if (state == Player.STATE_IDLE || state == Player.STATE_ENDED || !player.getPlayWhenReady()) {
-            methodName = "dispatchPlay";
-            shortControllerTimeout = true;
+    private fun dispatchPlayPause() {
+        if (player == null) return
+        val state = player!!.playbackState
+        val methodName: String
+        if (state == Player.STATE_IDLE || state == Player.STATE_ENDED || !player!!.playWhenReady) {
+            methodName = "dispatchPlay"
+            shortControllerTimeout = true
         } else {
-            methodName = "dispatchPause";
+            methodName = "dispatchPause"
         }
         try {
-            final Method method = StyledPlayerControlView.class.getDeclaredMethod(methodName, Player.class);
-            method.setAccessible(true);
-            method.invoke(controlView, (Player) player);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+            val method = StyledPlayerControlView::class.java.getDeclaredMethod(
+                methodName,
+                Player::class.java
+            )
+            method.isAccessible = true
+            method.invoke(controlView, player as Player?)
+        } catch (e: NoSuchMethodException) {
+            e.printStackTrace()
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (e: InvocationTargetException) {
+            e.printStackTrace()
         }
     }
 
-    void skipToNext() {
+    fun skipToNext() {
         if (nextUri != null) {
-            releasePlayer();
-            mPrefs.updateMedia(this, nextUri, null);
-            searchSubtitles();
-            initializePlayer();
+            releasePlayer()
+            mPrefs!!.updateMedia(this, nextUri, null)
+            searchSubtitles()
+            initializePlayer()
         }
     }
 
-    void notifyAudioSessionUpdate(final boolean active) {
-        final Intent intent = new Intent(active ? AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION
-                : AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION);
-        intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.getAudioSessionId());
-        intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+    fun notifyAudioSessionUpdate(active: Boolean) {
+        val intent =
+            Intent(if (active) AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION else AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
+        intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player!!.audioSessionId)
+        intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
         if (active) {
-            intent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MOVIE);
+            intent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MOVIE)
         }
         try {
-            sendBroadcast(intent);
-        } catch (SecurityException e) {
-            e.printStackTrace();
+            sendBroadcast(intent)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
         }
     }
 
-    void updateButtons(final boolean enable) {
+    fun updateButtons(enable: Boolean) {
         if (buttonPiP != null) {
-            Utils.setButtonEnabled(this, buttonPiP, enable);
+            setButtonEnabled(buttonPiP!!, enable)
         }
-        Utils.setButtonEnabled(this, buttonAspectRatio, enable);
+        setButtonEnabled(buttonAspectRatio!!, enable)
         if (isTvBox) {
-            Utils.setButtonEnabled(this, exoSettings, true);
+            setButtonEnabled(exoSettings!!, true)
         } else {
-            Utils.setButtonEnabled(this, exoSettings, enable);
+            setButtonEnabled(exoSettings!!, enable)
         }
     }
 
-    private void scaleStart() {
-        isScaling = true;
-        if (playerView.getResizeMode() != AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
-            playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+    private fun scaleStart() {
+        isScaling = true
+        if (playerView!!.resizeMode != AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
+            playerView!!.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         }
-        scaleFactor = playerView.getVideoSurfaceView().getScaleX();
-        playerView.removeCallbacks(playerView.textClearRunnable);
-        playerView.clearIcon();
-        playerView.setCustomErrorMessage((int) (scaleFactor * 100) + "%");
-        playerView.hideController();
-        isScaleStarting = true;
+        scaleFactor = playerView!!.videoSurfaceView!!.scaleX
+        playerView!!.removeCallbacks(playerView!!.textClearRunnable)
+        playerView!!.clearIcon()
+        playerView!!.setCustomErrorMessage((scaleFactor * 100).toInt().toString() + "%")
+        playerView!!.hideController()
+        isScaleStarting = true
     }
 
-    private void scale(boolean up) {
+    private fun scale(up: Boolean) {
         if (up) {
-            scaleFactor += 0.01;
+            scaleFactor += 0.01.toFloat()
         } else {
-            scaleFactor -= 0.01;
+            scaleFactor -= 0.01.toFloat()
         }
-        scaleFactor = Utils.normalizeScaleFactor(scaleFactor, playerView.getScaleFit());
-        playerView.setScale(scaleFactor);
-        playerView.setCustomErrorMessage((int) (scaleFactor * 100) + "%");
+        scaleFactor = normalizeScaleFactor(scaleFactor, playerView!!.scaleFit)
+        playerView!!.setScale(scaleFactor)
+        playerView!!.setCustomErrorMessage((scaleFactor * 100).toInt().toString() + "%")
     }
 
-    private void scaleEnd() {
-        isScaling = false;
-        playerView.postDelayed(playerView.textClearRunnable, 200);
-        if (!player.isPlaying()) {
-            playerView.showController();
+    private fun scaleEnd() {
+        isScaling = false
+        playerView!!.postDelayed(playerView!!.textClearRunnable, 200)
+        if (!player!!.isPlaying) {
+            playerView!!.showController()
         }
-        if (Math.abs(playerView.getScaleFit() - scaleFactor) < 0.01 / 2) {
-            playerView.setScale(1.f);
-            playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        if (abs(playerView!!.scaleFit - scaleFactor) < 0.01 / 2) {
+            playerView!!.setScale(1f)
+            playerView!!.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
         }
-        updatebuttonAspectRatioIcon();
+        updatebuttonAspectRatioIcon()
     }
 
-    private void updatebuttonAspectRatioIcon() {
-        if (playerView.getResizeMode() == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
-            buttonAspectRatio.setImageResource(R.drawable.ic_fit_screen_24dp);
+    private fun updatebuttonAspectRatioIcon() {
+        if (playerView!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
+            buttonAspectRatio!!.setImageResource(R.drawable.ic_fit_screen_24dp)
         } else {
-            buttonAspectRatio.setImageResource(R.drawable.ic_aspect_ratio_24dp);
+            buttonAspectRatio!!.setImageResource(R.drawable.ic_aspect_ratio_24dp)
         }
     }
 
-    private void updateButtonRotation() {
-        boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        boolean auto = false;
+    private fun updateButtonRotation() {
+        val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        var auto = false
         try {
-            auto = Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION) == 1;
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
+            auto =
+                Settings.System.getInt(contentResolver, Settings.System.ACCELEROMETER_ROTATION) == 1
+        } catch (e: Settings.SettingNotFoundException) {
+            e.printStackTrace()
         }
-
-        if (mPrefs.orientation == Utils.Orientation.VIDEO) {
+        if (mPrefs!!.orientation === Utils.Orientation.VIDEO) {
             if (auto) {
-                buttonRotation.setImageResource(R.drawable.ic_screen_lock_rotation_24dp);
+                buttonRotation!!.setImageResource(R.drawable.ic_screen_lock_rotation_24dp)
             } else if (portrait) {
-                buttonRotation.setImageResource(R.drawable.ic_screen_lock_portrait_24dp);
+                buttonRotation!!.setImageResource(R.drawable.ic_screen_lock_portrait_24dp)
             } else {
-                buttonRotation.setImageResource(R.drawable.ic_screen_lock_landscape_24dp);
+                buttonRotation!!.setImageResource(R.drawable.ic_screen_lock_landscape_24dp)
             }
         } else {
             if (auto) {
-                buttonRotation.setImageResource(R.drawable.ic_screen_rotation_24dp);
+                buttonRotation!!.setImageResource(R.drawable.ic_screen_rotation_24dp)
             } else if (portrait) {
-                buttonRotation.setImageResource(R.drawable.ic_screen_portrait_24dp);
+                buttonRotation!!.setImageResource(R.drawable.ic_screen_portrait_24dp)
             } else {
-                buttonRotation.setImageResource(R.drawable.ic_screen_landscape_24dp);
+                buttonRotation!!.setImageResource(R.drawable.ic_screen_landscape_24dp)
             }
         }
+    }
+
+    companion object {
+        var loudnessEnhancer: LoudnessEnhancer? = null
+        var player: ExoPlayer? = null
+        var haveMedia = false
+        var controllerVisible = false
+        var controllerVisibleFully = false
+        var snackbar: Snackbar? = null
+        var boostLevel = 0
+        private const val REQUEST_CHOOSER_VIDEO = 1
+        private const val REQUEST_CHOOSER_SUBTITLE = 2
+        private const val REQUEST_CHOOSER_SCOPE_DIR = 10
+        private const val REQUEST_CHOOSER_VIDEO_MEDIASTORE = 20
+        private const val REQUEST_CHOOSER_SUBTITLE_MEDIASTORE = 21
+        private const val REQUEST_SETTINGS = 100
+        private const val REQUEST_SYSTEM_CAPTIONS = 200
+        const val CONTROLLER_TIMEOUT = 3500
+        private const val ACTION_MEDIA_CONTROL = "media_control"
+        private const val EXTRA_CONTROL_TYPE = "control_type"
+        private const val REQUEST_PLAY = 1
+        private const val REQUEST_PAUSE = 2
+        private const val CONTROL_TYPE_PLAY = 1
+        private const val CONTROL_TYPE_PAUSE = 2
+        var focusPlay = false
+        private var isTvBox = false
+        var locked = false
+        var chapterStarts: LongArray? = null
+        var restoreControllerTimeout = false
+        var shortControllerTimeout = false
+        const val API_POSITION = "position"
+        const val API_DURATION = "duration"
+        const val API_RETURN_RESULT = "return_result"
+        const val API_SUBS = "subs"
+        const val API_SUBS_ENABLE = "subs.enable"
+        const val API_SUBS_NAME = "subs.name"
+        const val API_TITLE = "title"
+        const val API_END_BY = "end_by"
     }
 }

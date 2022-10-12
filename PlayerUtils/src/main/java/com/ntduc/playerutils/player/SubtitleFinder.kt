@@ -1,63 +1,55 @@
-package com.ntduc.playerutils.player;
+package com.ntduc.playerutils.player
 
-import android.net.Uri;
+import android.net.Uri
+import com.google.android.exoplayer2.util.Util
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import java.util.ArrayList
 
-import com.google.android.exoplayer2.util.Util;
+class SubtitleFinder(private val activity: PlayerActivity, uri: Uri) {
+    private val baseUri: Uri
+    private var path: String?
+    private val urls: MutableList<Uri>
 
-import java.util.ArrayList;
-import java.util.List;
-
-import okhttp3.HttpUrl;
-
-public class SubtitleFinder {
-
-    private PlayerActivity activity;
-    private Uri baseUri;
-    private String path;
-    private final List<Uri> urls;
-
-    public SubtitleFinder(PlayerActivity activity, Uri uri) {
-        this.activity = activity;
-        path = uri.getPath();
-        path = path.substring(0, path.lastIndexOf('.'));
-        baseUri = uri;
-        urls = new ArrayList<>();
+    init {
+        path = uri.path
+        path = path!!.substring(0, path!!.lastIndexOf('.'))
+        baseUri = uri
+        urls = ArrayList()
     }
 
-    public static boolean isUriCompatible(Uri uri) {
-        String pth = uri.getPath();
-        if (pth != null) {
-            return pth.lastIndexOf('.') > -1;
-        }
-        return false;
+    private fun addLanguage(lang: String, suffix: String) {
+        urls.add(buildUri("$lang.$suffix"))
+        urls.add(buildUri(Util.normalizeLanguageCode(lang) + "." + suffix))
     }
 
-    private void addLanguage(String lang, String suffix) {
-        urls.add(buildUri(lang + "." + suffix));
-        urls.add(buildUri(Util.normalizeLanguageCode(lang) + "." + suffix));
+    private fun buildUri(suffix: String): Uri {
+        val newPath = "$path.$suffix"
+        return baseUri.buildUpon().path(newPath).build()
     }
 
-    private Uri buildUri(String suffix) {
-        final String newPath = path + "." + suffix;
-        return baseUri.buildUpon().path(newPath).build();
-    }
-
-    public void start() {
+    fun start() {
         // Prevent IllegalArgumentException in okhttp3.Request.Builder
-        if (HttpUrl.parse(baseUri.toString()) == null) {
-            return;
+        if (baseUri.toString().toHttpUrlOrNull() == null) {
+            return
         }
-
-        for (String suffix : new String[] { "srt", "ssa", "ass" }) {
-            urls.add(buildUri(suffix));
-            for (String language : Utils.getDeviceLanguages()) {
-                addLanguage(language, suffix);
+        for (suffix in arrayOf("srt", "ssa", "ass")) {
+            urls.add(buildUri(suffix))
+            for (language in Utils.deviceLanguages) {
+                addLanguage(language, suffix)
             }
         }
-        urls.add(buildUri("vtt"));
-
-        SubtitleFetcher subtitleFetcher = new SubtitleFetcher(activity, urls);
-        subtitleFetcher.start();
+        urls.add(buildUri("vtt"))
+        val subtitleFetcher = SubtitleFetcher(activity, urls)
+        subtitleFetcher.start()
     }
 
+    companion object {
+        @JvmStatic
+        fun isUriCompatible(uri: Uri): Boolean {
+            val pth = uri.path
+            return if (pth != null) {
+                pth.lastIndexOf('.') > -1
+            } else false
+        }
+    }
 }
