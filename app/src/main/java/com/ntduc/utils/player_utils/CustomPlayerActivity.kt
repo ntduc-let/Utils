@@ -1,6 +1,7 @@
 package com.ntduc.utils.player_utils
 
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.ntduc.playerutils.player.PlayerActivity
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.R
@@ -29,6 +30,14 @@ class CustomPlayerActivity : PlayerActivity() {
 
     override fun enterMore(view: View) {
         shortToast("Click More")
+    }
+
+    override fun getPlayedColor(): Int {
+        return ContextCompat.getColor(this, R.color.played_color)
+    }
+
+    override fun getUnplayedColor(): Int {
+        return ContextCompat.getColor(this, R.color.unplayed_color)
     }
 
     override fun getVisibilitySubtitle(): Int {
