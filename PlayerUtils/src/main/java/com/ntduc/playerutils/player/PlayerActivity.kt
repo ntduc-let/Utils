@@ -85,6 +85,8 @@ import android.util.Rational
 import android.view.*
 import android.view.accessibility.CaptioningManager
 import android.widget.*
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import kotlin.jvm.JvmOverloads
@@ -528,8 +530,10 @@ open class PlayerActivity : Activity() {
         }
 
         //Xét color TimeBar
-        timeBar!!.setAdMarkerColor(getAdMarkerColor())                  //Xét color TimeBar đã play
-        timeBar!!.setPlayedAdMarkerColor(getPlayedAdMarkerColor())      //Xét color TimeBar chưa play
+        timeBar!!.setAdMarkerColor(getAdMarkerColor())
+        timeBar!!.setPlayedAdMarkerColor(getPlayedAdMarkerColor())
+        timeBar!!.setPlayedColor(getPlayedColor())
+        timeBar!!.setUnplayedColor(getUnplayedColor())
 
         //???
         try {
@@ -729,6 +733,7 @@ open class PlayerActivity : Activity() {
         releasePlayer(false)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         restorePlayStateAllowed = false
         super.onBackPressed()
@@ -1151,7 +1156,7 @@ open class PlayerActivity : Activity() {
             if (mPrefs!!.mediaUri!!.scheme!!.lowercase(Locale.getDefault()).startsWith("http")) {
                 val headers = HashMap<String, String>()
                 val userInfo = mPrefs!!.mediaUri!!.userInfo
-                if (userInfo != null && userInfo.length > 0 && userInfo.contains(":")) {
+                if (userInfo != null && userInfo.isNotEmpty() && userInfo.contains(":")) {
                     headers["Authorization"] =
                         "Basic " + Base64.encodeToString(userInfo.toByteArray(), Base64.NO_WRAP)
                     val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
@@ -1911,7 +1916,7 @@ open class PlayerActivity : Activity() {
                 val next: DocumentFile? = if (!isTvBox) {
                     findNext(video)
                 } else {
-                    val parentRaw = videoRaw!!.parentFile
+                    val parentRaw = videoRaw!!.parentFile ?: return null
                     val dir = DocumentFile.fromFile(parentRaw)
                     findNext(video, dir)
                 }
@@ -2254,6 +2259,7 @@ open class PlayerActivity : Activity() {
     }
 
     //Folder Open
+    @DrawableRes
     open fun getDrawableResFolderOpen(): Int {
         return R.drawable.ic_folder_open_24dp
     }
@@ -2263,10 +2269,12 @@ open class PlayerActivity : Activity() {
     }
 
     //PIP
+    @DrawableRes
     open fun getDrawableResPictureInPicturePlay(): Int {
         return R.drawable.ic_play_arrow_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResPictureInPictureAlt(): Int {
         return R.drawable.ic_picture_in_picture_alt_24dp
     }
@@ -2276,10 +2284,12 @@ open class PlayerActivity : Activity() {
     }
 
     //Aspect Ratio
+    @DrawableRes
     open fun getDrawableResAspectRatioFill(): Int {
         return R.drawable.ic_fit_screen_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResAspectRatioZoom(): Int {
         return R.drawable.ic_aspect_ratio_24dp
     }
@@ -2289,26 +2299,32 @@ open class PlayerActivity : Activity() {
     }
 
     //Rotation
+    @DrawableRes
     open fun getDrawableResScreenLockRotation(): Int {
         return R.drawable.ic_screen_lock_rotation_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResScreenLockPortrait(): Int {
         return R.drawable.ic_screen_lock_portrait_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResScreenLockLandscape(): Int {
         return R.drawable.ic_screen_lock_landscape_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResScreenRotation(): Int {
         return R.drawable.ic_screen_rotation_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResScreenPortrait(): Int {
         return R.drawable.ic_screen_portrait_24dp
     }
 
+    @DrawableRes
     open fun getDrawableResScreenLandscape(): Int {
         return R.drawable.ic_screen_landscape_24dp
     }
@@ -2335,12 +2351,24 @@ open class PlayerActivity : Activity() {
     open fun enterMore(view: View) {}
 
     //TimeBar
+    @ColorInt
     open fun getAdMarkerColor(): Int {
         return Color.argb(0x00, 0xFF, 0xFF, 0xFF)
     }
 
+    @ColorInt
     open fun getPlayedAdMarkerColor(): Int {
         return Color.argb(0x98, 0xFF, 0xFF, 0xFF)
+    }
+
+    @ColorInt
+    open fun getPlayedColor(): Int {
+        return DefaultTimeBar.DEFAULT_PLAYED_COLOR
+    }
+
+    @ColorInt
+    open fun getUnplayedColor(): Int {
+        return DefaultTimeBar.DEFAULT_UNPLAYED_COLOR
     }
 
     //Delete
