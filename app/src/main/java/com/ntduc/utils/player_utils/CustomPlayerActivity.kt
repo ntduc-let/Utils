@@ -36,10 +36,6 @@ class CustomPlayerActivity : PlayerActivity() {
         return ContextCompat.getColor(this, R.color.played_color)
     }
 
-    override fun getUnplayedColor(): Int {
-        return ContextCompat.getColor(this, R.color.unplayed_color)
-    }
-
     override fun getVisibilitySubtitle(): Int {
         return View.GONE
     }
