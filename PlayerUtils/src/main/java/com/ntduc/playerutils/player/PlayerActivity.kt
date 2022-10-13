@@ -88,6 +88,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.accessibility.CaptioningManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import kotlin.jvm.JvmOverloads
@@ -130,7 +131,9 @@ class PlayerActivity : Activity() {
     private var isScaleStarting = false
     private var scaleFactor = 1.0f
     private var coordinatorLayout: CoordinatorLayout? = null
+    private var buttonBack: ImageButton? = null
     private var titleView: TextView? = null
+    private var buttonMore: ImageButton? = null
     private var buttonOpen: ImageButton? = null
     private var buttonPiP: ImageButton? = null
     private var buttonAspectRatio: ImageButton? = null
@@ -418,7 +421,7 @@ class PlayerActivity : Activity() {
         buttonRotation = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
         buttonRotation!!.contentDescription = getString(R.string.button_rotate)
         updateButtonRotation()
-        buttonRotation!!.setOnClickListener { view: View? ->
+        buttonRotation!!.setOnClickListener {
             mPrefs!!.orientation = getNextOrientation(
                 mPrefs!!.orientation
             )
@@ -428,33 +431,16 @@ class PlayerActivity : Activity() {
             resetHideCallbacks()
         }
 
-        //Thiết lập Background và title video cho màn Play
-        val titleViewPaddingHorizontal = dpToPx(14)
-        val titleViewPaddingVertical =
-            resources.getDimensionPixelOffset(R.dimen.exo_styled_bottom_bar_time_padding)
-        val centerView = playerView!!.findViewById<FrameLayout>(R.id.exo_controls_background)
-        titleView = TextView(this)
-        titleView!!.setBackgroundResource(R.color.ui_controls_background)
-        titleView!!.setTextColor(Color.WHITE)
-        titleView!!.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        titleView!!.setPadding(
-            titleViewPaddingHorizontal,
-            titleViewPaddingVertical,
-            titleViewPaddingHorizontal,
-            titleViewPaddingVertical
-        )
-        titleView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-        titleView!!.visibility = View.GONE
-        titleView!!.maxLines = 1
-        titleView!!.ellipsize = TextUtils.TruncateAt.END
-        titleView!!.textDirection = View.TEXT_DIRECTION_LOCALE
-        centerView.addView(titleView)
+        val exoControlsToolbar = playerView!!.findViewById<FrameLayout>(R.id.exo_controls_toolbar)
+        buttonBack = playerView!!.findViewById(R.id.btn_back)
+        titleView = playerView!!.findViewById(R.id.txt_title)
+        buttonMore = playerView!!.findViewById(R.id.btn_more)
+
+        buttonBack!!.setOnClickListener { onBackPressed() }
+        buttonMore!!.setOnClickListener {  }
 
         //Gửi video
-        titleView!!.setOnLongClickListener { view: View? ->
+        titleView!!.setOnLongClickListener {
             // Prevent FileUriExposedException
             if (mPrefs!!.mediaUri != null && ContentResolver.SCHEME_FILE == mPrefs!!.mediaUri!!.scheme) {
                 return@setOnLongClickListener false
@@ -502,13 +488,13 @@ class PlayerActivity : Activity() {
                     }
                 }
                 setViewParams(
-                    titleView!!,
-                    paddingLeft + titleViewPaddingHorizontal,
-                    titleViewPaddingVertical,
-                    paddingRight + titleViewPaddingHorizontal,
-                    titleViewPaddingVertical,
+                    exoControlsToolbar!!,
+                    0,
+                    0,
+                    0,
+                    0,
                     marginLeft,
-                    windowInsets.systemWindowInsetTop,
+                    0,
                     marginRight,
                     0
                 )
@@ -736,7 +722,6 @@ class PlayerActivity : Activity() {
         releasePlayer(false)
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         restorePlayStateAllowed = false
         super.onBackPressed()
