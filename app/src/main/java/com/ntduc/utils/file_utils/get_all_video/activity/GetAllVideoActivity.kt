@@ -16,6 +16,7 @@ import com.ntduc.utils.databinding.ActivityGetAllVideoBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import com.ntduc.utils.file_utils.constant.FileType
 import com.ntduc.utils.file_utils.get_all_video.adapter.GetAllVideoAdapter
+import com.ntduc.utils.player_utils.CustomPlayerActivity
 import java.io.File
 
 class GetAllVideoActivity : AppCompatActivity() {
@@ -47,7 +48,7 @@ class GetAllVideoActivity : AppCompatActivity() {
             if (it.myFile?.data != null && File(it.myFile!!.data!!).exists()) {
                 val file = File(it.myFile!!.data!!)
                 val uri = FileProvider.getUriForFile(this, "com.ntduc.utils.provider", file)
-                val intentOpenVideo = Intent(this, PlayerActivity::class.java)
+                val intentOpenVideo = Intent(this, CustomPlayerActivity::class.java)
                 intentOpenVideo.setDataAndType(uri, file.getMimeType())
                 intentOpenVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 startActivity(intentOpenVideo)

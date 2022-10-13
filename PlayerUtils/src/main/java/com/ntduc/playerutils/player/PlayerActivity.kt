@@ -31,7 +31,6 @@ import com.ntduc.playerutils.player.SubtitleUtils.buildSubtitle
 import com.ntduc.playerutils.player.Utils.isPiPSupported
 import com.ntduc.playerutils.player.Utils.showText
 import com.ntduc.playerutils.player.Utils.getNextOrientation
-import com.ntduc.playerutils.player.Utils.dpToPx
 import com.ntduc.playerutils.player.Utils.setViewParams
 import com.ntduc.playerutils.player.Utils.setViewMargins
 import com.ntduc.playerutils.player.Utils.adjustVolume
@@ -81,14 +80,11 @@ import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import android.support.v4.media.MediaMetadataCompat
-import android.text.TextUtils
 import android.util.Base64
 import android.util.Rational
-import android.util.TypedValue
 import android.view.*
 import android.view.accessibility.CaptioningManager
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import kotlin.jvm.JvmOverloads
@@ -114,7 +110,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
-class PlayerActivity : Activity() {
+open class PlayerActivity : Activity() {
     private var playerListener: PlayerListener? = null
     private var mReceiver: BroadcastReceiver? = null
     private var mAudioManager: AudioManager? = null
@@ -251,6 +247,7 @@ class PlayerActivity : Activity() {
                     }
                     apiTitle = bundle.getString(API_TITLE)
                 }
+
                 mPrefs!!.updateMedia(this, uri, type) //Lưu information Video
 
                 //???
@@ -351,9 +348,10 @@ class PlayerActivity : Activity() {
 
         //Tạo Btn Open file
         buttonOpen = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
-        buttonOpen!!.setImageResource(R.drawable.ic_folder_open_24dp)
+        buttonOpen!!.setImageResource(getDrawableResFolderOpen())
         buttonOpen!!.id = View.generateViewId()
         buttonOpen!!.contentDescription = getString(R.string.button_open)
+        buttonOpen!!.visibility = getVisibilityFolderOpen()
 
         //Tải Video
         buttonOpen!!.setOnClickListener {
@@ -378,16 +376,17 @@ class PlayerActivity : Activity() {
             // https://developer.android.com/about/versions/12/features/pip-improvements
             mPictureInPictureParamsBuilder = PictureInPictureParams.Builder()
             val success = updatePictureInPictureActions(
-                R.drawable.ic_play_arrow_24dp,
+                getDrawableResPictureInPicturePlay(),
                 R.string.exo_controls_play_description,
                 CONTROL_TYPE_PLAY,
                 REQUEST_PLAY
             )
             if (success) {
                 buttonPiP = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
-                buttonPiP?.contentDescription = getString(R.string.button_pip)
-                buttonPiP?.setImageResource(R.drawable.ic_picture_in_picture_alt_24dp)
-                buttonPiP?.setOnClickListener { enterPiP() }
+                buttonPiP!!.contentDescription = getString(R.string.button_pip)
+                buttonPiP!!.setImageResource(getDrawableResPictureInPictureAlt())
+                buttonPiP!!.visibility = getVisibilityPictureInPictureAlt()
+                buttonPiP!!.setOnClickListener { enterPiP() }
             }
         }
 
@@ -396,6 +395,7 @@ class PlayerActivity : Activity() {
         buttonAspectRatio!!.id = Int.MAX_VALUE - 100
         buttonAspectRatio!!.contentDescription = getString(R.string.button_crop)
         updatebuttonAspectRatioIcon()
+        buttonAspectRatio!!.visibility = getVisibilityAspectRatio()
         buttonAspectRatio!!.setOnClickListener {
             playerView!!.setScale(1f)
             if (playerView!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_FIT) {
@@ -403,14 +403,14 @@ class PlayerActivity : Activity() {
                 showText(playerView!!, getString(R.string.video_resize_crop))
             } else {
                 // Default mode
-                playerView!!.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT)
+                playerView!!.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
                 showText(playerView!!, getString(R.string.video_resize_fit))
             }
             updatebuttonAspectRatioIcon()
             resetHideCallbacks()
         }
         if (isTvBox && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            buttonAspectRatio!!.setOnLongClickListener { v: View? ->
+            buttonAspectRatio!!.setOnLongClickListener {
                 scaleStart()
                 updatebuttonAspectRatioIcon()
                 true
@@ -421,6 +421,7 @@ class PlayerActivity : Activity() {
         buttonRotation = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
         buttonRotation!!.contentDescription = getString(R.string.button_rotate)
         updateButtonRotation()
+        buttonRotation!!.visibility = getVisibilityRotation()
         buttonRotation!!.setOnClickListener {
             mPrefs!!.orientation = getNextOrientation(
                 mPrefs!!.orientation
@@ -432,12 +433,18 @@ class PlayerActivity : Activity() {
         }
 
         val exoControlsToolbar = playerView!!.findViewById<FrameLayout>(R.id.exo_controls_toolbar)
+
         buttonBack = playerView!!.findViewById(R.id.btn_back)
+        buttonBack!!.visibility = getVisibilityBack()
+
         titleView = playerView!!.findViewById(R.id.txt_title)
+        titleView!!.visibility = getVisibilityTitle()
+
         buttonMore = playerView!!.findViewById(R.id.btn_more)
+        buttonMore!!.visibility = getVisibilityMore()
 
         buttonBack!!.setOnClickListener { onBackPressed() }
-        buttonMore!!.setOnClickListener {  }
+        buttonMore!!.setOnClickListener { enterMore(it) }
 
         //Gửi video
         titleView!!.setOnLongClickListener {
@@ -521,15 +528,8 @@ class PlayerActivity : Activity() {
         }
 
         //Xét color TimeBar
-        timeBar!!.setAdMarkerColor(Color.argb(0x00, 0xFF, 0xFF, 0xFF)) //Xét color TimeBar đã play
-        timeBar!!.setPlayedAdMarkerColor(
-            Color.argb(
-                0x98,
-                0xFF,
-                0xFF,
-                0xFF
-            )
-        ) //Xét color TimeBar chưa play
+        timeBar!!.setAdMarkerColor(getAdMarkerColor())                  //Xét color TimeBar đã play
+        timeBar!!.setPlayedAdMarkerColor(getPlayedAdMarkerColor())      //Xét color TimeBar chưa play
 
         //???
         try {
@@ -544,12 +544,16 @@ class PlayerActivity : Activity() {
         }
 
         //Thiết lập btn xóa video
-        findViewById<View>(R.id.delete).setOnClickListener { view: View? -> askDeleteMedia() }
+        val buttonDelete = findViewById<View>(R.id.delete)
+        buttonDelete.visibility = getVisibilityDelete()
+        buttonDelete.setOnClickListener { askDeleteMedia() }
 
         //Thiết lập btn next video
-        findViewById<View>(R.id.next).setOnClickListener { view: View? ->
+        val buttonNext = findViewById<View>(R.id.next)
+        buttonNext.visibility = getVisibilityNext()
+        buttonNext.setOnClickListener {
             if (!isTvBox && mPrefs!!.askScope) {
-                askForScope(false, true)
+                askForScope(loadSubtitlesOnCancel = false, skipToNextOnCancel = true)
             } else {
                 skipToNext()
             }
@@ -575,10 +579,13 @@ class PlayerActivity : Activity() {
         playerView!!.setBrightnessControl(mBrightnessControl)
         val exoBasicControls = playerView!!.findViewById<LinearLayout>(R.id.exo_basic_controls)
         val exoSubtitle = exoBasicControls.findViewById<ImageButton>(R.id.exo_subtitle)
+        exoSubtitle.visibility = getVisibilitySubtitle()
         exoBasicControls.removeView(exoSubtitle)
         exoSettings = exoBasicControls.findViewById(R.id.exo_settings)
+        exoSettings!!.visibility = getVisibilitySettings()
         exoBasicControls.removeView(exoSettings)
         val exoRepeat = exoBasicControls.findViewById<ImageButton>(R.id.exo_repeat_toggle)
+        exoRepeat.visibility = getVisibilityRepeat()
         exoBasicControls.removeView(exoRepeat)
         //exoBasicControls.setVisibility(View.GONE);
         exoSettings!!.setOnLongClickListener {
@@ -587,7 +594,7 @@ class PlayerActivity : Activity() {
             startActivityForResult(intent, REQUEST_SETTINGS)
             true
         }
-        exoSubtitle.setOnLongClickListener { v: View? ->
+        exoSubtitle.setOnLongClickListener {
             enableRotation()
             safelyStartActivityForResult(
                 Intent(Settings.ACTION_CAPTIONING_SETTINGS),
@@ -634,7 +641,7 @@ class PlayerActivity : Activity() {
                 // Because when using dpad controls, focus resets to first item in bottom controls bar
                 findViewById<View>(R.id.exo_play_pause).requestFocus()
             }
-            if (controllerVisible && playerView!!.isControllerFullyVisible()) {
+            if (controllerVisible && playerView!!.isControllerFullyVisible) {
                 if (mPrefs!!.firstRun) {
                     TapTargetView.showFor(this@PlayerActivity,
                         TapTarget.forView(
@@ -941,11 +948,11 @@ class PlayerActivity : Activity() {
             var value = event.getAxisValue(MotionEvent.AXIS_RZ)
             for (i in 0 until event.historySize) {
                 val historical = event.getHistoricalAxisValue(MotionEvent.AXIS_RZ, i)
-                if (Math.abs(historical) > value) {
+                if (abs(historical) > value) {
                     value = historical
                 }
             }
-            if (Math.abs(value) == 1.0f) {
+            if (abs(value) == 1.0f) {
                 adjustVolume(this, mAudioManager!!, playerView!!, value < 0, true, true)
             }
         }
@@ -1787,7 +1794,7 @@ class PlayerActivity : Activity() {
 
     fun reportScrubbing(position: Long) {
         val diff = position - scrubbingStart
-        if (Math.abs(diff) > 1000) {
+        if (abs(diff) > 1000) {
             scrubbingNoticeable = true
         }
         if (scrubbingNoticeable) {
@@ -2174,9 +2181,9 @@ class PlayerActivity : Activity() {
 
     private fun updatebuttonAspectRatioIcon() {
         if (playerView!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
-            buttonAspectRatio!!.setImageResource(R.drawable.ic_fit_screen_24dp)
+            buttonAspectRatio!!.setImageResource(getDrawableResAspectRatioFill())
         } else {
-            buttonAspectRatio!!.setImageResource(R.drawable.ic_aspect_ratio_24dp)
+            buttonAspectRatio!!.setImageResource(getDrawableResAspectRatioZoom())
         }
     }
 
@@ -2191,19 +2198,19 @@ class PlayerActivity : Activity() {
         }
         if (mPrefs!!.orientation === Utils.Orientation.VIDEO) {
             if (auto) {
-                buttonRotation!!.setImageResource(R.drawable.ic_screen_lock_rotation_24dp)
+                buttonRotation!!.setImageResource(getDrawableResScreenLockRotation())
             } else if (portrait) {
-                buttonRotation!!.setImageResource(R.drawable.ic_screen_lock_portrait_24dp)
+                buttonRotation!!.setImageResource(getDrawableResScreenLockPortrait())
             } else {
-                buttonRotation!!.setImageResource(R.drawable.ic_screen_lock_landscape_24dp)
+                buttonRotation!!.setImageResource(getDrawableResScreenLockLandscape())
             }
         } else {
             if (auto) {
-                buttonRotation!!.setImageResource(R.drawable.ic_screen_rotation_24dp)
+                buttonRotation!!.setImageResource(getDrawableResScreenRotation())
             } else if (portrait) {
-                buttonRotation!!.setImageResource(R.drawable.ic_screen_portrait_24dp)
+                buttonRotation!!.setImageResource(getDrawableResScreenPortrait())
             } else {
-                buttonRotation!!.setImageResource(R.drawable.ic_screen_landscape_24dp)
+                buttonRotation!!.setImageResource(getDrawableResScreenLandscape())
             }
         }
     }
@@ -2244,5 +2251,120 @@ class PlayerActivity : Activity() {
         const val API_SUBS_NAME = "subs.name"
         const val API_TITLE = "title"
         const val API_END_BY = "end_by"
+    }
+
+    //Folder Open
+    open fun getDrawableResFolderOpen(): Int {
+        return R.drawable.ic_folder_open_24dp
+    }
+
+    open fun getVisibilityFolderOpen(): Int {
+        return View.VISIBLE
+    }
+
+    //PIP
+    open fun getDrawableResPictureInPicturePlay(): Int {
+        return R.drawable.ic_play_arrow_24dp
+    }
+
+    open fun getDrawableResPictureInPictureAlt(): Int {
+        return R.drawable.ic_picture_in_picture_alt_24dp
+    }
+
+    open fun getVisibilityPictureInPictureAlt(): Int {
+        return View.VISIBLE
+    }
+
+    //Aspect Ratio
+    open fun getDrawableResAspectRatioFill(): Int {
+        return R.drawable.ic_fit_screen_24dp
+    }
+
+    open fun getDrawableResAspectRatioZoom(): Int {
+        return R.drawable.ic_aspect_ratio_24dp
+    }
+
+    open fun getVisibilityAspectRatio(): Int {
+        return View.VISIBLE
+    }
+
+    //Rotation
+    open fun getDrawableResScreenLockRotation(): Int {
+        return R.drawable.ic_screen_lock_rotation_24dp
+    }
+
+    open fun getDrawableResScreenLockPortrait(): Int {
+        return R.drawable.ic_screen_lock_portrait_24dp
+    }
+
+    open fun getDrawableResScreenLockLandscape(): Int {
+        return R.drawable.ic_screen_lock_landscape_24dp
+    }
+
+    open fun getDrawableResScreenRotation(): Int {
+        return R.drawable.ic_screen_rotation_24dp
+    }
+
+    open fun getDrawableResScreenPortrait(): Int {
+        return R.drawable.ic_screen_portrait_24dp
+    }
+
+    open fun getDrawableResScreenLandscape(): Int {
+        return R.drawable.ic_screen_landscape_24dp
+    }
+
+    open fun getVisibilityRotation(): Int {
+        return View.VISIBLE
+    }
+
+    //Back
+    open fun getVisibilityBack(): Int {
+        return View.VISIBLE
+    }
+
+    //Title
+    open fun getVisibilityTitle(): Int {
+        return View.VISIBLE
+    }
+
+    //More
+    open fun getVisibilityMore(): Int {
+        return View.VISIBLE
+    }
+
+    open fun enterMore(view: View) {}
+
+    //TimeBar
+    open fun getAdMarkerColor(): Int {
+        return Color.argb(0x00, 0xFF, 0xFF, 0xFF)
+    }
+
+    open fun getPlayedAdMarkerColor(): Int {
+        return Color.argb(0x98, 0xFF, 0xFF, 0xFF)
+    }
+
+    //Delete
+    open fun getVisibilityDelete(): Int {
+        return View.GONE
+    }
+
+    //Next
+    open fun getVisibilityNext(): Int {
+        return View.GONE
+    }
+
+    //Subtitle
+    open fun getVisibilitySubtitle(): Int {
+        return View.VISIBLE
+    }
+
+    //Settings
+    open fun getVisibilitySettings(): Int {
+        return View.VISIBLE
+    }
+
+    //Repeat
+    open fun getVisibilityRepeat(): Int {
+        return View.VISIBLE
     }
 }
