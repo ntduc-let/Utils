@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import androidx.core.view.GestureDetectorCompat
 import com.google.android.exoplayer2.SeekParameters
@@ -319,7 +320,7 @@ open class CustomStyledPlayerView constructor(
             canScale = true
         }
         val buttonAspectRatio = findViewById<ImageButton>(Int.MAX_VALUE - 100)
-        buttonAspectRatio.setImageResource(R.drawable.ic_fit_screen_24dp)
+        buttonAspectRatio.setImageResource(aspectRatioFillId)
         hideController()
         return true
     }
@@ -330,7 +331,7 @@ open class CustomStyledPlayerView constructor(
             setScale(1f)
             resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
             val buttonAspectRatio = findViewById<ImageButton>(Int.MAX_VALUE - 100)
-            buttonAspectRatio.setImageResource(R.drawable.ic_aspect_ratio_24dp)
+            buttonAspectRatio.setImageResource(aspectRatiooZoomId)
         }
         if (PlayerActivity.player != null && !PlayerActivity.player!!.isPlaying) {
             showController()
@@ -424,5 +425,16 @@ open class CustomStyledPlayerView constructor(
         const val MESSAGE_TIMEOUT_TOUCH = 400
         const val MESSAGE_TIMEOUT_KEY = 800
         const val MESSAGE_TIMEOUT_LONG = 1400
+    }
+
+    //Aspect Ratio
+    private var aspectRatioFillId: Int = 0
+    fun setDrawableResAspectRatioFill(@DrawableRes resId: Int) {
+        aspectRatioFillId = resId
+    }
+
+    private var aspectRatiooZoomId: Int = 0
+    fun setDrawableResAspectRatioZoom(@DrawableRes resId: Int) {
+        aspectRatiooZoomId = resId
     }
 }

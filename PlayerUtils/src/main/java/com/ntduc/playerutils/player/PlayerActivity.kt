@@ -297,14 +297,16 @@ open class PlayerActivity : Activity() {
         //Xét Control View
         exoPlayPause = findViewById(R.id.exo_play_pause)
         loadingProgressBar = findViewById(R.id.loading)
-        playerView!!.setShowNextButton(false) //Ẩn nút Next
-        playerView!!.setShowPreviousButton(false) //Ẩn nút Previous
-        playerView!!.setShowFastForwardButton(false) //Ẩn nút Fast Forward (Tua 15s)
-        playerView!!.setShowRewindButton(false) //Ẩn nút Rewind  (Back 5s)
-        playerView!!.setRepeatToggleModes(Player.REPEAT_MODE_ONE) //Xét chế độ Repeat
-        playerView!!.controllerHideOnTouch = false //Khóa Controller Video khi giữ
-        playerView!!.controllerAutoShow = true //Show Controller Video khi vừa vào?
-        (playerView as DoubleTapPlayerView?)?.isDoubleTapEnabled = false //Ẩn chế độ Double Tap
+        playerView!!.setShowNextButton(false)                               //Ẩn nút Next
+        playerView!!.setShowPreviousButton(false)                           //Ẩn nút Previous
+        playerView!!.setShowFastForwardButton(false)                        //Ẩn nút Fast Forward (Tua 15s)
+        playerView!!.setShowRewindButton(false)                             //Ẩn nút Rewind  (Back 5s)
+        playerView!!.setRepeatToggleModes(Player.REPEAT_MODE_ONE)           //Xét chế độ Repeat
+        playerView!!.controllerHideOnTouch = false                          //Khóa Controller Video khi giữ
+        playerView!!.controllerAutoShow = true                              //Show Controller Video khi vừa vào?
+        playerView!!.setDrawableResAspectRatioFill(getDrawableResAspectRatioFill())
+        playerView!!.setDrawableResAspectRatioZoom(getDrawableResAspectRatioZoom())
+        (playerView as DoubleTapPlayerView?)?.isDoubleTapEnabled = false    //Ẩn chế độ Double Tap
 
         //Xét Event TimeBar
         timeBar = playerView!!.findViewById(R.id.exo_progress)
@@ -363,7 +365,7 @@ open class PlayerActivity : Activity() {
         }
 
         //Tải phụ đề
-        buttonOpen?.setOnLongClickListener {
+        buttonOpen!!.setOnLongClickListener {
             if (!isTvBox && mPrefs!!.askScope) {
                 askForScope(loadSubtitlesOnCancel = true, skipToNextOnCancel = false)
             } else {
