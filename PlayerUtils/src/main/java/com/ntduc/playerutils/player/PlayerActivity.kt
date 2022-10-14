@@ -102,6 +102,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.ntduc.playerutils.R
+import com.ntduc.playerutils.player.Utils.muteVolume
 import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
 import java.io.File
 import java.lang.Exception
@@ -145,7 +146,6 @@ open class PlayerActivity : Activity() {
     private var timePosition: TextView? = null
     private var timeSeparator: TextView? = null
     private var timeDuration: TextView? = null
-    private var buttonVolume: ImageButton? = null
     private var restoreOrientationLock = false
     private var restorePlayState = false
     private var restorePlayStateAllowed = false
@@ -358,6 +358,14 @@ open class PlayerActivity : Activity() {
         })
 
         buttonVolume = findViewById(R.id.btn_volume)
+        buttonVolume!!.visibility = getVisibilityVolume()
+        buttonVolume!!.setOnClickListener {
+            muteVolume(
+                this,
+                mAudioManager!!,
+                playerView!!
+            )
+        }
 
         timePosition = findViewById(R.id.exo_position)
         timePosition!!.setTextColor(getTextColorTimePosition())
@@ -744,7 +752,7 @@ open class PlayerActivity : Activity() {
         savePlayer()
     }
 
-    public override fun onStop() {
+    override fun onStop() {
         super.onStop()
         alive = false
         if (Build.VERSION.SDK_INT >= 31) {
@@ -752,6 +760,11 @@ open class PlayerActivity : Activity() {
         }
         playerView!!.setCustomErrorMessage(null)
         releasePlayer(false)
+    }
+
+    override fun onDestroy() {
+        buttonVolume = null
+        super.onDestroy()
     }
 
     @Deprecated("Deprecated in Java")
@@ -833,7 +846,6 @@ open class PlayerActivity : Activity() {
                     this,
                     mAudioManager!!,
                     playerView!!,
-                    buttonVolume,
                     keyCode == KeyEvent.KEYCODE_VOLUME_UP,
                     event.repeatCount == 0,
                     true
@@ -961,7 +973,6 @@ open class PlayerActivity : Activity() {
                         this,
                         mAudioManager!!,
                         playerView!!,
-                        buttonVolume,
                         value > 0.0f,
                         abs(value) > 1.0f,
                         true
@@ -985,7 +996,6 @@ open class PlayerActivity : Activity() {
                     this,
                     mAudioManager!!,
                     playerView!!,
-                    buttonVolume,
                     value < 0,
                     canBoost = true,
                     clear = true
@@ -2252,6 +2262,9 @@ open class PlayerActivity : Activity() {
     }
 
     companion object {
+        @SuppressLint("StaticFieldLeak")
+        var buttonVolume: ImageButton? = null
+
         var loudnessEnhancer: LoudnessEnhancer? = null
         var player: ExoPlayer? = null
         var haveMedia = false
@@ -2445,5 +2458,10 @@ open class PlayerActivity : Activity() {
     @ColorInt
     open fun getTextColorTimeSeparator(): Int {
         return ContextCompat.getColor(this, R.color.white_opacity_70)
+    }
+
+    //Volume
+    open fun getVisibilityVolume(): Int {
+        return View.GONE
     }
 }

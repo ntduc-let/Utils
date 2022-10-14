@@ -59,4 +59,8 @@ class CustomPlayerActivity : PlayerActivity() {
     override fun getTextColorTimeDuration(): Int {
         return ContextCompat.getColor(this, R.color.white)
     }
+
+    override fun getVisibilityVolume(): Int {
+        return View.VISIBLE
+    }
 }

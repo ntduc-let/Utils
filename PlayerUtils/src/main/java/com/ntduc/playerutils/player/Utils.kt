@@ -176,7 +176,6 @@ object Utils {
         context: Context,
         audioManager: AudioManager,
         playerView: CustomStyledPlayerView,
-        buttonVolume: ImageButton?,
         raise: Boolean,
         canBoost: Boolean,
         clear: Boolean
@@ -228,7 +227,7 @@ object Utils {
             playerView.setCustomErrorMessage(" " + (volumeMax + PlayerActivity.boostLevel))
         }
         playerView.setIconVolume(volumeActive)
-        buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
+        PlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
         if (PlayerActivity.loudnessEnhancer != null) PlayerActivity.loudnessEnhancer!!.enabled =
             PlayerActivity.boostLevel > 0
         playerView.setHighlight(PlayerActivity.boostLevel > 0)
@@ -238,6 +237,39 @@ object Utils {
                 CustomStyledPlayerView.MESSAGE_TIMEOUT_KEY.toLong()
             )
         }
+    }
+
+    @JvmStatic
+    fun muteVolume(
+        context: Context,
+        audioManager: AudioManager,
+        playerView: CustomStyledPlayerView
+    ) {
+        playerView.removeCallbacks(playerView.textClearRunnable)
+        val volume = getVolume(context, false, audioManager)
+        var volumeActive = volume != 0
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            audioManager.adjustStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                if (volumeActive) AudioManager.ADJUST_MUTE else AudioManager.ADJUST_UNMUTE,
+                AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE
+            )
+        } else {
+            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, volumeActive)
+        }
+
+        val volumeNew = getVolume(context, false, audioManager)
+        volumeActive = volumeNew != 0
+        playerView.setCustomErrorMessage(if (volumeActive) " $volumeNew" else "")
+
+        playerView.setIconVolume(volumeActive)
+        PlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
+
+        playerView.postDelayed(
+            playerView.textClearRunnable,
+            CustomStyledPlayerView.MESSAGE_TIMEOUT_KEY.toLong()
+        )
     }
 
     private fun getVolume(context: Context, max: Boolean, audioManager: AudioManager): Int {
