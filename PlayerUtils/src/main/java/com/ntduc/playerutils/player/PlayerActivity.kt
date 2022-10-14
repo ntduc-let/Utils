@@ -88,6 +88,7 @@ import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import kotlin.jvm.JvmOverloads
 import com.google.android.exoplayer2.util.MimeTypes
@@ -141,6 +142,9 @@ open class PlayerActivity : Activity() {
     private var loadingProgressBar: ProgressBar? = null
     private var controlView: StyledPlayerControlView? = null
     private var timeBar: CustomDefaultTimeBar? = null
+    private var timePosition: TextView? = null
+    private var timeSeparator: TextView? = null
+    private var timeDuration: TextView? = null
     private var restoreOrientationLock = false
     private var restorePlayState = false
     private var restorePlayStateAllowed = false
@@ -302,8 +306,10 @@ open class PlayerActivity : Activity() {
         playerView!!.setShowFastForwardButton(false)                        //Ẩn nút Fast Forward (Tua 15s)
         playerView!!.setShowRewindButton(false)                             //Ẩn nút Rewind  (Back 5s)
         playerView!!.setRepeatToggleModes(Player.REPEAT_MODE_ONE)           //Xét chế độ Repeat
-        playerView!!.controllerHideOnTouch = false                          //Khóa Controller Video khi giữ
-        playerView!!.controllerAutoShow = true                              //Show Controller Video khi vừa vào?
+        playerView!!.controllerHideOnTouch =
+            false                          //Khóa Controller Video khi giữ
+        playerView!!.controllerAutoShow =
+            true                              //Show Controller Video khi vừa vào?
         playerView!!.setDrawableResAspectRatioFill(getDrawableResAspectRatioFill())
         playerView!!.setDrawableResAspectRatioZoom(getDrawableResAspectRatioZoom())
         (playerView as DoubleTapPlayerView?)?.isDoubleTapEnabled = false    //Ẩn chế độ Double Tap
@@ -349,6 +355,16 @@ open class PlayerActivity : Activity() {
                 }
             }
         })
+
+        timePosition = findViewById(R.id.exo_position)
+        timePosition!!.setTextColor(getTextColorTimePosition())
+
+        timeSeparator = findViewById(R.id.exo_separator)
+        timeSeparator!!.text = getTextTimeSeparator()
+        timeSeparator!!.setTextColor(getTextColorTimeSeparator())
+
+        timeDuration = findViewById(R.id.exo_duration)
+        timeDuration!!.setTextColor(getTextColorTimeDuration())
 
         //Tạo Btn Open file
         buttonOpen = ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom)
@@ -2396,5 +2412,25 @@ open class PlayerActivity : Activity() {
     //Repeat
     open fun getVisibilityRepeat(): Int {
         return View.VISIBLE
+    }
+
+    //Time
+    @ColorInt
+    open fun getTextColorTimePosition(): Int {
+        return ContextCompat.getColor(this, R.color.white)
+    }
+
+    @ColorInt
+    open fun getTextColorTimeDuration(): Int {
+        return ContextCompat.getColor(this, R.color.white_opacity_70)
+    }
+
+    open fun getTextTimeSeparator(): String {
+        return "·"
+    }
+
+    @ColorInt
+    open fun getTextColorTimeSeparator(): Int {
+        return ContextCompat.getColor(this, R.color.white_opacity_70)
     }
 }

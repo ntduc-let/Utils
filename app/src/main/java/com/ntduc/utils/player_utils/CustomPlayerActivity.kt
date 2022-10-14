@@ -47,4 +47,16 @@ class CustomPlayerActivity : PlayerActivity() {
     override fun getVisibilityRepeat(): Int {
         return View.GONE
     }
+
+    override fun getTextTimeSeparator(): String {
+        return "/"
+    }
+
+    override fun getTextColorTimeSeparator(): Int {
+        return ContextCompat.getColor(this, R.color.white)
+    }
+
+    override fun getTextColorTimeDuration(): Int {
+        return ContextCompat.getColor(this, R.color.white)
+    }
 }
