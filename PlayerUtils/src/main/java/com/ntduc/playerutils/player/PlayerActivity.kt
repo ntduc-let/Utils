@@ -145,6 +145,7 @@ open class PlayerActivity : Activity() {
     private var timePosition: TextView? = null
     private var timeSeparator: TextView? = null
     private var timeDuration: TextView? = null
+    private var buttonVolume: ImageButton? = null
     private var restoreOrientationLock = false
     private var restorePlayState = false
     private var restorePlayStateAllowed = false
@@ -355,6 +356,8 @@ open class PlayerActivity : Activity() {
                 }
             }
         })
+
+        buttonVolume = findViewById(R.id.btn_volume)
 
         timePosition = findViewById(R.id.exo_position)
         timePosition!!.setTextColor(getTextColorTimePosition())
@@ -830,6 +833,7 @@ open class PlayerActivity : Activity() {
                     this,
                     mAudioManager!!,
                     playerView!!,
+                    buttonVolume,
                     keyCode == KeyEvent.KEYCODE_VOLUME_UP,
                     event.repeatCount == 0,
                     true
@@ -957,8 +961,9 @@ open class PlayerActivity : Activity() {
                         this,
                         mAudioManager!!,
                         playerView!!,
+                        buttonVolume,
                         value > 0.0f,
-                        Math.abs(value) > 1.0f,
+                        abs(value) > 1.0f,
                         true
                     )
                     return true
@@ -976,7 +981,15 @@ open class PlayerActivity : Activity() {
                 }
             }
             if (abs(value) == 1.0f) {
-                adjustVolume(this, mAudioManager!!, playerView!!, value < 0, true, true)
+                adjustVolume(
+                    this,
+                    mAudioManager!!,
+                    playerView!!,
+                    buttonVolume,
+                    value < 0,
+                    canBoost = true,
+                    clear = true
+                )
             }
         }
         return super.onGenericMotionEvent(event)

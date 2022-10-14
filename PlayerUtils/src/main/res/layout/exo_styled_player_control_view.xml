@@ -59,6 +59,10 @@
             android:paddingEnd="@dimen/exo_styled_bottom_bar_time_padding"
             android:paddingRight="@dimen/exo_styled_bottom_bar_time_padding">
 
+            <ImageButton
+                android:id="@+id/btn_volume"
+                style="@style/ExoStyledControls.Button.Bottom.Volume" />
+
             <TextView
                 android:id="@+id/exo_position"
                 style="@style/ExoStyledControls.TimeText.Position" />

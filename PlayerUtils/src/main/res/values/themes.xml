@@ -39,6 +39,10 @@
         <item name="android:src">@drawable/ic_more_24dp</item>
     </style>
 
+    <style name="ExoStyledControls.Button.Bottom.Volume">
+        <item name="android:src">@drawable/ic_volume_up_24dp</item>
+    </style>
+
     <style name="ExoStyledControls.TimeText.Tittle">
         <item name="android:textColor">@color/exo_white</item>
     </style>

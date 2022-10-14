@@ -176,6 +176,7 @@ object Utils {
         context: Context,
         audioManager: AudioManager,
         playerView: CustomStyledPlayerView,
+        buttonVolume: ImageButton?,
         raise: Boolean,
         canBoost: Boolean,
         clear: Boolean
@@ -192,8 +193,7 @@ object Utils {
         }
         if (PlayerActivity.loudnessEnhancer == null) canBoost = false
         if (volume != volumeMax || PlayerActivity.boostLevel == 0 && !raise) {
-            if (PlayerActivity.loudnessEnhancer != null) PlayerActivity.loudnessEnhancer!!.enabled =
-                false
+            if (PlayerActivity.loudnessEnhancer != null) PlayerActivity.loudnessEnhancer!!.enabled = false
             audioManager.adjustStreamVolume(
                 AudioManager.STREAM_MUSIC,
                 if (raise) AudioManager.ADJUST_RAISE else AudioManager.ADJUST_LOWER,
@@ -228,6 +228,7 @@ object Utils {
             playerView.setCustomErrorMessage(" " + (volumeMax + PlayerActivity.boostLevel))
         }
         playerView.setIconVolume(volumeActive)
+        buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
         if (PlayerActivity.loudnessEnhancer != null) PlayerActivity.loudnessEnhancer!!.enabled =
             PlayerActivity.boostLevel > 0
         playerView.setHighlight(PlayerActivity.boostLevel > 0)

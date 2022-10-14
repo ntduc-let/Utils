@@ -255,6 +255,7 @@ open class CustomStyledPlayerView constructor(
                         context,
                         mAudioManager,
                         this,
+                        null,
                         gestureScrollY > 0,
                         canBoostVolume,
                         false
