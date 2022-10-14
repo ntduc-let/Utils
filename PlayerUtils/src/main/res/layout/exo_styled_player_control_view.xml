@@ -12,15 +12,15 @@
     <FrameLayout
         android:id="@+id/exo_controls_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/exo_styled_bottom_bar_height"
+        android:background="@color/exo_bottom_bar_background"
         android:layout_gravity="top"
         android:layoutDirection="ltr">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/exo_styled_bottom_bar_height"
-            android:background="@color/exo_bottom_bar_background"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageButton

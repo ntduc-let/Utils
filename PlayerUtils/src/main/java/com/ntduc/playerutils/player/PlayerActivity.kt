@@ -81,6 +81,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Base64
+import android.util.Log
 import android.util.Rational
 import android.view.*
 import android.view.accessibility.CaptioningManager
@@ -302,18 +303,16 @@ open class PlayerActivity : Activity() {
         //Xét Control View
         exoPlayPause = findViewById(R.id.exo_play_pause)
         loadingProgressBar = findViewById(R.id.loading)
-        playerView!!.setShowNextButton(false)                               //Ẩn nút Next
-        playerView!!.setShowPreviousButton(false)                           //Ẩn nút Previous
-        playerView!!.setShowFastForwardButton(false)                        //Ẩn nút Fast Forward (Tua 15s)
-        playerView!!.setShowRewindButton(false)                             //Ẩn nút Rewind  (Back 5s)
-        playerView!!.setRepeatToggleModes(Player.REPEAT_MODE_ONE)           //Xét chế độ Repeat
-        playerView!!.controllerHideOnTouch =
-            false                          //Khóa Controller Video khi giữ
-        playerView!!.controllerAutoShow =
-            true                              //Show Controller Video khi vừa vào?
+        playerView!!.setShowNextButton(isShowNextButton())
+        playerView!!.setShowPreviousButton(isShowPreviousButton())
+        playerView!!.setShowFastForwardButton(isShowFastForwardButton())
+        playerView!!.setShowRewindButton(isShowRewindButton())
+        playerView!!.setRepeatToggleModes(isRepeatToggleModes())
+        playerView!!.controllerHideOnTouch = isControllerHideOnTouch()
+        playerView!!.controllerAutoShow = isControllerAutoShow()
         playerView!!.setDrawableResAspectRatioFill(getDrawableResAspectRatioFill())
         playerView!!.setDrawableResAspectRatioZoom(getDrawableResAspectRatioZoom())
-        (playerView as DoubleTapPlayerView?)?.isDoubleTapEnabled = false    //Ẩn chế độ Double Tap
+        (playerView as DoubleTapPlayerView?)?.isDoubleTapEnabled = isDoubleTapEnabled()
 
         //Xét Event TimeBar
         timeBar = playerView!!.findViewById(R.id.exo_progress)
@@ -527,9 +526,9 @@ open class PlayerActivity : Activity() {
                 }
                 setViewParams(
                     exoControlsToolbar!!,
+                    paddingLeft,
                     0,
-                    0,
-                    0,
+                    paddingRight,
                     0,
                     marginLeft,
                     0,
@@ -1826,10 +1825,10 @@ open class PlayerActivity : Activity() {
     fun showSnack(textPrimary: String?, textSecondary: String?) {
         snackbar = Snackbar.make(coordinatorLayout!!, textPrimary!!, Snackbar.LENGTH_LONG)
         if (textSecondary != null) {
-            snackbar!!.setAction(R.string.error_details) { v: View? ->
+            snackbar!!.setAction(R.string.error_details) {
                 val builder = AlertDialog.Builder(this@PlayerActivity)
                 builder.setMessage(textSecondary)
-                builder.setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, i: Int -> dialogInterface.dismiss() }
+                builder.setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, _: Int -> dialogInterface.dismiss() }
                 val dialog = builder.create()
                 dialog.show()
             }
@@ -2463,5 +2462,45 @@ open class PlayerActivity : Activity() {
     //Volume
     open fun getVisibilityVolume(): Int {
         return View.GONE
+    }
+
+    //Next
+    open fun isShowNextButton(): Boolean {
+        return false
+    }
+
+    //Previous
+    open fun isShowPreviousButton(): Boolean {
+        return false
+    }
+
+    //FastForward
+    open fun isShowFastForwardButton(): Boolean {
+        return false
+    }
+
+    //Rewind
+    open fun isShowRewindButton(): Boolean {
+        return false
+    }
+
+    //Repeat
+    open fun isRepeatToggleModes(): Int {
+        return Player.REPEAT_MODE_ONE
+    }
+
+    //ControllerHideOnTouch
+    open fun isControllerHideOnTouch(): Boolean {
+        return false
+    }
+
+    //ControllerAutoShow
+    open fun isControllerAutoShow(): Boolean {
+        return true
+    }
+
+    //DoubleTap
+    open fun isDoubleTapEnabled(): Boolean {
+        return false
     }
 }
