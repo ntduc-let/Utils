@@ -81,7 +81,6 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Base64
-import android.util.Log
 import android.util.Rational
 import android.view.*
 import android.view.accessibility.CaptioningManager
@@ -125,7 +124,7 @@ open class PlayerActivity : Activity() {
     private var youTubeOverlay: YouTubeOverlay? = null
     private var mPictureInPictureParamsBuilder: Any? = null
     var mPrefs: Prefs? = null
-    var mBrightnessControl: BrightnessControl? = null
+    private var mBrightnessControl: BrightnessControl? = null
     private var videoLoading = false
     private var errorToShow: ExoPlaybackException? = null
     private var isScaling = false
@@ -162,8 +161,8 @@ open class PlayerActivity : Activity() {
     var frameRateSwitchThread: Thread? = null
     var chaptersThread: Thread? = null
     private var lastScrubbingPosition: Long = 0
-    val rationalLimitWide = Rational(239, 100)
-    val rationalLimitTall = Rational(100, 239)
+    private val rationalLimitWide = Rational(239, 100)
+    private val rationalLimitTall = Rational(100, 239)
     var apiAccess = false
     var apiTitle: String? = null
     var apiSubs: MutableList<SubtitleConfiguration> = ArrayList()
@@ -1046,7 +1045,7 @@ open class PlayerActivity : Activity() {
         }
     }
 
-    fun resetApiAccess() {
+    private fun resetApiAccess() {
         apiAccess = false
         apiTitle = null
         apiSubs.clear()
@@ -1684,7 +1683,7 @@ open class PlayerActivity : Activity() {
         return false
     }
 
-    fun getSelectedTrack(trackType: Int): String? {
+    private fun getSelectedTrack(trackType: Int): String? {
         if (player == null) {
             return null
         }
@@ -1710,11 +1709,11 @@ open class PlayerActivity : Activity() {
         return null
     }
 
-    fun setSubtitleTextSize() {
+    private fun setSubtitleTextSize() {
         setSubtitleTextSize(resources.configuration.orientation)
     }
 
-    fun setSubtitleTextSize(orientation: Int) {
+    private fun setSubtitleTextSize(orientation: Int) {
         // Tweak text size as fraction size doesn't work well in portrait
         val subtitleView = playerView!!.subtitleView
         if (subtitleView != null) {
@@ -1762,7 +1761,7 @@ open class PlayerActivity : Activity() {
         )
     }
 
-    fun setSubtitleTextSizePiP() {
+    private fun setSubtitleTextSizePiP() {
         val subtitleView = playerView!!.subtitleView
         subtitleView?.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * 2)
     }
@@ -1822,7 +1821,7 @@ open class PlayerActivity : Activity() {
         showSnack(errorGeneral, errorDetailed)
     }
 
-    fun showSnack(textPrimary: String?, textSecondary: String?) {
+    private fun showSnack(textPrimary: String?, textSecondary: String?) {
         snackbar = Snackbar.make(coordinatorLayout!!, textPrimary!!, Snackbar.LENGTH_LONG)
         if (textSecondary != null) {
             snackbar!!.setAction(R.string.error_details) {
@@ -1852,7 +1851,7 @@ open class PlayerActivity : Activity() {
         }
     }
 
-    fun updateSubtitleStyle(context: Context?) {
+    private fun updateSubtitleStyle(context: Context?) {
         val captioningManager = getSystemService(CAPTIONING_SERVICE) as CaptioningManager
         val subtitleView = playerView!!.subtitleView
         val isTablet = isTablet(context!!)
@@ -1932,7 +1931,7 @@ open class PlayerActivity : Activity() {
         }
     }
 
-    fun findNext(): Uri? {
+    private fun findNext(): Uri? {
         // TODO: Unify with searchSubtitles()
         if (mPrefs!!.scopeUri != null || isTvBox) {
             var video: DocumentFile? = null
@@ -1968,7 +1967,7 @@ open class PlayerActivity : Activity() {
         return null
     }
 
-    fun askForScope(loadSubtitlesOnCancel: Boolean, skipToNextOnCancel: Boolean) {
+    private fun askForScope(loadSubtitlesOnCancel: Boolean, skipToNextOnCancel: Boolean) {
         val builder = AlertDialog.Builder(this@PlayerActivity)
         builder.setMessage(
             String.format(
@@ -1995,7 +1994,7 @@ open class PlayerActivity : Activity() {
         dialog.show()
     }
 
-    fun resetHideCallbacks() {
+    private fun resetHideCallbacks() {
         if (haveMedia && player != null && player!!.isPlaying) {
             // Keep controller UI visible - alternative to resetHideCallbacks()
             playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
@@ -2087,7 +2086,7 @@ open class PlayerActivity : Activity() {
         findViewById<View>(R.id.next).visibility = nextVisible
     }
 
-    fun askDeleteMedia() {
+    private fun askDeleteMedia() {
         val builder = AlertDialog.Builder(this@PlayerActivity)
         builder.setMessage(getString(R.string.delete_query))
         builder.setPositiveButton(R.string.delete_confirmation) { _: DialogInterface?, _: Int ->
@@ -2106,7 +2105,7 @@ open class PlayerActivity : Activity() {
         dialog.show()
     }
 
-    fun deleteMedia() {
+    private fun deleteMedia() {
         try {
             if (ContentResolver.SCHEME_CONTENT == mPrefs!!.mediaUri!!.scheme) {
                 DocumentsContract.deleteDocument(contentResolver, mPrefs!!.mediaUri!!)
@@ -2151,7 +2150,7 @@ open class PlayerActivity : Activity() {
         }
     }
 
-    fun skipToNext() {
+    private fun skipToNext() {
         if (nextUri != null) {
             releasePlayer()
             mPrefs!!.updateMedia(this, nextUri, null)
@@ -2175,7 +2174,7 @@ open class PlayerActivity : Activity() {
         }
     }
 
-    fun updateButtons(enable: Boolean) {
+    private fun updateButtons(enable: Boolean) {
         if (buttonPiP != null) {
             setButtonEnabled(buttonPiP!!, enable)
         }
