@@ -247,6 +247,7 @@ object Utils {
     ) {
         playerView.removeCallbacks(playerView.textClearRunnable)
         val volume = getVolume(context, false, audioManager)
+        val volumeMax = getVolume(context, true, audioManager)
         var volumeActive = volume != 0
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -260,8 +261,35 @@ object Utils {
         }
 
         val volumeNew = getVolume(context, false, audioManager)
-        volumeActive = volumeNew != 0
-        playerView.setCustomErrorMessage(if (volumeActive) " $volumeNew" else "")
+
+        if (volume == 0 && volumeNew == 0) {
+            audioManager.adjustStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                AudioManager.ADJUST_RAISE,
+                AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE
+            )
+
+            val volNew = getVolume(context, false, audioManager)
+            volumeActive = volNew != 0
+            playerView.setCustomErrorMessage(if (volumeActive) " $volNew" else "")
+            playerView.setHighlight(false)
+        }else{
+            volumeActive = volumeNew != 0
+            if (volumeNew != volumeMax){
+                playerView.setCustomErrorMessage(if (volumeActive) " $volumeNew" else "")
+                playerView.setHighlight(false)
+            }else{
+                if (PlayerActivity.loudnessEnhancer != null) {
+                    try {
+                        PlayerActivity.loudnessEnhancer!!.setTargetGain(PlayerActivity.boostLevel * 200)
+                    } catch (e: RuntimeException) {
+                        e.printStackTrace()
+                    }
+                }
+                playerView.setCustomErrorMessage(" " + (volumeMax + PlayerActivity.boostLevel))
+                playerView.setHighlight(PlayerActivity.boostLevel > 0)
+            }
+        }
 
         playerView.setIconVolume(volumeActive)
         PlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)

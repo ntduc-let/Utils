@@ -105,7 +105,7 @@ open class CustomStyledPlayerView constructor(
                 } else {
                     postDelayed(
                         textClearRunnable,
-                        (if (isHandledLongPress) MESSAGE_TIMEOUT_LONG else MESSAGE_TIMEOUT_TOUCH.toLong()) as Long
+                        if (isHandledLongPress) MESSAGE_TIMEOUT_LONG.toLong() else MESSAGE_TIMEOUT_TOUCH.toLong()
                     )
                 }
                 if (restorePlayState) {
