@@ -47,11 +47,11 @@ fun View.fade(
         .setDuration(AnimationConstants.SHORT)
         .setInterpolator(AnimationConstants.LINEAR_OUT_SLOW_IN)
         .setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator?) {
+            override fun onAnimationStart(animation: Animator) {
                 visibility = View.VISIBLE
             }
 
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 if (alpha == 0f) visibility = View.INVISIBLE
             }
         })
@@ -76,11 +76,11 @@ fun View.translate(
         .setDuration(AnimationConstants.MEDIUM)
         .setInterpolator(AnimationConstants.FAST_OUT_SLOW_IN)
         .setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator?) {
+            override fun onAnimationStart(animation: Animator) {
                 visibility = View.VISIBLE
             }
 
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 if (alpha == 0f) visibility = View.INVISIBLE
             }
         })
@@ -276,13 +276,13 @@ fun View.reveal(
             ?: if (show) radius else 0f
     )
     anim.addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator?) {
+        override fun onAnimationStart(animation: Animator) {
             if (show) {
                 visibility = View.VISIBLE
             }
         }
 
-        override fun onAnimationEnd(animation: Animator?) {
+        override fun onAnimationEnd(animation: Animator) {
             if (!show) {
                 visibility = View.INVISIBLE
             }
