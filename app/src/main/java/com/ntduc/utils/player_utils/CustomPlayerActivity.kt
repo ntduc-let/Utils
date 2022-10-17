@@ -63,4 +63,8 @@ class CustomPlayerActivity : PlayerActivity() {
     override fun getVisibilityVolume(): Int {
         return View.VISIBLE
     }
+
+    override fun getVisibilityDelete(): Int {
+        return View.VISIBLE
+    }
 }

@@ -180,10 +180,14 @@ open class PlayerActivity : Activity() {
     @SuppressLint("PrivateResource")
     @RequiresApi(api = Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Xoay màn hình càng sớm càng tốt, trước khi inflater để tránh gặp trục trặc với animation khởi tạo activity
-        // Rotate ASAP, before super/inflating to avoid glitches with activity launch animation
         mPrefs = Prefs(this) //Load SharedPreferences
-        setOrientation(this, mPrefs!!.orientation) //Xoay Activity
+
+        if (getVisibilityRotation() == View.VISIBLE) {
+            // Xoay màn hình càng sớm càng tốt, trước khi inflater để tránh gặp trục trặc với animation khởi tạo activity
+            // Rotate ASAP, before super/inflating to avoid glitches with activity launch animation
+            setOrientation(this, mPrefs!!.orientation) //Xoay Activity
+        }
+
         super.onCreate(savedInstanceState)
 
         //Kiểm tra nhà sản xuất phần cứng để sử dụng layout phù hợp
@@ -674,26 +678,28 @@ open class PlayerActivity : Activity() {
             }
             if (controllerVisible && playerView!!.isControllerFullyVisible) {
                 if (mPrefs!!.firstRun) {
-                    TapTargetView.showFor(this@PlayerActivity,
-                        TapTarget.forView(
-                            buttonOpen, getString(R.string.onboarding_open_title), getString(
-                                R.string.onboarding_open_description
+                    if (getVisibilityFolderOpen() == View.VISIBLE) {
+                        TapTargetView.showFor(this@PlayerActivity,
+                            TapTarget.forView(
+                                buttonOpen, getString(R.string.onboarding_open_title), getString(
+                                    R.string.onboarding_open_description
+                                )
                             )
-                        )
-                            .outerCircleColor(R.color.green)
-                            .targetCircleColor(R.color.white)
-                            .titleTextSize(22)
-                            .titleTextColor(R.color.white)
-                            .descriptionTextSize(14)
-                            .cancelable(true),
-                        object : TapTargetView.Listener() {
-                            override fun onTargetClick(view: TapTargetView) {
-                                super.onTargetClick(view)
-                                buttonOpen!!.performClick()
-                            }
-                        })
-                    // TODO: Explain gestures?
-                    //  "Use vertical and horizontal gestures to change brightness, volume and seek in video"
+                                .outerCircleColor(R.color.green)
+                                .targetCircleColor(R.color.white)
+                                .titleTextSize(22)
+                                .titleTextColor(R.color.white)
+                                .descriptionTextSize(14)
+                                .cancelable(true),
+                            object : TapTargetView.Listener() {
+                                override fun onTargetClick(view: TapTargetView) {
+                                    super.onTargetClick(view)
+                                    buttonOpen!!.performClick()
+                                }
+                            })
+                        // TODO: Explain gestures?
+                        //  "Use vertical and horizontal gestures to change brightness, volume and seek in video"
+                    }
                     mPrefs!!.markFirstRun()
                 }
                 if (errorToShow != null) {
@@ -1431,26 +1437,30 @@ open class PlayerActivity : Activity() {
                 frameRendered = true
                 if (videoLoading) {
                     videoLoading = false
-                    if (mPrefs!!.orientation === Utils.Orientation.UNSPECIFIED) {
-                        mPrefs!!.orientation = getNextOrientation(
-                            mPrefs!!.orientation
-                        )
-                        setOrientation(this@PlayerActivity, mPrefs!!.orientation)
-                    }
-                    val format = player!!.videoFormat
-                    if (format != null) {
-                        if (mPrefs!!.orientation === Utils.Orientation.VIDEO) {
-                            if (isPortrait(format)) {
-                                this@PlayerActivity.requestedOrientation =
-                                    ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                            } else {
-                                this@PlayerActivity.requestedOrientation =
-                                    ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                            }
-                            updateButtonRotation()
+                    if (getVisibilityRotation() == View.VISIBLE) {
+                        if (mPrefs!!.orientation === Utils.Orientation.UNSPECIFIED) {
+                            mPrefs!!.orientation = getNextOrientation(
+                                mPrefs!!.orientation
+                            )
+                            setOrientation(this@PlayerActivity, mPrefs!!.orientation)
                         }
-                        updateSubtitleViewMargin(format)
+
+                        val format = player!!.videoFormat
+                        if (format != null) {
+                            if (mPrefs!!.orientation === Utils.Orientation.VIDEO) {
+                                if (isPortrait(format)) {
+                                    this@PlayerActivity.requestedOrientation =
+                                        ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                                } else {
+                                    this@PlayerActivity.requestedOrientation =
+                                        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                                }
+                                updateButtonRotation()
+                            }
+                            updateSubtitleViewMargin(format)
+                        }
                     }
+
                     if (duration != C.TIME_UNSET && duration > TimeUnit.MINUTES.toMillis(20)) {
                         timeBar!!.setKeyTimeIncrement(TimeUnit.MINUTES.toMillis(1))
                     } else {
