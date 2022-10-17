@@ -80,15 +80,12 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
-    compileOnly files('libs/extension-av1-release.aar')
-    compileOnly files('libs/extension-ffmpeg-release.aar')
-    compileOnly files('libs/library-common-release.aar')
-    compileOnly files('libs/library-core-release.aar')
-    compileOnly files('libs/library-extractor-release.aar')
-    compileOnly files('libs/library-ui-release.aar')
-
-    implementation fileTree(dir: "libs", include: ["extension-*.aar"])
-    implementation fileTree(dir: "libs", include: ["library-*.aar"])
+    implementation files('libs/extension-av1-release.aar')
+    implementation files('libs/extension-ffmpeg-release.aar')
+    implementation files('libs/library-common-release.aar')
+    implementation files('libs/library-core-release.aar')
+    implementation files('libs/library-extractor-release.aar')
+    implementation files('libs/library-ui-release.aar')
 
     def preference_version = "1.2.0"
     implementation "androidx.preference:preference-ktx:$preference_version"
