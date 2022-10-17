@@ -53,7 +53,7 @@ class DoubleTapPlayerView @JvmOverloads constructor(
         if (attrs != null) {
             val a = context.obtainStyledAttributes(attrs, R.styleable.DoubleTapPlayerView, 0, 0)
             controllerRef =
-                a.getResourceId(R.styleable.DoubleTapPlayerView_dtpv_controller, -1) ?: -1
+                a.getResourceId(R.styleable.DoubleTapPlayerView_dtpv_controller, -1)
             a.recycle()
         }
         isDoubleTapEnabled = true

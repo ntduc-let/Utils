@@ -752,7 +752,7 @@ class ChooserDialog(activity: Activity, @StyleRes fileChooserTheme: Int) :
 
     companion object {
         private val _defaultNavUpCB = CanNavigateUp { dir: File? -> dir != null && dir.canRead() }
-        private val _defaultNavToCB = CanNavigateTo { dir: File? -> true }
+        private val _defaultNavToCB = CanNavigateTo { true }
         const val CHOOSE_MODE_NORMAL = 0
         const val CHOOSE_MODE_DELETE = 1
         const val CHOOSE_MODE_SELECT_MULTIPLE = 2

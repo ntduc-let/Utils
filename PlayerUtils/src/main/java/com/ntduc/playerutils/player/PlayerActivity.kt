@@ -656,11 +656,11 @@ open class PlayerActivity : Activity() {
         controls.addView(exoSettings)
         exoBasicControls.addView(horizontalScrollView)
         if (Build.VERSION.SDK_INT > 23) {
-            horizontalScrollView.setOnScrollChangeListener { view: View?, i: Int, i1: Int, i2: Int, i3: Int -> resetHideCallbacks() }
+            horizontalScrollView.setOnScrollChangeListener { _: View?, _: Int, _: Int, _: Int, _: Int -> resetHideCallbacks() }
         }
         playerView!!.setControllerVisibilityListener(ControllerVisibilityListener { visibility ->
             controllerVisible = visibility == View.VISIBLE
-            controllerVisibleFully = playerView!!.isControllerFullyVisible()
+            controllerVisibleFully = playerView!!.isControllerFullyVisible
             if (restoreControllerTimeout) {
                 restoreControllerTimeout = false
                 if (player == null || !player!!.isPlaying) {

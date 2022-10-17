@@ -39,30 +39,32 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     def exoplayerVersion = '2.18.1'
-    implementation("com.google.android.exoplayer:exoplayer-datasource:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
-    }
-    implementation("com.google.android.exoplayer:exoplayer-decoder:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
-    }
-    implementation("com.google.android.exoplayer:exoplayer-database:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
-    }
-    implementation("com.google.android.exoplayer:extension-mediasession:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
-    }
-    implementation("com.google.android.exoplayer:exoplayer-dash:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
-    }
-    implementation("com.google.android.exoplayer:exoplayer-hls:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
-    }
-    implementation("com.google.android.exoplayer:exoplayer-smoothstreaming:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
-    }
-    implementation("com.google.android.exoplayer:exoplayer-rtsp:$exoplayerVersion") {
-        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
-    }
+    implementation "com.google.android.exoplayer:exoplayer:$exoplayerVersion"
+    implementation "com.google.android.exoplayer:extension-mediasession:$exoplayerVersion"
+//    implementation("com.google.android.exoplayer:exoplayer-datasource:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
+//    }
+//    implementation("com.google.android.exoplayer:exoplayer-decoder:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
+//    }
+//    implementation("com.google.android.exoplayer:exoplayer-database:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
+//    }
+//    implementation("com.google.android.exoplayer:extension-mediasession:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-common"
+//    }
+//    implementation("com.google.android.exoplayer:exoplayer-dash:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
+//    }
+//    implementation("com.google.android.exoplayer:exoplayer-hls:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
+//    }
+//    implementation("com.google.android.exoplayer:exoplayer-smoothstreaming:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
+//    }
+//    implementation("com.google.android.exoplayer:exoplayer-rtsp:$exoplayerVersion") {
+//        exclude group: "com.google.android.exoplayer", module: "exoplayer-core"
+//    }
     api ('com.google.guava:guava:31.0.1-android') {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
         exclude group: 'org.checkerframework', module: 'checker-compat-qual'
@@ -79,8 +81,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation fileTree(dir: "libs", include: ["extension-*.aar"])
-    implementation fileTree(dir: "libs", include: ["library-*.aar"])
+//    implementation fileTree(dir: "libs", include: ["extension-*.aar"])
+//    implementation fileTree(dir: "libs", include: ["library-*.aar"])
 
     def preference_version = "1.2.0"
     implementation "androidx.preference:preference-ktx:$preference_version"

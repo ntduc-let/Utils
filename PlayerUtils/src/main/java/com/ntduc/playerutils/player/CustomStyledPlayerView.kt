@@ -115,7 +115,8 @@ open class CustomStyledPlayerView constructor(
                 controllerAutoShow = true
                 if (seekProgress) {
                     seekProgress = false
-                    hideControllerImmediately()
+                    hideController()
+//                    hideControllerImmediately()
                 }
             }
         }
@@ -189,7 +190,7 @@ open class CustomStyledPlayerView constructor(
                     seekMax = PlayerActivity.player!!.duration
                     if (!isControllerFullyVisible) {
                         seekProgress = true
-                        showProgress()
+//                        showProgress()
                     }
                 }
                 gestureOrientation = Orientation.HORIZONTAL
