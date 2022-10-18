@@ -66,7 +66,7 @@ android {
 }
 dependencies {
   ...
-  def utilsVersion = "1.1.7"
+  def utilsVersion = "1.2.2"
   implementation "com.github.ntduc-let.Utils:ActivityUtils:$utilsVersion"
   implementation "com.github.ntduc-let.Utils:AnimationUtils:$utilsVersion"
   implementation "com.github.ntduc-let.Utils:AppUtils:$utilsVersion"
@@ -79,6 +79,7 @@ dependencies {
   implementation "com.github.ntduc-let.Utils:StringUtils:$utilsVersion"
   implementation "com.github.ntduc-let.Utils:ToastUtils:$utilsVersion"
   implementation "com.github.ntduc-let.Utils:ViewPager2Utils:$utilsVersion"
+  implementation "com.github.ntduc-let.Utils:PlayerUtils:$utilsVersion"
 }
 ```
 
