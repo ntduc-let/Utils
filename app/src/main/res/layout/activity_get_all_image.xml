@@ -3,14 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F2F4F7"
     tools:context=".file_utils.get_all_image.activity.GetAllImageActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F2F4F7"
-        android:paddingHorizontal="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="@color/white"
         android:visibility="gone" />
 
     <include

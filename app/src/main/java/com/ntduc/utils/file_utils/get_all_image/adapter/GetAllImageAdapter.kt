@@ -14,19 +14,19 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
+import com.ntduc.utils.databinding.ItemHeaderBottomSelectBinding
+import com.ntduc.utils.databinding.ItemHeaderTopSelectBinding
 import com.ntduc.utils.databinding.ItemImageBinding
-import com.ntduc.utils.databinding.ItemHeaderBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import com.ntduc.utils.model.MyFile
 import com.ntduc.utils.model.MyFolderImage
 import com.ntduc.utils.model.MyImage
-import java.util.ArrayList
 
 class GetAllImageAdapter(
     val context: Context,
     private var listFolderImage: List<MyFolderImage> = listOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders, StickyHeaders.ViewSetup {
-    private var list: ArrayList<MyImage> = ArrayList()
+    private var list: ArrayList<MyImageInRCV> = ArrayList()
 
     init {
         initData()
@@ -34,16 +34,34 @@ class GetAllImageAdapter(
 
     private fun initData() {
         listFolderImage.forEach { folder ->
-            list.add(MyImage(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
+            val size = folder.list.size
+            val myShow = MyShow(true)
+            list.add(
+                MyImageInRCV(
+                    myImage = MyImage(
+                        myFile = MyFile(
+                            title = "${folder.folder.title} ($size)"
+                        )
+                    ),
+                    size = size,
+                    myShow = myShow
+                )
+            )
             folder.list.forEach {
-                list.add(it)
+                list.add(
+                    MyImageInRCV(
+                        myImage = it,
+                        myShow = myShow
+                    )
+                )
             }
+            list.add(MyImageInRCV(size = size, myShow = myShow))
         }
     }
 
-    inner class ItemHeaderViewHolder(binding: ItemHeaderBinding) :
+    inner class ItemHeaderTopViewHolder(binding: ItemHeaderTopSelectBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        internal val binding: ItemHeaderBinding
+        internal val binding: ItemHeaderTopSelectBinding
 
         init {
             this.binding = binding
@@ -59,39 +77,77 @@ class GetAllImageAdapter(
         }
     }
 
+    inner class ItemHeaderBottomViewHolder(binding: ItemHeaderBottomSelectBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        internal val binding: ItemHeaderBottomSelectBinding
+
+        init {
+            this.binding = binding
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == HEADER_ITEM) {
-            val binding = ItemHeaderBinding.inflate(LayoutInflater.from(context), parent, false)
-            ItemHeaderViewHolder(binding)
-        } else {
-            val binding = ItemImageBinding.inflate(LayoutInflater.from(context), parent, false)
-            ItemImageViewHolder(binding)
+        return when (viewType) {
+            HEADER_TOP_ITEM -> {
+                val binding =
+                    ItemHeaderTopSelectBinding.inflate(LayoutInflater.from(context), parent, false)
+                ItemHeaderTopViewHolder(binding)
+            }
+            HEADER_BOTTOM_ITEM -> {
+                val binding = ItemHeaderBottomSelectBinding.inflate(
+                    LayoutInflater.from(context),
+                    parent,
+                    false
+                )
+                ItemHeaderBottomViewHolder(binding)
+            }
+            else -> {
+                val binding = ItemImageBinding.inflate(LayoutInflater.from(context), parent, false)
+                ItemImageViewHolder(binding)
+            }
         }
     }
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = list[position]
-
         when (holder) {
-            is ItemHeaderViewHolder -> {
-                holder.binding.txtHeader.text = item.myFile?.title
-            }
-            is ItemImageViewHolder -> {
-                var requestOptions = RequestOptions()
-                requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
+            is ItemHeaderTopViewHolder -> {
+                holder.binding.txtHeader.text = item.myImage?.myFile?.title
 
-                Glide.with(context)
-                    .applyDefaultRequestOptions(RequestOptions())
-                    .load(item.myFile?.data)
-                    .apply(requestOptions)
-                    .placeholder(R.drawable.ic_empty)
-                    .error(ExtensionConstants.getIconFile(item.myFile?.data ?: ""))
-                    .into(holder.binding.img)
+                holder.binding.btnMore.isActivated = item.myShow.isShow
 
                 holder.binding.root.setOnClickListener {
-                    onOpenListener?.let {
-                        it(item)
+                    item.myShow.isShow = !item.myShow.isShow
+                    holder.binding.btnMore.isActivated = item.myShow.isShow
+                    notifyItemRangeChanged(position + 1, item.size)
+                }
+            }
+            is ItemImageViewHolder -> {
+                if (!item.myShow.isShow) {
+                    val params = holder.itemView.layoutParams
+                    params.height = 0
+                    params.width = 0
+                } else {
+                    val params = holder.itemView.layoutParams
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT
+
+                    var requestOptions = RequestOptions()
+                    requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
+
+                    Glide.with(context)
+                        .applyDefaultRequestOptions(RequestOptions())
+                        .load(item.myImage?.myFile?.data)
+                        .apply(requestOptions)
+                        .placeholder(R.drawable.ic_empty)
+                        .error(ExtensionConstants.getIconFile(item.myImage?.myFile?.data ?: ""))
+                        .into(holder.binding.img)
+
+                    holder.binding.root.setOnClickListener {
+                        onOpenListener?.let {
+                            it(item.myImage!!)
+                        }
                     }
                 }
             }
@@ -103,13 +159,13 @@ class GetAllImageAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (list[position].myFile?.data == null) HEADER_ITEM else super.getItemViewType(
-            position
-        )
+        return if (list[position].myImage?.myFile == null) HEADER_BOTTOM_ITEM
+        else if (list[position].myImage?.myFile!!.data == null) HEADER_TOP_ITEM
+        else super.getItemViewType(position)
     }
 
     override fun isStickyHeader(position: Int): Boolean {
-        return getItemViewType(position) == HEADER_ITEM
+        return getItemViewType(position) == HEADER_TOP_ITEM || getItemViewType(position) == HEADER_BOTTOM_ITEM
     }
 
     override fun setupStickyHeaderView(stickyHeader: View) {
@@ -139,7 +195,8 @@ class GetAllImageAdapter(
     }
 
     companion object {
-        private const val HEADER_ITEM = 123
+        private const val HEADER_TOP_ITEM = 123
+        private const val HEADER_BOTTOM_ITEM = 456
     }
 
     private var onOpenListener: ((MyImage) -> Unit)? = null
@@ -147,4 +204,14 @@ class GetAllImageAdapter(
     fun setOnOpenListener(listener: (MyImage) -> Unit) {
         onOpenListener = listener
     }
+
+    class MyImageInRCV(
+        var myImage: MyImage? = null,
+        var size: Int = 0,
+        var myShow: MyShow = MyShow(true)
+    )
+
+    class MyShow(
+        var isShow: Boolean = true
+    )
 }

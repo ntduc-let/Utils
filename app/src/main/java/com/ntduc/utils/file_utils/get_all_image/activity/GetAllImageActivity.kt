@@ -70,7 +70,6 @@ class GetAllImageActivity : AppCompatActivity() {
 
         adapter = GetAllImageAdapter(this)
         binding.rcvList.adapter = adapter
-        binding.rcvList.setHasFixedSize(true)
         val layoutManager: StickyHeadersGridLayoutManager<GetAllImageAdapter> =
             StickyHeadersGridLayoutManager(this, 3)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
