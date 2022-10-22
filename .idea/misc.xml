@@ -97,11 +97,6 @@
     </option>
     <option name="selectedLicences">
       <map>
-        <entry key="Apache-2.0" value="true" />
-        <entry key="BSD" value="true" />
-        <entry key="EPL-1.0" value="true" />
-        <entry key="LGPL-2.1" value="true" />
-        <entry key="LGPL-3.0" value="true" />
         <entry key="Unknown" value="true" />
       </map>
     </option>
@@ -110,13 +105,16 @@
         <entry key="AndroidJacocoAnt" value="true" />
         <entry key="AndroidTestImplementation" value="true" />
         <entry key="AndroidTestImplementationDependenciesMetadata" value="true" />
+        <entry key="AnnotationProcessor" value="true" />
         <entry key="Api" value="true" />
         <entry key="ApiDependenciesMetadata" value="true" />
         <entry key="DebugAndroidTestCompileClasspath" value="true" />
         <entry key="DebugAndroidTestImplementationDependenciesMetadata" value="true" />
         <entry key="DebugAndroidTestRuntimeClasspath" value="true" />
+        <entry key="DebugAnnotationProcessorClasspath" value="true" />
         <entry key="DebugApiDependenciesMetadata" value="true" />
         <entry key="DebugCompileClasspath" value="true" />
+        <entry key="DebugImplementation" value="true" />
         <entry key="DebugImplementationDependenciesMetadata" value="true" />
         <entry key="DebugRuntimeClasspath" value="true" />
         <entry key="DebugUnitTestCompileClasspath" value="true" />
@@ -127,6 +125,7 @@
         <entry key="KotlinCompilerClasspath" value="true" />
         <entry key="KotlinKlibCommonizerClasspath" value="true" />
         <entry key="None" value="true" />
+        <entry key="ReleaseAnnotationProcessorClasspath" value="true" />
         <entry key="ReleaseApiDependenciesMetadata" value="true" />
         <entry key="ReleaseCompileClasspath" value="true" />
         <entry key="ReleaseImplementationDependenciesMetadata" value="true" />
