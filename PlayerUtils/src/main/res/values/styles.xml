@@ -231,4 +231,7 @@
         <item name="android:paddingTop">@dimen/exo_small_icon_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/exo_small_icon_padding_vertical</item>
     </style>
+
+    <drawable name="exo_styled_controls_pause">@drawable/ic_pause_62dp</drawable>
+    <drawable name="exo_styled_controls_play">@drawable/ic_play_arrow_62dp</drawable>
 </resources>
