@@ -27,6 +27,7 @@
 
     <!-- ChooserDialog style -->
     <public name="FileChooserStyle" type="style" />
+
     <style name="FileChooserStyle">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
@@ -43,6 +44,7 @@
 
     <!-- Dialog -->
     <public name="FileChooserDialogStyle" type="style" />
+
     <style name="FileChooserDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
         <!--<item name="android:windowBackground">@android:color/transparent</item>-->
         <item name="android:windowTitleStyle">@style/FileChooserTitleStyle</item>
@@ -60,6 +62,7 @@
     </style>
 
     <public name="FileChooserTitleStyle" type="style" />
+
     <style name="FileChooserTitleStyle">
         <item name="android:maxLines">1</item>
         <item name="android:scrollHorizontally">true</item>
@@ -68,6 +71,7 @@
     </style>
 
     <public name="FileChooserButtonStyle" type="style" />
+
     <style name="FileChooserButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textAppearanceButton">@style/TextAppearance.AppCompat.Button</item>
         <item name="android:textColor">@color/text_primary</item>
@@ -76,6 +80,7 @@
 
     <!-- List -->
     <public name="FileChooserListItemStyle" type="style" />
+
     <style name="FileChooserListItemStyle">
         <item name="fileChooserTextNameStyle">@style/FileChooserTextNameStyle</item>
         <item name="fileChooserTextSizeStyle">@style/FileChooserTextSizeStyle</item>
@@ -89,6 +94,7 @@
     </style>
 
     <public name="FileChooserTextNameStyle" type="style" />
+
     <style name="FileChooserTextNameStyle">
         <item name="android:paddingLeft">@dimen/list_item_padding</item>
         <item name="android:paddingRight">@dimen/list_item_padding</item>
@@ -102,6 +108,7 @@
     </style>
 
     <public name="FileChooserTextSizeStyle" type="style" />
+
     <style name="FileChooserTextSizeStyle">
         <item name="android:paddingLeft">@dimen/list_item_padding</item>
         <item name="android:paddingRight">@dimen/list_item_padding</item>
@@ -113,6 +120,7 @@
     </style>
 
     <public name="FileChooserTextDateStyle" type="style" />
+
     <style name="FileChooserTextDateStyle">
         <item name="android:paddingLeft">@dimen/list_item_padding</item>
         <item name="android:paddingRight">@dimen/list_item_padding</item>
@@ -124,6 +132,7 @@
     </style>
 
     <public name="FileChooserFileIconStyle" type="style" />
+
     <style name="FileChooserFileIconStyle">
         <item name="android:layout_marginLeft">12dp</item>
         <item name="android:layout_marginRight">6dp</item>
@@ -134,6 +143,7 @@
 
     <!-- PathView -->
     <public name="FileChooserPathViewStyle" type="style" />
+
     <style name="FileChooserPathViewStyle">
         <item name="android:background">#ffffffff</item>
         <item name="android:textColor">#40000000</item>
@@ -150,6 +160,7 @@
 
     <!-- New Folder -->
     <public name="FileChooserNewFolderStyle" type="style" />
+
     <style name="FileChooserNewFolderStyle">
         <item name="fileChooserNewFolderOverlayColor">#60ffffff</item>
         <item name="fileChooserNewFolderBackgroundColor">#ffffffff</item>
@@ -234,4 +245,6 @@
 
     <drawable name="exo_styled_controls_pause">@drawable/ic_pause_62dp</drawable>
     <drawable name="exo_styled_controls_play">@drawable/ic_play_arrow_62dp</drawable>
+    <drawable name="exo_styled_controls_next">@drawable/ic_next_48dp</drawable>
+    <drawable name="exo_styled_controls_previous">@drawable/ic_previous_48dp</drawable>
 </resources>

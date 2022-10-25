@@ -64,7 +64,11 @@ class CustomPlayerActivity : PlayerActivity() {
         return View.VISIBLE
     }
 
-    override fun getVisibilityDelete(): Int {
-        return View.VISIBLE
+    override fun isShowNextButton(): Boolean {
+        return true
+    }
+
+    override fun isShowPreviousButton(): Boolean {
+        return true
     }
 }

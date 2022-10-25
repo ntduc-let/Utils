@@ -22,64 +22,8 @@ import android.os.Bundle
 import android.os.Process
 import android.provider.DocumentsContract
 import android.provider.Settings
-import com.ntduc.playerutils.player.Utils.toggleSystemUi
-import com.ntduc.playerutils.player.Utils.setOrientation
-import com.ntduc.playerutils.player.Utils.isTvBox
-import com.ntduc.playerutils.player.Utils.moviesFolderUri
-import com.ntduc.playerutils.player.SubtitleUtils.isSubtitle
-import com.ntduc.playerutils.player.SubtitleUtils.buildSubtitle
-import com.ntduc.playerutils.player.Utils.isPiPSupported
-import com.ntduc.playerutils.player.Utils.showText
-import com.ntduc.playerutils.player.Utils.getNextOrientation
-import com.ntduc.playerutils.player.Utils.setViewParams
-import com.ntduc.playerutils.player.Utils.setViewMargins
-import com.ntduc.playerutils.player.Utils.adjustVolume
-import com.ntduc.playerutils.player.Utils.formatMilisSign
-import com.ntduc.playerutils.player.Utils.formatMilis
-import com.ntduc.playerutils.player.SubtitleUtils.clearCache
-import com.ntduc.playerutils.player.SubtitleUtils.convertToUTF
-import com.ntduc.playerutils.player.Utils.isSupportedNetworkUri
-import com.ntduc.playerutils.player.Utils.fileExists
-import com.ntduc.playerutils.player.Utils.deviceLanguages
-import com.ntduc.playerutils.player.Utils.getFileName
-import com.ntduc.playerutils.player.Utils.markChapters
-import com.ntduc.playerutils.player.Utils.isPortrait
-import com.ntduc.playerutils.player.Utils.switchFrameRate
-import com.ntduc.playerutils.player.Utils.alternativeChooser
-import com.ntduc.playerutils.player.Utils.getSystemComponent
-import com.ntduc.playerutils.player.Utils.getRational
-import com.ntduc.playerutils.player.Utils.isTablet
-import com.ntduc.playerutils.player.SubtitleUtils.normalizeFontScale
-import com.ntduc.playerutils.player.Utils.isProgressiveContainerUri
-import com.ntduc.playerutils.player.SubtitleFinder.Companion.isUriCompatible
-import com.ntduc.playerutils.player.SubtitleUtils.findUriInScope
-import com.ntduc.playerutils.player.SubtitleUtils.findDocInScope
-import com.ntduc.playerutils.player.SubtitleUtils.findSubtitle
-import com.ntduc.playerutils.player.SubtitleUtils.findNext
-import com.ntduc.playerutils.player.Utils.isDeletable
-import com.ntduc.playerutils.player.Utils.setButtonEnabled
-import com.ntduc.playerutils.player.Utils.normalizeScaleFactor
-import android.support.v4.media.session.MediaSessionCompat
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay
-import com.google.android.exoplayer2.ui.StyledPlayerControlView
-import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
-import com.google.android.exoplayer2.ui.TimeBar
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.StyledPlayerView.ControllerVisibilityListener
-import com.getkeepsafe.taptargetview.TapTargetView
-import com.getkeepsafe.taptargetview.TapTarget
-import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay.PerformListener
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
-import com.google.android.exoplayer2.extractor.ts.TsExtractor
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.util.Base64
 import android.util.Rational
 import android.view.*
@@ -87,28 +31,73 @@ import android.view.accessibility.CaptioningManager
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import com.google.android.exoplayer2.ui.DefaultTimeBar
-import kotlin.jvm.JvmOverloads
-import com.google.android.exoplayer2.util.MimeTypes
-import com.google.android.exoplayer2.source.TrackGroup
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
-import com.google.android.exoplayer2.ui.SubtitleView
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import androidx.documentfile.provider.DocumentFile
+import com.getkeepsafe.taptargetview.TapTarget
+import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
+import com.google.android.exoplayer2.extractor.ts.TsExtractor
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.source.TrackGroup
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
+import com.google.android.exoplayer2.ui.*
+import com.google.android.exoplayer2.ui.StyledPlayerView.ControllerVisibilityListener
+import com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.material.snackbar.Snackbar
 import com.ntduc.playerutils.R
+import com.ntduc.playerutils.player.SubtitleFinder.Companion.isUriCompatible
+import com.ntduc.playerutils.player.SubtitleUtils.buildSubtitle
+import com.ntduc.playerutils.player.SubtitleUtils.clearCache
+import com.ntduc.playerutils.player.SubtitleUtils.convertToUTF
+import com.ntduc.playerutils.player.SubtitleUtils.findDocInScope
+import com.ntduc.playerutils.player.SubtitleUtils.findNext
+import com.ntduc.playerutils.player.SubtitleUtils.findSubtitle
+import com.ntduc.playerutils.player.SubtitleUtils.findUriInScope
+import com.ntduc.playerutils.player.SubtitleUtils.isSubtitle
+import com.ntduc.playerutils.player.SubtitleUtils.normalizeFontScale
+import com.ntduc.playerutils.player.Utils.adjustVolume
+import com.ntduc.playerutils.player.Utils.alternativeChooser
+import com.ntduc.playerutils.player.Utils.deviceLanguages
+import com.ntduc.playerutils.player.Utils.fileExists
+import com.ntduc.playerutils.player.Utils.formatMilis
+import com.ntduc.playerutils.player.Utils.formatMilisSign
+import com.ntduc.playerutils.player.Utils.getFileName
+import com.ntduc.playerutils.player.Utils.getNextOrientation
+import com.ntduc.playerutils.player.Utils.getRational
+import com.ntduc.playerutils.player.Utils.getSystemComponent
+import com.ntduc.playerutils.player.Utils.isPiPSupported
+import com.ntduc.playerutils.player.Utils.isPortrait
+import com.ntduc.playerutils.player.Utils.isProgressiveContainerUri
+import com.ntduc.playerutils.player.Utils.isSupportedNetworkUri
+import com.ntduc.playerutils.player.Utils.isTablet
+import com.ntduc.playerutils.player.Utils.isTvBox
+import com.ntduc.playerutils.player.Utils.markChapters
+import com.ntduc.playerutils.player.Utils.moviesFolderUri
 import com.ntduc.playerutils.player.Utils.muteVolume
+import com.ntduc.playerutils.player.Utils.normalizeScaleFactor
+import com.ntduc.playerutils.player.Utils.setButtonEnabled
+import com.ntduc.playerutils.player.Utils.setOrientation
+import com.ntduc.playerutils.player.Utils.setViewMargins
+import com.ntduc.playerutils.player.Utils.setViewParams
+import com.ntduc.playerutils.player.Utils.showText
+import com.ntduc.playerutils.player.Utils.switchFrameRate
+import com.ntduc.playerutils.player.Utils.toggleSystemUi
 import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
+import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay
+import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay.PerformListener
 import java.io.File
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
 import java.lang.reflect.InvocationTargetException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -578,21 +567,21 @@ open class PlayerActivity : Activity() {
             e.printStackTrace()
         }
 
-        //Thiết lập btn xóa video
-        val buttonDelete = findViewById<View>(R.id.delete)
-        buttonDelete.visibility = getVisibilityDelete()
-        buttonDelete.setOnClickListener { askDeleteMedia() }
+//        //Thiết lập btn xóa video
+//        val buttonDelete = findViewById<View>(R.id.delete)
+//        buttonDelete.visibility = getVisibilityDelete()
+//        buttonDelete.setOnClickListener { askDeleteMedia() }
 
-        //Thiết lập btn next video
-        val buttonNext = findViewById<View>(R.id.next)
-        buttonNext.visibility = getVisibilityNext()
-        buttonNext.setOnClickListener {
-            if (!isTvBox && mPrefs!!.askScope) {
-                askForScope(loadSubtitlesOnCancel = false, skipToNextOnCancel = true)
-            } else {
-                skipToNext()
-            }
-        }
+//        //Thiết lập btn next video
+//        val buttonNext = findViewById<View>(R.id.next)
+//        buttonNext.visibility = getVisibilityNext()
+//        buttonNext.setOnClickListener {
+//            if (!isTvBox && mPrefs!!.askScope) {
+//                askForScope(loadSubtitlesOnCancel = false, skipToNextOnCancel = true)
+//            } else {
+//                skipToNext()
+//            }
+//        }
 
         //Thiết lập btn pause/play video
         exoPlayPause!!.setOnClickListener { dispatchPlayPause() }
@@ -1259,6 +1248,8 @@ open class PlayerActivity : Activity() {
                 playerView!!.setScale(1f)
             }
             updatebuttonAspectRatioIcon()
+
+
             val mediaItemBuilder = MediaItem.Builder()
                 .setUri(mPrefs!!.mediaUri)
                 .setMimeType(mPrefs!!.mediaType)
@@ -1415,24 +1406,24 @@ open class PlayerActivity : Activity() {
 
         @SuppressLint("SourceLockedOrientationActivity")
         override fun onPlaybackStateChanged(state: Int) {
-            var isNearEnd = false
+//            var isNearEnd = false
             val duration = player!!.duration
-            if (duration != C.TIME_UNSET) {
-                val position = player!!.currentPosition
-                if (position + 4000 >= duration) {
-                    isNearEnd = true
-                } else {
-                    // Last chapter is probably "Credits" chapter
-                    val chapters = chapterStarts!!.size
-                    if (chapters > 1) {
-                        val lastChapter = chapterStarts!![chapters - 1]
-                        if (duration - lastChapter < duration / 10 && position > lastChapter) {
-                            isNearEnd = true
-                        }
-                    }
-                }
-            }
-            setEndControlsVisible(haveMedia && (state == Player.STATE_ENDED || isNearEnd))
+//            if (duration != C.TIME_UNSET) {
+//                val position = player!!.currentPosition
+//                if (position + 4000 >= duration) {
+//                    isNearEnd = true
+//                } else {
+//                    // Last chapter is probably "Credits" chapter
+//                    val chapters = chapterStarts!!.size
+//                    if (chapters > 1) {
+//                        val lastChapter = chapterStarts!![chapters - 1]
+//                        if (duration - lastChapter < duration / 10 && position > lastChapter) {
+//                            isNearEnd = true
+//                        }
+//                    }
+//                }
+//            }
+//            setEndControlsVisible(haveMedia && (state == Player.STATE_ENDED || isNearEnd))
             if (state == Player.STATE_READY) {
                 frameRendered = true
                 if (videoLoading) {
@@ -2084,51 +2075,57 @@ open class PlayerActivity : Activity() {
         enterPictureInPictureMode((mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.build())
     }
 
-    fun setEndControlsVisible(visible: Boolean) {
-        val deleteVisible = if (visible && haveMedia && isDeletable(
-                this,
-                mPrefs!!.mediaUri!!
-            )
-        ) View.VISIBLE else View.INVISIBLE
-        val nextVisible =
-            if (visible && haveMedia && (nextUri != null || mPrefs!!.askScope && !isTvBox)) View.VISIBLE else View.INVISIBLE
-        findViewById<View>(R.id.delete).visibility = deleteVisible
-        findViewById<View>(R.id.next).visibility = nextVisible
-    }
+//    fun setEndControlsVisible(visible: Boolean) {
+//        val deleteVisible = if (visible && haveMedia && isDeletable(
+//                this,
+//                mPrefs!!.mediaUri!!
+//            )
+//        ) View.VISIBLE else View.INVISIBLE
+//        val nextVisible =
+//            if (visible && haveMedia && (nextUri != null || mPrefs!!.askScope && !isTvBox)) View.VISIBLE else View.INVISIBLE
+//
+//        if (getVisibilityDelete() == View.VISIBLE){
+//            findViewById<View>(R.id.delete).visibility = deleteVisible
+//        }
+//
+//        if (getVisibilityNext() == View.VISIBLE){
+//            findViewById<View>(R.id.next).visibility = nextVisible
+//        }
+//    }
 
-    private fun askDeleteMedia() {
-        val builder = AlertDialog.Builder(this@PlayerActivity)
-        builder.setMessage(getString(R.string.delete_query))
-        builder.setPositiveButton(R.string.delete_confirmation) { _: DialogInterface?, _: Int ->
-            releasePlayer()
-            deleteMedia()
-            if (nextUri == null) {
-                haveMedia = false
-                setEndControlsVisible(false)
-                playerView!!.controllerShowTimeoutMs = -1
-            } else {
-                skipToNext()
-            }
-        }
-        builder.setNegativeButton(android.R.string.cancel) { _: DialogInterface?, _: Int -> }
-        val dialog = builder.create()
-        dialog.show()
-    }
+//    private fun askDeleteMedia() {
+//        val builder = AlertDialog.Builder(this@PlayerActivity)
+//        builder.setMessage(getString(R.string.delete_query))
+//        builder.setPositiveButton(R.string.delete_confirmation) { _: DialogInterface?, _: Int ->
+//            releasePlayer()
+//            deleteMedia()
+//            if (nextUri == null) {
+//                haveMedia = false
+////                setEndControlsVisible(false)
+//                playerView!!.controllerShowTimeoutMs = -1
+//            } else {
+//                skipToNext()
+//            }
+//        }
+//        builder.setNegativeButton(android.R.string.cancel) { _: DialogInterface?, _: Int -> }
+//        val dialog = builder.create()
+//        dialog.show()
+//    }
 
-    private fun deleteMedia() {
-        try {
-            if (ContentResolver.SCHEME_CONTENT == mPrefs!!.mediaUri!!.scheme) {
-                DocumentsContract.deleteDocument(contentResolver, mPrefs!!.mediaUri!!)
-            } else if (ContentResolver.SCHEME_FILE == mPrefs!!.mediaUri!!.scheme) {
-                val file = File(mPrefs!!.mediaUri!!.schemeSpecificPart)
-                if (file.canWrite()) {
-                    file.delete()
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+//    private fun deleteMedia() {
+//        try {
+//            if (ContentResolver.SCHEME_CONTENT == mPrefs!!.mediaUri!!.scheme) {
+//                DocumentsContract.deleteDocument(contentResolver, mPrefs!!.mediaUri!!)
+//            } else if (ContentResolver.SCHEME_FILE == mPrefs!!.mediaUri!!.scheme) {
+//                val file = File(mPrefs!!.mediaUri!!.schemeSpecificPart)
+//                if (file.canWrite()) {
+//                    file.delete()
+//                }
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
 
     private fun dispatchPlayPause() {
         if (player == null) return
@@ -2423,15 +2420,15 @@ open class PlayerActivity : Activity() {
         return DefaultTimeBar.DEFAULT_UNPLAYED_COLOR
     }
 
-    //Delete
-    open fun getVisibilityDelete(): Int {
-        return View.GONE
-    }
-
-    //Next
-    open fun getVisibilityNext(): Int {
-        return View.GONE
-    }
+//    //Delete
+//    open fun getVisibilityDelete(): Int {
+//        return View.GONE
+//    }
+//
+//    //Next
+//    open fun getVisibilityNext(): Int {
+//        return View.GONE
+//    }
 
     //Subtitle
     open fun getVisibilitySubtitle(): Int {
