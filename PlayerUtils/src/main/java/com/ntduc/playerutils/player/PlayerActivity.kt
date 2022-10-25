@@ -53,8 +53,10 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
 import com.google.android.exoplayer2.ui.*
 import com.google.android.exoplayer2.ui.StyledPlayerView.ControllerVisibilityListener
 import com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.exoplayer2.util.Util
 import com.google.android.material.snackbar.Snackbar
 import com.ntduc.playerutils.R
 import com.ntduc.playerutils.player.SubtitleFinder.Companion.isUriCompatible
@@ -101,6 +103,7 @@ import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 open class PlayerActivity : Activity() {
@@ -113,6 +116,10 @@ open class PlayerActivity : Activity() {
     private var youTubeOverlay: YouTubeOverlay? = null
     private var mPictureInPictureParamsBuilder: Any? = null
     var mPrefs: Prefs? = null
+    private var isPlaylist = false
+    private var playlist: ArrayList<Uri>? = null
+    private var currentPlaylistItems: ArrayList<MediaMetadataCompat> = ArrayList()
+    private var currentPlay: Int = -1
     private var mBrightnessControl: BrightnessControl? = null
     private var videoLoading = false
     private var errorToShow: ExoPlaybackException? = null
@@ -229,6 +236,20 @@ open class PlayerActivity : Activity() {
         } else if (launchIntent.data != null) {
             resetApiAccess()
             val uri = launchIntent.data
+
+            playlist = try {
+                launchIntent.getParcelableArrayListExtra(API_PLAYLIST)
+            } catch (e: Exception) {
+                null
+            }
+            if (playlist != null) {
+                for (i in 0 until playlist!!.size) {
+                    if (playlist!![i] == uri) {
+                        currentPlay = i
+                    }
+                }
+            }
+            isPlaylist = playlist != null && currentPlay != -1
 
             //Kiểm tra video có phụ đề không
             if (isSubtitle(uri, type)) {
@@ -1249,17 +1270,27 @@ open class PlayerActivity : Activity() {
             }
             updatebuttonAspectRatioIcon()
 
-
-            val mediaItemBuilder = MediaItem.Builder()
-                .setUri(mPrefs!!.mediaUri)
-                .setMimeType(mPrefs!!.mediaType)
-            if (apiAccess && apiSubs.size > 0) {
-                mediaItemBuilder.setSubtitleConfigurations(apiSubs)
-            } else if (mPrefs!!.subtitleUri != null && fileExists(this, mPrefs!!.subtitleUri!!)) {
-                val subtitle = buildSubtitle(this, mPrefs!!.subtitleUri!!, null, true)
-                mediaItemBuilder.setSubtitleConfigurations(listOf(subtitle))
+            if (isPlaylist) {
+                currentPlaylistItems = convertPlayList(playlist!!)
+                val mediaSource = currentPlaylistItems.toMediaSource(dataSourceFactory)
+                player!!.setMediaSource(mediaSource)
+            } else {
+                val mediaItemBuilder = MediaItem.Builder()
+                    .setUri(mPrefs!!.mediaUri)
+                    .setMimeType(mPrefs!!.mediaType)
+                if (apiAccess && apiSubs.size > 0) {
+                    mediaItemBuilder.setSubtitleConfigurations(apiSubs)
+                } else if (mPrefs!!.subtitleUri != null && fileExists(
+                        this,
+                        mPrefs!!.subtitleUri!!
+                    )
+                ) {
+                    val subtitle = buildSubtitle(this, mPrefs!!.subtitleUri!!, null, true)
+                    mediaItemBuilder.setSubtitleConfigurations(listOf(subtitle))
+                }
+                player!!.setMediaItem(mediaItemBuilder.build(), mPrefs!!.position)
             }
-            player!!.setMediaItem(mediaItemBuilder.build(), mPrefs!!.position)
+
             if (loudnessEnhancer != null) {
                 loudnessEnhancer!!.release()
             }
@@ -1311,6 +1342,20 @@ open class PlayerActivity : Activity() {
             playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
             player!!.playWhenReady = true
         }
+        if (isPlaylist) player!!.seekTo(currentPlay, C.TIME_UNSET)
+    }
+
+    private fun convertPlayList(playlist: ArrayList<Uri>): ArrayList<MediaMetadataCompat> {
+        val result = ArrayList<MediaMetadataCompat>()
+        playlist.forEach {
+            val title = getFileName(this@PlayerActivity, it)
+            result.add(MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, it.toString())
+                .build())
+        }
+        return result
     }
 
     private fun savePlayer() {
@@ -1345,6 +1390,7 @@ open class PlayerActivity : Activity() {
             if (player!!.isPlaying && restorePlayStateAllowed) {
                 restorePlayState = true
             }
+            currentPlay = player!!.currentMediaItemIndex
             player!!.removeListener(playerListener!!)
             player!!.clearMediaItems()
             player!!.release()
@@ -2266,6 +2312,14 @@ open class PlayerActivity : Activity() {
         }
     }
 
+    private val dataSourceFactory: DefaultDataSourceFactory by lazy {
+        DefaultDataSourceFactory(
+            /* context = */ this,
+            Util.getUserAgent(/* context = */ this, PLAYER_USER_AGENT), /* listener = */
+            null
+        )
+    }
+
     companion object {
         @SuppressLint("StaticFieldLeak")
         var buttonVolume: ImageButton? = null
@@ -2287,6 +2341,7 @@ open class PlayerActivity : Activity() {
         const val CONTROLLER_TIMEOUT = 3500
         private const val ACTION_MEDIA_CONTROL = "media_control"
         private const val EXTRA_CONTROL_TYPE = "control_type"
+        private const val PLAYER_USER_AGENT: String = "radio.next"
         private const val REQUEST_PLAY = 1
         private const val REQUEST_PAUSE = 2
         private const val CONTROL_TYPE_PLAY = 1
@@ -2305,6 +2360,7 @@ open class PlayerActivity : Activity() {
         const val API_SUBS_NAME = "subs.name"
         const val API_TITLE = "title"
         const val API_END_BY = "end_by"
+        const val API_PLAYLIST = "playlist"
     }
 
     //Folder Open

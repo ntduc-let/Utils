@@ -1,6 +1,8 @@
 package com.ntduc.utils.file_utils.get_all_video.activity
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,9 +21,11 @@ import kotlin.collections.ArrayList
 
 class GetAllVideoViewModel : ViewModel() {
     var listAllVideo: MutableLiveData<List<MyFolderVideo>> = MutableLiveData(listOf())
+    var listUri: MutableLiveData<ArrayList<Uri>> = MutableLiveData(arrayListOf())
     var isLoadListAllVideo = false
 
     fun loadAllVideo(context: Context) {
+        listUri.value = arrayListOf()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val videos = context.getVideos(types = ExtensionConstants.VIDEO.toList())
@@ -29,6 +33,7 @@ class GetAllVideoViewModel : ViewModel() {
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }
                 val result = ArrayList<MyVideo>()
+                val uris = ArrayList<Uri>()
                 temp.forEach {
                     val myFile = MyFile(
                         it.title,
@@ -41,7 +46,10 @@ class GetAllVideoViewModel : ViewModel() {
                     )
                     val myVideo = MyVideo(myFile, it.height, it.width, it.album, it.artist, it.duration, it.bucketID, it.bucketDisplayName, it.resolution)
                     result.add(myVideo)
+
+                    uris.add(FileProvider.getUriForFile(context, "com.ntduc.utils.provider", File(it.data!!)))
                 }
+                listUri.postValue(uris)
                 loadRecentVideo(result)
             }
         }
