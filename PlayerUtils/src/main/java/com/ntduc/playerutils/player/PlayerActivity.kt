@@ -1342,18 +1342,20 @@ open class PlayerActivity : Activity() {
             playerView!!.controllerShowTimeoutMs = CONTROLLER_TIMEOUT
             player!!.playWhenReady = true
         }
-        if (isPlaylist) player!!.seekTo(currentPlay, C.TIME_UNSET)
+        if (isPlaylist) player!!.seekTo(currentPlay, mPrefs!!.position)
     }
 
     private fun convertPlayList(playlist: ArrayList<Uri>): ArrayList<MediaMetadataCompat> {
         val result = ArrayList<MediaMetadataCompat>()
         playlist.forEach {
             val title = getFileName(this@PlayerActivity, it)
-            result.add(MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, it.toString())
-                .build())
+            result.add(
+                MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+                    .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, it.toString())
+                    .build()
+            )
         }
         return result
     }
@@ -1453,7 +1455,6 @@ open class PlayerActivity : Activity() {
         @SuppressLint("SourceLockedOrientationActivity")
         override fun onPlaybackStateChanged(state: Int) {
 //            var isNearEnd = false
-            val duration = player!!.duration
 //            if (duration != C.TIME_UNSET) {
 //                val position = player!!.currentPosition
 //                if (position + 4000 >= duration) {
@@ -1471,6 +1472,16 @@ open class PlayerActivity : Activity() {
 //            }
 //            setEndControlsVisible(haveMedia && (state == Player.STATE_ENDED || isNearEnd))
             if (state == Player.STATE_READY) {
+                val uri = player!!.currentMediaItem?.localConfiguration?.uri
+                mPrefs!!.updateMedia(this@PlayerActivity, uri, null)
+                if (apiTitle != null) {
+                    titleView!!.text = apiTitle
+                } else {
+                    titleView!!.text = getFileName(this@PlayerActivity, mPrefs!!.mediaUri!!)
+                }
+
+                val duration = player!!.duration
+
                 frameRendered = true
                 if (videoLoading) {
                     videoLoading = false
