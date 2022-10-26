@@ -6,7 +6,7 @@
         android:shortcutShortLabel="@string/shortcut_videos">
         <intent
             android:action="com.ntduc.playerutils.player.action.SHORTCUT_VIDEOS"
-            android:targetClass="com.ntduc.playerutils.video.player.VideoPlayerActivity"
-            android:targetPackage="com.ntduc.playerutils.video.player" />
+            android:targetClass="com.ntduc.videoplayerutils.video.player.VideoPlayerActivity"
+            android:targetPackage="com.ntduc.videoplayerutils.video.player" />
     </shortcut>
 </shortcuts>

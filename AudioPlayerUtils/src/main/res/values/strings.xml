@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+ * Copyright (C) 2012 Paul Burke
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<resources>
+    <string name="empty_directory" translatable="false">Empty Directory</string>
+    <string name="storage_removed" translatable="false">Storage was removed or unmounted.</string>
+    <string name="choose_file" translatable="false">Select a file</string>
+    <string name="error_selecting_file" translatable="false">Error selecting File</string>
+    <string name="internal_storage" translatable="false">Internal storage</string>
+
+    <string name="app_name" translatable="false">Just Player</string>
+    <string name="video_resize_fit" translatable="false">Fit</string>
+    <string name="video_resize_crop" translatable="false">Crop</string>
+    <string name="video_orientation_video" translatable="false">Video orientation</string>
+    <string name="video_orientation_sensor" translatable="false">Auto-rotate</string>
+    <string name="video_orientation_system" translatable="false">Device orientation</string>
+    <string name="onboarding_open_title" translatable="false">Choose a video to play</string>
+    <string name="onboarding_open_description" translatable="false">Tap to open a video file. Long tap to load external subtitles.</string>
+    <string name="open_subtitles" translatable="false">Load subtitles</string>
+    <string name="error_details" translatable="false">Details</string>
+    <string name="error_files_missing" translatable="false">Files app is disabled or missing</string>
+    <string name="request_scope" translatable="false">To automatically load external subtitles or enable skipping to next file in a directory, grant %s access to the topmost folder containing your videos (e.g. Movies).</string>
+    <string name="delete_query" translatable="false">Delete this file\?</string>
+    <string name="delete_confirmation" translatable="false">Delete</string>
+    <string name="pref_title" translatable="false">Settings</string>
+    <string name="pref_general_header" translatable="false">General</string>
+    <string name="pref_framerate_matching" translatable="false">Auto frame rate matching</string>
+    <string name="pref_framerate_matching_on" translatable="false">Switch display refresh rate to match video frame rate</string>
+    <string name="pref_framerate_matching_off" translatable="false">Do not change display refresh rate</string>
+    <string name="pref_tunneling" translatable="false">Tunneled playback</string>
+    <string name="pref_tunneling_summary" translatable="false">Tunneling provides better support for 4K/HDR content, but may not work on all devices</string>
+    <string name="pref_auto_pip" translatable="false">Auto picture-in-picture</string>
+    <string name="pref_auto_pip_on" translatable="false">Switch to PiP when leaving the app</string>
+    <string name="pref_auto_pip_off" translatable="false">Do not automatically switch to PiP</string>
+    <string name="pref_skip_silence" translatable="false">Skip silence</string>
+    <string name="pref_skip_silence_on" translatable="false">Skip parts with silence on the audio stream</string>
+    <string name="pref_skip_silence_off" translatable="false">Play content as is</string>
+    <string name="pref_repeat_toggle" translatable="false">Repeat toggle</string>
+    <string name="pref_repeat_toggle_summary" translatable="false">Extra control to allow indefinitely loop video (requires app restart)</string>
+    <string name="shortcut_videos" translatable="false">Videos</string>
+    <string name="button_open" translatable="false">Open</string>
+    <string name="button_crop" translatable="false">Resize</string>
+    <string name="button_rotate" translatable="false">Rotate</string>
+    <string name="button_pip" translatable="false">Picture-in-picture</string>
+    <string name="pref_file_access" translatable="false">File access</string>
+    <string name="pref_file_access_auto" translatable="false">Auto</string>
+    <string name="mediastore_empty" translatable="false">No indexed video files found. To access video files in given storage, enable automatic media scanning in system settings.</string>
+    <string name="pref_shortcuts_header" translatable="false">Shortcuts</string>
+    <string name="pref_captioning_preferences" translatable="false">Captioning preferences</string>
+    <string name="pref_decoder_priority" translatable="false">Decoder priority</string>
+    <string name="pref_decoder_priority_prefer_device" translatable="false">Prefer device decoders</string>
+    <string name="pref_decoder_priority_prefer_app" translatable="false">Prefer app decoders</string>
+    <string name="pref_decoder_priority_only_device" translatable="false">Device decoders only</string>
+    <string name="exo_controls_play_description" translatable="false">Play</string>
+    <string name="exo_controls_pause_description" translatable="false">Pause</string>
+</resources>

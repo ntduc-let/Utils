@@ -8,7 +8,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.ntduc.fileutils.getMimeType
-import com.ntduc.playerutils.video.player.VideoPlayerActivity
+import com.ntduc.videoplayerutils.video.player.VideoPlayerActivity
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersGridLayoutManager
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityGetAllVideoBinding

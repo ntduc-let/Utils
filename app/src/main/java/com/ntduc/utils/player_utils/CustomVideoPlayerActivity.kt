@@ -2,7 +2,7 @@ package com.ntduc.utils.player_utils
 
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.ntduc.playerutils.video.player.VideoPlayerActivity
+import com.ntduc.videoplayerutils.video.player.VideoPlayerActivity
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.R
 

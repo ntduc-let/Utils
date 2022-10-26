@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ResourceName,PrivateResource">
+    <color name="text_secondary">#5f6368</color>
+    <color name="text_primary">#212121</color>
+    <color name="li_row_background">#fffbfbfb</color>
+    <color name="li_row_background_tint">#40444444</color>
+    <color name="li_row_selector">#40888888</color>
+
+    <color name="text_light_secondary">#bbbbbb</color>
+    <color name="text_light_primary">#fefefe</color>
+    <color name="li_row_background_dark">#303030</color>
+    <color name="li_row_background_tint_dark">#00ffffff</color>
+    <color name="li_row_selector_dark">#30ffffff</color>
+    <color name="background_dark">#303030</color>
+    <color name="overlay_dark">#00000000</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="white_opacity_70">#B3ffffff</color>
+    <color name="green">#3DDC84</color>
+    <color name="shortcut_background">#F5F5F5</color>
+
+    <color name="ui_controls_background">#98000000</color>
+    <color name="exo_bottom_bar_background" tools:keep="@color/exo_bottom_bar_background">@color/ui_controls_background</color>
+    <color name="exo_black_opacity_70" tools:keep="@color/exo_black_opacity_70">@color/ui_controls_background</color>
+    <color name="exo_styled_error_message_background" tools:keep="@color/exo_styled_error_message_background">@color/ui_controls_background</color>
+</resources>
