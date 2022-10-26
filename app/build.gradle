@@ -52,7 +52,7 @@ dependencies {
     implementation project(path: ':FileUtils')
     implementation project(path: ':RecyclerViewUtils')
     implementation project(path: ':AppUtils')
-    implementation project(path: ':PlayerUtils')
+    implementation project(path: ':VideoPlayerUtils')
 
     // Coroutines kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
