@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.content.Context
 import android.graphics.Color
@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.SeekParameters
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.ntduc.playerutils.R
+import com.ntduc.playerutils.video.utils.Utils
 import java.lang.IllegalArgumentException
 import kotlin.math.abs
 
@@ -68,8 +69,8 @@ open class CustomStyledPlayerView constructor(
         mScaleDetector = ScaleGestureDetector(context, this)
         if (!Utils.isTvBox(getContext())) {
             exoErrorMessage.setOnClickListener {
-                if (PlayerActivity.locked) {
-                    PlayerActivity.locked = false
+                if (VideoPlayerActivity.locked) {
+                    VideoPlayerActivity.locked = false
                     Utils.showText(this@CustomStyledPlayerView, "", MESSAGE_TIMEOUT_LONG.toLong())
                     setIconLock(false)
                 }
@@ -83,17 +84,17 @@ open class CustomStyledPlayerView constructor(
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        if (PlayerActivity.restoreControllerTimeout) {
-            controllerShowTimeoutMs = PlayerActivity.CONTROLLER_TIMEOUT
-            PlayerActivity.restoreControllerTimeout = false
+        if (VideoPlayerActivity.restoreControllerTimeout) {
+            controllerShowTimeoutMs = VideoPlayerActivity.CONTROLLER_TIMEOUT
+            VideoPlayerActivity.restoreControllerTimeout = false
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && gestureOrientation == Orientation.UNKNOWN) mScaleDetector.onTouchEvent(
             ev
         )
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> handleTouch =
-                if (PlayerActivity.snackbar != null && PlayerActivity.snackbar!!.isShown) {
-                    PlayerActivity.snackbar!!.dismiss()
+                if (VideoPlayerActivity.snackbar != null && VideoPlayerActivity.snackbar!!.isShown) {
+                    VideoPlayerActivity.snackbar!!.dismiss()
                     false
                 } else {
                     removeCallbacks(textClearRunnable)
@@ -110,7 +111,7 @@ open class CustomStyledPlayerView constructor(
                 }
                 if (restorePlayState) {
                     restorePlayState = false
-                    PlayerActivity.player!!.play()
+                    VideoPlayerActivity.player!!.play()
                 }
                 controllerAutoShow = true
                 if (seekProgress) {
@@ -140,15 +141,15 @@ open class CustomStyledPlayerView constructor(
     }
 
     fun tap(): Boolean {
-        if (PlayerActivity.locked) {
+        if (VideoPlayerActivity.locked) {
             Utils.showText(this, "", MESSAGE_TIMEOUT_LONG.toLong())
             setIconLock(true)
             return true
         }
-        if (!PlayerActivity.controllerVisibleFully) {
+        if (!VideoPlayerActivity.controllerVisibleFully) {
             showController()
             return true
-        } else if (PlayerActivity.haveMedia && PlayerActivity.player != null && PlayerActivity.player!!.isPlaying) {
+        } else if (VideoPlayerActivity.haveMedia && VideoPlayerActivity.player != null && VideoPlayerActivity.player!!.isPlaying) {
             hideController()
             return true
         }
@@ -161,7 +162,7 @@ open class CustomStyledPlayerView constructor(
         distanceX: Float,
         distanceY: Float
     ): Boolean {
-        if (mScaleDetector.isInProgress || PlayerActivity.player == null || PlayerActivity.locked) return false
+        if (mScaleDetector.isInProgress || VideoPlayerActivity.player == null || VideoPlayerActivity.locked) return false
 
         // Exclude edge areas
         if (motionEvent.y < IGNORE_BORDER || motionEvent.x < IGNORE_BORDER || motionEvent.y > height - IGNORE_BORDER || motionEvent.x > width - IGNORE_BORDER) return false
@@ -179,15 +180,15 @@ open class CustomStyledPlayerView constructor(
                 // Do not show controller if not already visible
                 controllerAutoShow = false
                 if (gestureOrientation == Orientation.UNKNOWN) {
-                    if (PlayerActivity.player!!.isPlaying) {
+                    if (VideoPlayerActivity.player!!.isPlaying) {
                         restorePlayState = true
-                        PlayerActivity.player!!.pause()
+                        VideoPlayerActivity.player!!.pause()
                     }
                     clearIcon()
-                    seekStart = PlayerActivity.player!!.currentPosition
+                    seekStart = VideoPlayerActivity.player!!.currentPosition
                     seekLastPosition = seekStart
                     seekChange = 0L
-                    seekMax = PlayerActivity.player!!.duration
+                    seekMax = VideoPlayerActivity.player!!.duration
                     if (!isControllerFullyVisible) {
                         seekProgress = true
 //                        showProgress()
@@ -197,27 +198,27 @@ open class CustomStyledPlayerView constructor(
                 var position: Long = 0
                 val distanceDiff =
                     0.5f.coerceAtLeast(abs(Utils.pxToDp(distanceX) / 4).coerceAtMost(10f))
-                if (PlayerActivity.haveMedia) {
+                if (VideoPlayerActivity.haveMedia) {
                     if (gestureScrollX > 0) {
                         if (seekStart + seekChange - SEEK_STEP * distanceDiff >= 0) {
-                            PlayerActivity.player!!.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
+                            VideoPlayerActivity.player!!.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
                             seekChange -= (SEEK_STEP * distanceDiff).toLong()
                             position = seekStart + seekChange
-                            PlayerActivity.player!!.seekTo(position)
+                            VideoPlayerActivity.player!!.seekTo(position)
                         }
                     } else {
-                        PlayerActivity.player!!.setSeekParameters(SeekParameters.NEXT_SYNC)
+                        VideoPlayerActivity.player!!.setSeekParameters(SeekParameters.NEXT_SYNC)
                         if (seekMax == C.TIME_UNSET) {
                             seekChange += (SEEK_STEP * distanceDiff).toLong()
                             position = seekStart + seekChange
-                            PlayerActivity.player!!.seekTo(position)
+                            VideoPlayerActivity.player!!.seekTo(position)
                         } else if (seekStart + seekChange + SEEK_STEP < seekMax) {
                             seekChange += (SEEK_STEP * distanceDiff).toLong()
                             position = seekStart + seekChange
-                            PlayerActivity.player!!.seekTo(position)
+                            VideoPlayerActivity.player!!.seekTo(position)
                         }
                     }
-                    for (start in PlayerActivity.chapterStarts!!) {
+                    for (start in VideoPlayerActivity.chapterStarts!!) {
                         if ((start in ((seekLastPosition + 1)..position)) || (start in (position until seekLastPosition))) {
                             performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                         }
@@ -268,12 +269,12 @@ open class CustomStyledPlayerView constructor(
     }
 
     override fun onLongPress(motionEvent: MotionEvent) {
-        if (PlayerActivity.locked || player != null && player!!.isPlaying) {
-            PlayerActivity.locked = !PlayerActivity.locked
+        if (VideoPlayerActivity.locked || player != null && player!!.isPlaying) {
+            VideoPlayerActivity.locked = !VideoPlayerActivity.locked
             isHandledLongPress = true
             Utils.showText(this, "", MESSAGE_TIMEOUT_LONG.toLong())
-            setIconLock(PlayerActivity.locked)
-            if (PlayerActivity.locked && PlayerActivity.controllerVisible) {
+            setIconLock(VideoPlayerActivity.locked)
+            if (VideoPlayerActivity.locked && VideoPlayerActivity.controllerVisible) {
                 hideController()
             }
         }
@@ -289,7 +290,7 @@ open class CustomStyledPlayerView constructor(
     }
 
     override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
-        if (PlayerActivity.locked) return false
+        if (VideoPlayerActivity.locked) return false
         if (canScale) {
             val factor = scaleGestureDetector.scaleFactor
             mScaleFactor *= factor + (1 - factor) / 3 * 2
@@ -304,7 +305,7 @@ open class CustomStyledPlayerView constructor(
     }
 
     override fun onScaleBegin(scaleGestureDetector: ScaleGestureDetector): Boolean {
-        if (PlayerActivity.locked) return false
+        if (VideoPlayerActivity.locked) return false
         mScaleFactor = videoSurfaceView!!.scaleX
         if (resizeMode != AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
             canScale = false
@@ -327,14 +328,14 @@ open class CustomStyledPlayerView constructor(
     }
 
     override fun onScaleEnd(scaleGestureDetector: ScaleGestureDetector) {
-        if (PlayerActivity.locked) return
+        if (VideoPlayerActivity.locked) return
         if (mScaleFactor - mScaleFactorFit < 0.001) {
             setScale(1f)
             resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
             val buttonAspectRatio = findViewById<ImageButton>(Int.MAX_VALUE - 100)
             buttonAspectRatio.setImageResource(aspectRatiooZoomId)
         }
-        if (PlayerActivity.player != null && !PlayerActivity.player!!.isPlaying) {
+        if (VideoPlayerActivity.player != null && !VideoPlayerActivity.player!!.isPlaying) {
             showController()
         }
         restoreSurfaceView()

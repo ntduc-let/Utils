@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.content.ContentResolver
 import android.content.Context
@@ -7,6 +7,8 @@ import android.net.Uri
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.ntduc.playerutils.video.utils.SubtitleUtils
+import com.ntduc.playerutils.video.utils.Utils
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.lang.Exception

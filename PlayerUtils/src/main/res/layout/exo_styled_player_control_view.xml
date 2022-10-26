@@ -137,7 +137,7 @@
 
     </FrameLayout>
 
-    <com.ntduc.playerutils.player.CustomDefaultTimeBar
+    <com.ntduc.playerutils.video.player.CustomDefaultTimeBar
         android:id="@+id/exo_progress"
         android:layout_width="match_parent"
         android:layout_height="@dimen/exo_styled_progress_layout_height"

@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.content.Context
 import android.graphics.Rect
@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import kotlin.jvm.JvmOverloads
 import com.google.android.exoplayer2.ui.DefaultTimeBar
+import com.ntduc.playerutils.video.utils.Utils
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import kotlin.math.abs

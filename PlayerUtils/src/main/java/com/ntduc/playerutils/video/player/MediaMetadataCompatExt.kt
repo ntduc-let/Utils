@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.graphics.Bitmap
 import android.net.Uri

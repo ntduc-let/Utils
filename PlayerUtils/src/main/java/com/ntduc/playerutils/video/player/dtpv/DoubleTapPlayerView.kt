@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player.dtpv
+package com.ntduc.playerutils.video.player.dtpv
 
 import android.content.Context
 import android.os.Handler
@@ -10,7 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.GestureDetectorCompat
 import com.ntduc.playerutils.R
-import com.ntduc.playerutils.player.CustomStyledPlayerView
+import com.ntduc.playerutils.video.player.CustomStyledPlayerView
 
 /**
  * Custom player class for Double-Tapping listening

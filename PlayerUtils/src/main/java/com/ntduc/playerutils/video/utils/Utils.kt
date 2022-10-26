@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.utils
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -25,8 +25,8 @@ import android.view.View
 import android.view.WindowInsets
 import android.widget.FrameLayout
 import android.widget.ImageButton
-import com.ntduc.playerutils.player.SubtitleUtils.clearCache
-import com.ntduc.playerutils.player.SubtitleUtils.convertToUTF
+import com.ntduc.playerutils.video.utils.SubtitleUtils.clearCache
+import com.ntduc.playerutils.video.utils.SubtitleUtils.convertToUTF
 import com.google.android.exoplayer2.util.MimeTypes
 import com.arthenica.ffmpegkit.MediaInformation
 import androidx.annotation.RequiresApi
@@ -38,6 +38,8 @@ import com.arthenica.ffmpegkit.FFprobeKit
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
 import com.google.android.exoplayer2.Format
 import com.ntduc.playerutils.R
+import com.ntduc.playerutils.video.player.CustomStyledPlayerView
+import com.ntduc.playerutils.video.player.VideoPlayerActivity
 import java.io.File
 import java.lang.Exception
 import java.lang.RuntimeException
@@ -188,11 +190,11 @@ object Utils {
 
         // Handle volume changes outside the app (lose boost if volume is not maxed out)
         if (volume != volumeMax) {
-            PlayerActivity.boostLevel = 0
+            VideoPlayerActivity.boostLevel = 0
         }
-        if (PlayerActivity.loudnessEnhancer == null) canBoost = false
-        if (volume != volumeMax || PlayerActivity.boostLevel == 0 && !raise) {
-            if (PlayerActivity.loudnessEnhancer != null) PlayerActivity.loudnessEnhancer!!.enabled = false
+        if (VideoPlayerActivity.loudnessEnhancer == null) canBoost = false
+        if (volume != volumeMax || VideoPlayerActivity.boostLevel == 0 && !raise) {
+            if (VideoPlayerActivity.loudnessEnhancer != null) VideoPlayerActivity.loudnessEnhancer!!.enabled = false
             audioManager.adjustStreamVolume(
                 AudioManager.STREAM_MUSIC,
                 if (raise) AudioManager.ADJUST_RAISE else AudioManager.ADJUST_LOWER,
@@ -216,21 +218,21 @@ object Utils {
                 playerView.setCustomErrorMessage(if (volumeActive) " $volumeNew" else "")
             }
         } else {
-            if (canBoost && raise && PlayerActivity.boostLevel < 10) PlayerActivity.boostLevel++ else if (!raise && PlayerActivity.boostLevel > 0) PlayerActivity.boostLevel--
-            if (PlayerActivity.loudnessEnhancer != null) {
+            if (canBoost && raise && VideoPlayerActivity.boostLevel < 10) VideoPlayerActivity.boostLevel++ else if (!raise && VideoPlayerActivity.boostLevel > 0) VideoPlayerActivity.boostLevel--
+            if (VideoPlayerActivity.loudnessEnhancer != null) {
                 try {
-                    PlayerActivity.loudnessEnhancer!!.setTargetGain(PlayerActivity.boostLevel * 200)
+                    VideoPlayerActivity.loudnessEnhancer!!.setTargetGain(VideoPlayerActivity.boostLevel * 200)
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
             }
-            playerView.setCustomErrorMessage(" " + (volumeMax + PlayerActivity.boostLevel))
+            playerView.setCustomErrorMessage(" " + (volumeMax + VideoPlayerActivity.boostLevel))
         }
         playerView.setIconVolume(volumeActive)
-        PlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
-        if (PlayerActivity.loudnessEnhancer != null) PlayerActivity.loudnessEnhancer!!.enabled =
-            PlayerActivity.boostLevel > 0
-        playerView.setHighlight(PlayerActivity.boostLevel > 0)
+        VideoPlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
+        if (VideoPlayerActivity.loudnessEnhancer != null) VideoPlayerActivity.loudnessEnhancer!!.enabled =
+            VideoPlayerActivity.boostLevel > 0
+        playerView.setHighlight(VideoPlayerActivity.boostLevel > 0)
         if (clear) {
             playerView.postDelayed(
                 playerView.textClearRunnable,
@@ -279,20 +281,20 @@ object Utils {
                 playerView.setCustomErrorMessage(if (volumeActive) " $volumeNew" else "")
                 playerView.setHighlight(false)
             }else{
-                if (PlayerActivity.loudnessEnhancer != null) {
+                if (VideoPlayerActivity.loudnessEnhancer != null) {
                     try {
-                        PlayerActivity.loudnessEnhancer!!.setTargetGain(PlayerActivity.boostLevel * 200)
+                        VideoPlayerActivity.loudnessEnhancer!!.setTargetGain(VideoPlayerActivity.boostLevel * 200)
                     } catch (e: RuntimeException) {
                         e.printStackTrace()
                     }
                 }
-                playerView.setCustomErrorMessage(" " + (volumeMax + PlayerActivity.boostLevel))
-                playerView.setHighlight(PlayerActivity.boostLevel > 0)
+                playerView.setCustomErrorMessage(" " + (volumeMax + VideoPlayerActivity.boostLevel))
+                playerView.setHighlight(VideoPlayerActivity.boostLevel > 0)
             }
         }
 
         playerView.setIconVolume(volumeActive)
-        PlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
+        VideoPlayerActivity.buttonVolume?.setImageResource(if (volumeActive) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
 
         playerView.postDelayed(
             playerView.textClearRunnable,
@@ -356,8 +358,8 @@ object Utils {
     @SuppressLint("SourceLockedOrientationActivity")
     fun setOrientation(activity: Activity, orientation: Orientation?) {
         when (orientation) {
-            Orientation.VIDEO -> if (PlayerActivity.player != null) {
-                val format = PlayerActivity.player!!.videoFormat
+            Orientation.VIDEO -> if (VideoPlayerActivity.player != null) {
+                val format = VideoPlayerActivity.player!!.videoFormat
                 if (format != null && isPortrait(format)) activity.requestedOrientation =
                     ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT else activity.requestedOrientation =
                     ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
@@ -540,7 +542,7 @@ object Utils {
         return (rate * 100f).toInt()
     }
 
-    fun switchFrameRate(activity: PlayerActivity, uri: Uri, play: Boolean): Boolean {
+    fun switchFrameRate(activity: VideoPlayerActivity, uri: Uri, play: Boolean): Boolean {
         // preferredDisplayModeId only available on SDK 23+
         // ExoPlayer already uses Surface.setFrameRate() on Android 11+
         return if (Build.VERSION.SDK_INT >= 23) {
@@ -578,7 +580,7 @@ object Utils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private fun handleFrameRate(activity: PlayerActivity, frameRate: Float, play: Boolean) {
+    private fun handleFrameRate(activity: VideoPlayerActivity, frameRate: Float, play: Boolean) {
         activity.runOnUiThread {
             var switchingModes = false
 
@@ -643,14 +645,14 @@ object Utils {
         }
     }
 
-    private fun playIfCan(activity: PlayerActivity, play: Boolean) {
+    private fun playIfCan(activity: VideoPlayerActivity, play: Boolean) {
         if (play) {
-            if (PlayerActivity.player != null) PlayerActivity.player!!.play()
+            if (VideoPlayerActivity.player != null) VideoPlayerActivity.player!!.play()
             if (activity.playerView != null) activity.playerView!!.hideController()
         }
     }
 
-    fun alternativeChooser(activity: PlayerActivity, initialUri: Uri?, video: Boolean): Boolean {
+    fun alternativeChooser(activity: VideoPlayerActivity, initialUri: Uri?, video: Boolean): Boolean {
         val startPath: String =
             if (initialUri != null && File(initialUri.schemeSpecificPart).exists()) {
                 initialUri.schemeSpecificPart
@@ -674,7 +676,7 @@ object Utils {
                     uri = convertToUTF(activity, uri!!)
                     activity.mPrefs!!.updateSubtitle(uri)
                 }
-                PlayerActivity.focusPlay = true
+                VideoPlayerActivity.focusPlay = true
                 activity.initializePlayer()
             } // to handle the back key pressed or clicked outside the dialog:
             .withOnCancelListener { dialog ->
@@ -782,7 +784,7 @@ object Utils {
         return mediaInformationSession.mediaInformation
     }
 
-    fun markChapters(activity: PlayerActivity, uri: Uri, controlView: StyledPlayerControlView) {
+    fun markChapters(activity: VideoPlayerActivity, uri: Uri, controlView: StyledPlayerControlView) {
         if (activity.chaptersThread != null) {
             activity.chaptersThread!!.interrupt()
         }
@@ -802,7 +804,7 @@ object Utils {
                 }
                 i++
             }
-            PlayerActivity.chapterStarts = starts
+            VideoPlayerActivity.chapterStarts = starts
             activity.runOnUiThread { controlView.setExtraAdGroupMarkers(starts, played) }
         }
         activity.chaptersThread!!.start()

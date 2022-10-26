@@ -1,11 +1,12 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.net.Uri
 import com.google.android.exoplayer2.util.Util
+import com.ntduc.playerutils.video.utils.Utils
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.util.ArrayList
 
-class SubtitleFinder(private val activity: PlayerActivity, uri: Uri) {
+class SubtitleFinder(private val activity: VideoPlayerActivity, uri: Uri) {
     private val baseUri: Uri
     private var path: String?
     private val urls: MutableList<Uri>

@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.content.res.Resources
 import com.google.android.exoplayer2.Format

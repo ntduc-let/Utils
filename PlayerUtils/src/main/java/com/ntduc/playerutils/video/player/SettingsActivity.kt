@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.graphics.Color
 import android.os.Build
@@ -12,6 +12,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.playerutils.R
+import com.ntduc.playerutils.video.utils.Utils
 import java.util.*
 
 class SettingsActivity : AppCompatActivity() {

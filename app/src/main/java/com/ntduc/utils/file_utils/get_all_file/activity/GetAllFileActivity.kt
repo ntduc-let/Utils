@@ -8,7 +8,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.ntduc.fileutils.getMimeType
 import com.ntduc.fileutils.openFile
-import com.ntduc.playerutils.player.PlayerActivity
+import com.ntduc.playerutils.video.player.VideoPlayerActivity
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityGetAllFileBinding
@@ -48,7 +48,7 @@ class GetAllFileActivity : AppCompatActivity() {
                     FileType.VIDEO -> {
                         val file = File(it.data!!)
                         val uri = FileProvider.getUriForFile(this, "com.ntduc.utils.provider", file)
-                        val intentOpenVideo = Intent(this, PlayerActivity::class.java)
+                        val intentOpenVideo = Intent(this, VideoPlayerActivity::class.java)
                         intentOpenVideo.setDataAndType(uri, file.getMimeType())
                         intentOpenVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         startActivity(intentOpenVideo)

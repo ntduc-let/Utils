@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.utils
 
 import android.content.ContentResolver
 import android.content.Context
@@ -8,6 +8,8 @@ import androidx.documentfile.provider.DocumentFile
 import com.ibm.icu.text.CharsetDetector
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
 import com.google.android.exoplayer2.C
+import com.ntduc.playerutils.video.player.SubtitleFetcher
+import com.ntduc.playerutils.video.player.VideoPlayerActivity
 import java.io.*
 import java.lang.Exception
 import java.lang.NullPointerException
@@ -233,7 +235,7 @@ internal object SubtitleUtils {
         }
     }
 
-    fun convertToUTF(activity: PlayerActivity, subtitleUri: Uri): Uri? {
+    fun convertToUTF(activity: VideoPlayerActivity, subtitleUri: Uri): Uri? {
         try {
             val scheme = subtitleUri.scheme
             return if (scheme != null && scheme.lowercase(Locale.getDefault()).startsWith("http")) {

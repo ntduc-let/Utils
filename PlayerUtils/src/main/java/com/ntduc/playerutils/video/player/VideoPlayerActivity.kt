@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -59,46 +59,47 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.snackbar.Snackbar
 import com.ntduc.playerutils.R
-import com.ntduc.playerutils.player.SubtitleFinder.Companion.isUriCompatible
-import com.ntduc.playerutils.player.SubtitleUtils.buildSubtitle
-import com.ntduc.playerutils.player.SubtitleUtils.clearCache
-import com.ntduc.playerutils.player.SubtitleUtils.convertToUTF
-import com.ntduc.playerutils.player.SubtitleUtils.findDocInScope
-import com.ntduc.playerutils.player.SubtitleUtils.findNext
-import com.ntduc.playerutils.player.SubtitleUtils.findSubtitle
-import com.ntduc.playerutils.player.SubtitleUtils.findUriInScope
-import com.ntduc.playerutils.player.SubtitleUtils.isSubtitle
-import com.ntduc.playerutils.player.SubtitleUtils.normalizeFontScale
-import com.ntduc.playerutils.player.Utils.adjustVolume
-import com.ntduc.playerutils.player.Utils.alternativeChooser
-import com.ntduc.playerutils.player.Utils.deviceLanguages
-import com.ntduc.playerutils.player.Utils.fileExists
-import com.ntduc.playerutils.player.Utils.formatMilis
-import com.ntduc.playerutils.player.Utils.formatMilisSign
-import com.ntduc.playerutils.player.Utils.getFileName
-import com.ntduc.playerutils.player.Utils.getNextOrientation
-import com.ntduc.playerutils.player.Utils.getRational
-import com.ntduc.playerutils.player.Utils.getSystemComponent
-import com.ntduc.playerutils.player.Utils.isPiPSupported
-import com.ntduc.playerutils.player.Utils.isPortrait
-import com.ntduc.playerutils.player.Utils.isProgressiveContainerUri
-import com.ntduc.playerutils.player.Utils.isSupportedNetworkUri
-import com.ntduc.playerutils.player.Utils.isTablet
-import com.ntduc.playerutils.player.Utils.isTvBox
-import com.ntduc.playerutils.player.Utils.markChapters
-import com.ntduc.playerutils.player.Utils.moviesFolderUri
-import com.ntduc.playerutils.player.Utils.muteVolume
-import com.ntduc.playerutils.player.Utils.normalizeScaleFactor
-import com.ntduc.playerutils.player.Utils.setButtonEnabled
-import com.ntduc.playerutils.player.Utils.setOrientation
-import com.ntduc.playerutils.player.Utils.setViewMargins
-import com.ntduc.playerutils.player.Utils.setViewParams
-import com.ntduc.playerutils.player.Utils.showText
-import com.ntduc.playerutils.player.Utils.switchFrameRate
-import com.ntduc.playerutils.player.Utils.toggleSystemUi
-import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
-import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay
-import com.ntduc.playerutils.player.dtpv.youtube.YouTubeOverlay.PerformListener
+import com.ntduc.playerutils.video.player.SubtitleFinder.Companion.isUriCompatible
+import com.ntduc.playerutils.video.utils.SubtitleUtils.buildSubtitle
+import com.ntduc.playerutils.video.utils.SubtitleUtils.clearCache
+import com.ntduc.playerutils.video.utils.SubtitleUtils.convertToUTF
+import com.ntduc.playerutils.video.utils.SubtitleUtils.findDocInScope
+import com.ntduc.playerutils.video.utils.SubtitleUtils.findNext
+import com.ntduc.playerutils.video.utils.SubtitleUtils.findSubtitle
+import com.ntduc.playerutils.video.utils.SubtitleUtils.findUriInScope
+import com.ntduc.playerutils.video.utils.SubtitleUtils.isSubtitle
+import com.ntduc.playerutils.video.utils.SubtitleUtils.normalizeFontScale
+import com.ntduc.playerutils.video.utils.Utils.adjustVolume
+import com.ntduc.playerutils.video.utils.Utils.alternativeChooser
+import com.ntduc.playerutils.video.utils.Utils.deviceLanguages
+import com.ntduc.playerutils.video.utils.Utils.fileExists
+import com.ntduc.playerutils.video.utils.Utils.formatMilis
+import com.ntduc.playerutils.video.utils.Utils.formatMilisSign
+import com.ntduc.playerutils.video.utils.Utils.getFileName
+import com.ntduc.playerutils.video.utils.Utils.getNextOrientation
+import com.ntduc.playerutils.video.utils.Utils.getRational
+import com.ntduc.playerutils.video.utils.Utils.getSystemComponent
+import com.ntduc.playerutils.video.utils.Utils.isPiPSupported
+import com.ntduc.playerutils.video.utils.Utils.isPortrait
+import com.ntduc.playerutils.video.utils.Utils.isProgressiveContainerUri
+import com.ntduc.playerutils.video.utils.Utils.isSupportedNetworkUri
+import com.ntduc.playerutils.video.utils.Utils.isTablet
+import com.ntduc.playerutils.video.utils.Utils.isTvBox
+import com.ntduc.playerutils.video.utils.Utils.markChapters
+import com.ntduc.playerutils.video.utils.Utils.moviesFolderUri
+import com.ntduc.playerutils.video.utils.Utils.muteVolume
+import com.ntduc.playerutils.video.utils.Utils.normalizeScaleFactor
+import com.ntduc.playerutils.video.utils.Utils.setButtonEnabled
+import com.ntduc.playerutils.video.utils.Utils.setOrientation
+import com.ntduc.playerutils.video.utils.Utils.setViewMargins
+import com.ntduc.playerutils.video.utils.Utils.setViewParams
+import com.ntduc.playerutils.video.utils.Utils.showText
+import com.ntduc.playerutils.video.utils.Utils.switchFrameRate
+import com.ntduc.playerutils.video.utils.Utils.toggleSystemUi
+import com.ntduc.playerutils.video.player.dtpv.DoubleTapPlayerView
+import com.ntduc.playerutils.video.player.dtpv.youtube.YouTubeOverlay
+import com.ntduc.playerutils.video.player.dtpv.youtube.YouTubeOverlay.PerformListener
+import com.ntduc.playerutils.video.utils.Utils
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.util.*
@@ -106,7 +107,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
-open class PlayerActivity : Activity() {
+open class VideoPlayerActivity : Activity() {
     private var playerListener: PlayerListener? = null
     private var mReceiver: BroadcastReceiver? = null
     private var mAudioManager: AudioManager? = null
@@ -169,7 +170,7 @@ open class PlayerActivity : Activity() {
     var subtitleFinder: SubtitleFinder? = null
     var barsHider = Runnable {
         if (playerView != null && !controllerVisible) {
-            toggleSystemUi(this@PlayerActivity, playerView!!, false)
+            toggleSystemUi(this@VideoPlayerActivity, playerView!!, false)
         }
     }
 
@@ -469,7 +470,7 @@ open class PlayerActivity : Activity() {
             mPrefs!!.orientation = getNextOrientation(
                 mPrefs!!.orientation
             )
-            setOrientation(this@PlayerActivity, mPrefs!!.orientation)
+            setOrientation(this@VideoPlayerActivity, mPrefs!!.orientation)
             updateButtonRotation()
             showText(playerView!!, getString(mPrefs!!.orientation.description), 2500)
             resetHideCallbacks()
@@ -681,7 +682,7 @@ open class PlayerActivity : Activity() {
             }
 
             // https://developer.android.com/training/system-ui/immersive
-            toggleSystemUi(this@PlayerActivity, playerView!!, visibility == View.VISIBLE)
+            toggleSystemUi(this@VideoPlayerActivity, playerView!!, visibility == View.VISIBLE)
             if (visibility == View.VISIBLE) {
                 // Because when using dpad controls, focus resets to first item in bottom controls bar
                 findViewById<View>(R.id.exo_play_pause).requestFocus()
@@ -689,7 +690,7 @@ open class PlayerActivity : Activity() {
             if (controllerVisible && playerView!!.isControllerFullyVisible) {
                 if (mPrefs!!.firstRun) {
                     if (getVisibilityFolderOpen() == View.VISIBLE) {
-                        TapTargetView.showFor(this@PlayerActivity,
+                        TapTargetView.showFor(this@VideoPlayerActivity,
                             TapTarget.forView(
                                 buttonOpen, getString(R.string.onboarding_open_title), getString(
                                     R.string.onboarding_open_description
@@ -1241,7 +1242,7 @@ open class PlayerActivity : Activity() {
         mediaSessionConnector.setPlayer(player)
 
         if (mPrefs!!.mediaUri != null) {
-            val title = getFileName(this@PlayerActivity, mPrefs!!.mediaUri!!)
+            val title = getFileName(this@VideoPlayerActivity, mPrefs!!.mediaUri!!)
             if (title != null) {
                 mediaSessionConnector.setMediaMetadataProvider {
                     return@setMediaMetadataProvider MediaMetadataCompat.Builder()
@@ -1348,7 +1349,7 @@ open class PlayerActivity : Activity() {
     private fun convertPlayList(playlist: ArrayList<Uri>): ArrayList<MediaMetadataCompat> {
         val result = ArrayList<MediaMetadataCompat>()
         playlist.forEach {
-            val title = getFileName(this@PlayerActivity, it)
+            val title = getFileName(this@VideoPlayerActivity, it)
             result.add(
                 MediaMetadataCompat.Builder()
                     .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
@@ -1417,7 +1418,7 @@ open class PlayerActivity : Activity() {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             playerView!!.keepScreenOn = isPlaying
-            if (isPiPSupported(this@PlayerActivity)) {
+            if (isPiPSupported(this@VideoPlayerActivity)) {
                 if (isPlaying) {
                     updatePictureInPictureActions(
                         R.drawable.ic_pause_24dp,
@@ -1473,11 +1474,11 @@ open class PlayerActivity : Activity() {
 //            setEndControlsVisible(haveMedia && (state == Player.STATE_ENDED || isNearEnd))
             if (state == Player.STATE_READY) {
                 val uri = player!!.currentMediaItem?.localConfiguration?.uri
-                mPrefs!!.updateMedia(this@PlayerActivity, uri, null)
+                mPrefs!!.updateMedia(this@VideoPlayerActivity, uri, null)
                 if (apiTitle != null) {
                     titleView!!.text = apiTitle
                 } else {
-                    titleView!!.text = getFileName(this@PlayerActivity, mPrefs!!.mediaUri!!)
+                    titleView!!.text = getFileName(this@VideoPlayerActivity, mPrefs!!.mediaUri!!)
                 }
 
                 val duration = player!!.duration
@@ -1490,17 +1491,17 @@ open class PlayerActivity : Activity() {
                             mPrefs!!.orientation = getNextOrientation(
                                 mPrefs!!.orientation
                             )
-                            setOrientation(this@PlayerActivity, mPrefs!!.orientation)
+                            setOrientation(this@VideoPlayerActivity, mPrefs!!.orientation)
                         }
 
                         val format = player!!.videoFormat
                         if (format != null) {
                             if (mPrefs!!.orientation === Utils.Orientation.VIDEO) {
                                 if (isPortrait(format)) {
-                                    this@PlayerActivity.requestedOrientation =
+                                    this@VideoPlayerActivity.requestedOrientation =
                                         ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
                                 } else {
-                                    this@PlayerActivity.requestedOrientation =
+                                    this@VideoPlayerActivity.requestedOrientation =
                                         ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                                 }
                                 updateButtonRotation()
@@ -1540,7 +1541,7 @@ open class PlayerActivity : Activity() {
                             }
                             displayManager!!.registerDisplayListener(displayListener, null)
                         }
-                        switched = switchFrameRate(this@PlayerActivity, mPrefs!!.mediaUri!!, play)
+                        switched = switchFrameRate(this@VideoPlayerActivity, mPrefs!!.mediaUri!!, play)
                     }
                     if (!switched) {
                         if (displayManager != null) {
@@ -1627,7 +1628,7 @@ open class PlayerActivity : Activity() {
     }
 
     private fun loadSubtitleFile(pickerInitialUri: Uri?) {
-        Toast.makeText(this@PlayerActivity, R.string.open_subtitles, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@VideoPlayerActivity, R.string.open_subtitles, Toast.LENGTH_SHORT).show()
         val targetSdkVersion = applicationContext.applicationInfo.targetSdkVersion
         if (isTvBox && Build.VERSION.SDK_INT >= 30 && targetSdkVersion >= 30 && mPrefs!!.fileAccess == "auto" || mPrefs!!.fileAccess == "mediastore") {
             val intent = Intent(this, MediaStoreChooserActivity::class.java)
@@ -1834,12 +1835,12 @@ open class PlayerActivity : Activity() {
         try {
             val actions = ArrayList<RemoteAction>()
             val intent = PendingIntent.getBroadcast(
-                this@PlayerActivity,
+                this@VideoPlayerActivity,
                 requestCode,
                 Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, controlType),
                 PendingIntent.FLAG_IMMUTABLE
             )
-            val icon = Icon.createWithResource(this@PlayerActivity, iconId)
+            val icon = Icon.createWithResource(this@VideoPlayerActivity, iconId)
             val title = getString(resTitle)
             actions.add(RemoteAction(icon, title, title, intent))
             (mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.setActions(actions)
@@ -1883,7 +1884,7 @@ open class PlayerActivity : Activity() {
         snackbar = Snackbar.make(coordinatorLayout!!, textPrimary!!, Snackbar.LENGTH_LONG)
         if (textSecondary != null) {
             snackbar!!.setAction(R.string.error_details) {
-                val builder = AlertDialog.Builder(this@PlayerActivity)
+                val builder = AlertDialog.Builder(this@VideoPlayerActivity)
                 builder.setMessage(textSecondary)
                 builder.setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, _: Int -> dialogInterface.dismiss() }
                 val dialog = builder.create()
@@ -1948,7 +1949,7 @@ open class PlayerActivity : Activity() {
         ) {
             clearCache(this)
             if (isUriCompatible(mPrefs!!.mediaUri!!)) {
-                subtitleFinder = SubtitleFinder(this@PlayerActivity, mPrefs!!.mediaUri!!)
+                subtitleFinder = SubtitleFinder(this@VideoPlayerActivity, mPrefs!!.mediaUri!!)
                 subtitleFinder!!.start()
             }
             return
@@ -2026,7 +2027,7 @@ open class PlayerActivity : Activity() {
     }
 
     private fun askForScope(loadSubtitlesOnCancel: Boolean, skipToNextOnCancel: Boolean) {
-        val builder = AlertDialog.Builder(this@PlayerActivity)
+        val builder = AlertDialog.Builder(this@VideoPlayerActivity)
         builder.setMessage(
             String.format(
                 getString(R.string.request_scope),

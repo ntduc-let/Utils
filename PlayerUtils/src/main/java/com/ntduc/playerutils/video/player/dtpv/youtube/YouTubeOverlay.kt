@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player.dtpv.youtube
+package com.ntduc.playerutils.video.player.dtpv.youtube
 
 import android.content.Context
 import android.util.AttributeSet
@@ -13,12 +13,12 @@ import androidx.core.widget.TextViewCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SeekParameters
 import com.ntduc.playerutils.R
-import com.ntduc.playerutils.player.PlayerActivity
-import com.ntduc.playerutils.player.dtpv.DoubleTapPlayerView
-import com.ntduc.playerutils.player.dtpv.PlayerDoubleTapListener
-import com.ntduc.playerutils.player.dtpv.SeekListener
-import com.ntduc.playerutils.player.dtpv.youtube.views.CircleClipTapView
-import com.ntduc.playerutils.player.dtpv.youtube.views.SecondsView
+import com.ntduc.playerutils.video.player.VideoPlayerActivity
+import com.ntduc.playerutils.video.player.dtpv.DoubleTapPlayerView
+import com.ntduc.playerutils.video.player.dtpv.PlayerDoubleTapListener
+import com.ntduc.playerutils.video.player.dtpv.SeekListener
+import com.ntduc.playerutils.video.player.dtpv.youtube.views.CircleClipTapView
+import com.ntduc.playerutils.video.player.dtpv.youtube.views.SecondsView
 
 /**
  * Overlay for [DoubleTapPlayerView] to create a similar UI/UX experience like the official
@@ -334,7 +334,7 @@ class YouTubeOverlay(context: Context, private val attrs: AttributeSet?) :
         get() = (findViewById<View>(R.id.seconds_view) as SecondsView).getTextView()
 
     override fun onDoubleTapStarted(posX: Float, posY: Float) {
-        if (PlayerActivity.locked) return
+        if (VideoPlayerActivity.locked) return
         if (player != null && player!!.currentPosition >= 0L && playerView != null && playerView!!.width > 0) {
             if (posX >= playerView!!.width * 0.35 && posX <= playerView!!.width * 0.65) {
                 if (player!!.isPlaying) {
@@ -351,7 +351,7 @@ class YouTubeOverlay(context: Context, private val attrs: AttributeSet?) :
     }
 
     override fun onDoubleTapProgressUp(posX: Float, posY: Float) {
-        if (PlayerActivity.locked) return
+        if (VideoPlayerActivity.locked) return
 
         // Check first whether forwarding/rewinding is "valid"
         if (player == null || player!!.mediaItemCount < 1 || player!!.currentPosition < 0 || playerView == null || playerView!!.width < 0) return

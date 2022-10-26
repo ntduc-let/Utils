@@ -1,6 +1,8 @@
-package com.ntduc.playerutils.player
+package com.ntduc.playerutils.video.player
 
 import android.net.Uri
+import com.ntduc.playerutils.video.utils.SubtitleUtils
+import com.ntduc.playerutils.video.utils.Utils
 import kotlin.Throws
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -8,7 +10,7 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.concurrent.CountDownLatch
 
-internal class SubtitleFetcher(private val activity: PlayerActivity, private val urls: List<Uri>) {
+internal class SubtitleFetcher(private val activity: VideoPlayerActivity, private val urls: List<Uri>) {
     private var countDownLatch: CountDownLatch? = null
     private var subtitleUri: Uri? = null
     private val foundUrls: MutableList<Uri>
@@ -81,8 +83,8 @@ internal class SubtitleFetcher(private val activity: PlayerActivity, private val
                     ) ?: return@Runnable
                     activity.runOnUiThread {
                         activity.mPrefs!!.updateSubtitle(convertedSubtitleUri)
-                        if (PlayerActivity.player != null) {
-                            var mediaItem = PlayerActivity.player!!.currentMediaItem
+                        if (VideoPlayerActivity.player != null) {
+                            var mediaItem = VideoPlayerActivity.player!!.currentMediaItem
                             if (mediaItem != null) {
                                 val subtitle = SubtitleUtils.buildSubtitle(
                                     activity,
@@ -92,7 +94,7 @@ internal class SubtitleFetcher(private val activity: PlayerActivity, private val
                                 )
                                 mediaItem = mediaItem.buildUpon()
                                     .setSubtitleConfigurations(listOf(subtitle)).build()
-                                PlayerActivity.player!!.setMediaItem(mediaItem, false)
+                                VideoPlayerActivity.player!!.setMediaItem(mediaItem, false)
                                 //                            if (BuildConfig.DEBUG) {
 //                                Toast.makeText(activity, "Subtitle found", Toast.LENGTH_SHORT).show();
 //                            }

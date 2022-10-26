@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player.dtpv
+package com.ntduc.playerutils.video.player.dtpv
 
 interface PlayerDoubleTapListener {
     /**

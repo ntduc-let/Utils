@@ -1,4 +1,4 @@
-package com.ntduc.playerutils.player.dtpv.youtube.views
+package com.ntduc.playerutils.video.player.dtpv.youtube.views
 
 import android.animation.Animator
 import android.animation.ValueAnimator
