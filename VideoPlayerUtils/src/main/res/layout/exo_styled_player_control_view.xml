@@ -137,7 +137,7 @@
 
     </FrameLayout>
 
-    <com.ntduc.audioplayerutils.player.CustomDefaultTimeBar
+    <com.ntduc.musicplayerutils.player.CustomDefaultTimeBar
         android:id="@+id/exo_progress"
         android:layout_width="match_parent"
         android:layout_height="@dimen/exo_styled_progress_layout_height"

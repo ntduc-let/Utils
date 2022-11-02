@@ -14,11 +14,11 @@
             <option value="$PROJECT_DIR$/ActivityUtils" />
             <option value="$PROJECT_DIR$/AnimationUtils" />
             <option value="$PROJECT_DIR$/AppUtils" />
-            <option value="$PROJECT_DIR$/AudioPlayerUtils" />
             <option value="$PROJECT_DIR$/ColorUtils" />
             <option value="$PROJECT_DIR$/ContextUtils" />
             <option value="$PROJECT_DIR$/DateTimeUtils" />
             <option value="$PROJECT_DIR$/FileUtils" />
+            <option value="$PROJECT_DIR$/MusicPlayerUtils" />
             <option value="$PROJECT_DIR$/NumberUtils" />
             <option value="$PROJECT_DIR$/RecyclerViewUtils" />
             <option value="$PROJECT_DIR$/StringUtils" />
