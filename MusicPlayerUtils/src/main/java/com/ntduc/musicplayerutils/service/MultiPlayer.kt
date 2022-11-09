@@ -52,7 +52,7 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
         completion: (success: Boolean) -> Unit,
     ) {
         isInitialized = false
-        setDataSourceImpl(mCurrentMediaPlayer, song.uri.toString()) { success ->
+        setDataSourceImpl(mCurrentMediaPlayer, song.data.toString()) { success ->
             isInitialized = success
             if (isInitialized) {
                 setNextDataSource(null)

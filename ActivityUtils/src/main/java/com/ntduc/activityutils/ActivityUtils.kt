@@ -47,6 +47,20 @@ fun Activity.showBottomBar() {
     ).show(WindowInsetsCompat.Type.navigationBars())
 }
 
+
+//Đặt màu StatusBar
+fun Activity.setStatusBarColor(@ColorRes color: Int) {
+    window.statusBarColor = ContextCompat.getColor(this, color)
+}
+
+// Chiều cao StatusBar (px)
+val Activity.getStatusBarHeight: Int
+    get() {
+        val rect = Rect()
+        window.decorView.getWindowVisibleDisplayFrame(rect)
+        return rect.top
+    }
+
 //Ẩn StatusBar
 fun Activity.hideStatusBar() {
     WindowInsetsControllerCompat(window, window.decorView).let { controller ->
@@ -63,6 +77,19 @@ fun Activity.showStatusBar() {
         window.decorView
     ).show(WindowInsetsCompat.Type.statusBars())
 }
+
+
+//Đặt màu NavigationBar
+fun Activity.setNavigationBarColor(@ColorRes color: Int) {
+    window.navigationBarColor = ContextCompat.getColor(this, color)
+}
+
+//Đặt màu dải phân cách NavigationBar
+@RequiresApi(api = Build.VERSION_CODES.P)
+fun Activity.setNavigationBarDividerColor(@ColorRes color: Int) {
+    window.navigationBarDividerColor = ContextCompat.getColor(this, color)
+}
+
 
 //Bật chế độ full màn hình
 fun Activity.enterFullScreenMode() {
@@ -83,6 +110,7 @@ fun Activity.exitFullScreenMode() {
     ).show(WindowInsetsCompat.Type.systemBars())
 }
 
+
 //Tắt chụp màn hình
 fun Activity.addSecureFlag() {
     window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -92,6 +120,7 @@ fun Activity.addSecureFlag() {
 fun Activity.clearSecureFlag() {
     window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
 }
+
 
 //Hiển thị bàn phím
 fun Activity.showKeyboard(toFocus: View) {
@@ -111,11 +140,6 @@ fun Activity.hideKeyboard() {
     }
 }
 
-//Check PIP
-val Activity.supportsPictureInPicture: Boolean
-    get() {
-        return SDK_INT >= N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
-    }
 
 //Thay đổi độ sáng
 var Activity.brightness: Float?
@@ -127,77 +151,16 @@ var Activity.brightness: Float?
         window?.attributes = layoutParams
     }
 
-// Chiều cao StatusBar (px)
-val Activity.getStatusBarHeight: Int
-    get() {
-        val rect = Rect()
-        window.decorView.getWindowVisibleDisplayFrame(rect)
-        return rect.top
-    }
-
-//Kích thước màn hình (px)
-val Activity.displaySizePixels: Point
-    get() {
-        var display = this.windowManager.defaultDisplay
-        if (SDK_INT >= Build.VERSION_CODES.R) {
-            display = this.display
-        }
-        return DisplayMetrics()
-            .apply {
-                display.getRealMetrics(this)
-            }.let {
-                Point(it.widthPixels, it.heightPixels)
-            }
-    }
-
-//Đặt màu StatusBar
-fun Activity.setStatusBarColor(@ColorRes color: Int) {
-    window.statusBarColor = ContextCompat.getColor(this, color)
+//Bật tính năng luôn cho màn hình sáng
+fun Activity.keepScreenOn() {
+    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 }
 
-//Đặt màu NavigationBar
-fun Activity.setNavigationBarColor(@ColorRes color: Int) {
-    window.navigationBarColor = ContextCompat.getColor(this, color)
+//Tắt tính năng Luôn cho màn hình sáng
+fun Activity.keepScreenOFF() {
+    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 }
 
-//Đặt màu dải phân cách NavigationBar
-@RequiresApi(api = Build.VERSION_CODES.P)
-fun Activity.setNavigationBarDividerColor(@ColorRes color: Int) {
-    window.navigationBarDividerColor = ContextCompat.getColor(this, color)
-}
-
-// Restart Activity
-inline fun Activity.restart(intentBuilder: Intent.() -> Unit = {}) {
-    val i = Intent(this, this::class.java)
-    val oldExtras = intent.extras
-    if (oldExtras != null)
-        i.putExtras(oldExtras)
-    i.intentBuilder()
-    startActivity(i)
-    finish()
-}
-
-//Chỉnh thời gian tắt màn hình
-inline var Context.sleepDuration: Int
-    @RequiresPermission(WRITE_SETTINGS)
-    set(value) {
-        Settings.System.putInt(
-            this.contentResolver,
-            Settings.System.SCREEN_OFF_TIMEOUT,
-            value
-        )
-    }
-    get() {
-        return try {
-            Settings.System.getInt(
-                this.contentResolver,
-                Settings.System.SCREEN_OFF_TIMEOUT
-            )
-        } catch (e: Settings.SettingNotFoundException) {
-            e.printStackTrace()
-            -123
-        }
-    }
 
 //Khoá xoay màn hình
 fun Activity.lockOrientation() {
@@ -217,87 +180,35 @@ fun Activity.lockCurrentScreenOrientation() {
     }
 }
 
-// Uri --> Bitmap
-fun Activity.getBitmapFromUri(uri: Uri): Bitmap? {
-    return contentResolver.openInputStream(uri)?.use {
-        return@use BitmapFactory.decodeStream(it)
+
+//Check PIP
+val Activity.supportsPictureInPicture: Boolean
+    get() {
+        return SDK_INT >= N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
     }
-}
 
-//Setup toolbar
-fun AppCompatActivity.setupToolbar(
-    toolbar: Toolbar,
-    displayHomeAsUpEnabled: Boolean = true,
-    displayShowHomeEnabled: Boolean = true,
-    displayShowTitleEnabled: Boolean = false,
-    showUpArrowAsCloseIcon: Boolean = false,
-    @DrawableRes closeIconDrawableRes: Int? = null
-) {
-    setSupportActionBar(toolbar)
-    supportActionBar?.apply {
-        setDisplayHomeAsUpEnabled(displayHomeAsUpEnabled)
-        setDisplayShowHomeEnabled(displayShowHomeEnabled)
-        setDisplayShowTitleEnabled(displayShowTitleEnabled)
-
-        if (showUpArrowAsCloseIcon && closeIconDrawableRes != null) {
-            setHomeAsUpIndicator(
-                AppCompatResources.getDrawable(
-                    this@setupToolbar,
-                    closeIconDrawableRes
-                )
-            )
+//Kích thước Activity (px)
+val Activity.displaySizePixels: Point
+    get() {
+        var display = this.windowManager.defaultDisplay
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            display = this.display
         }
+        return DisplayMetrics()
+            .apply {
+                display.getRealMetrics(this)
+            }.let {
+                Point(it.widthPixels, it.heightPixels)
+            }
     }
-}
 
-//Hiển thị BackButton Toolbar
-fun AppCompatActivity.showBackButton() {
-    this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-}
-
-//Ẩn BackButton Toolbar
-fun AppCompatActivity.hideBackButton() {
-    this.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-}
-
-//Ẩn Toolbar
-fun AppCompatActivity.hideToolbar() {
-    this.supportActionBar?.hide()
-}
-
-//Hiển thị Toolbar
-fun AppCompatActivity.showToolbar() {
-    this.supportActionBar?.show()
-}
-
-//Đặt Title Toolbar
-fun AppCompatActivity.setToolbarTitle(@StringRes title: Int) {
-    supportActionBar?.setTitle(title)
-}
-
-//Đặt Title Toolbar
-fun AppCompatActivity.setToolbarTitle(title: String) {
-    supportActionBar?.title = title
-}
-
-fun AppCompatActivity.customToolbarDrawable(drawable: Drawable?) {
-    supportActionBar?.setBackgroundDrawable(drawable)
-}
-
-fun AppCompatActivity.customBackButton(drawable: Drawable?) {
-    supportActionBar?.setHomeAsUpIndicator(drawable)
-}
-
-fun AppCompatActivity.customBackButton(drawableResource: Int) {
-    supportActionBar?.setHomeAsUpIndicator(drawableResource)
-}
-
-//Bật tính năng luôn cho màn hình sáng
-fun Activity.keepScreenOn() {
-    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-}
-
-//Tắt tính năng Luôn cho màn hình sáng
-fun Activity.keepScreenOFF() {
-    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+// Restart Activity
+inline fun Activity.restart(intentBuilder: Intent.() -> Unit = {}) {
+    val i = Intent(this, this::class.java)
+    val oldExtras = intent.extras
+    if (oldExtras != null)
+        i.putExtras(oldExtras)
+    i.intentBuilder()
+    startActivity(i)
+    finish()
 }

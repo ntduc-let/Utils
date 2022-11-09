@@ -15,6 +15,8 @@
 package com.ntduc.musicplayerutils
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class App : Application() {
 
@@ -24,11 +26,11 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-//
-//        startKoin {
-//            androidContext(this@App)
-//            modules(appModules)
-//        }
+
+        startKoin {
+            androidContext(this@App)
+            modules(appModules)
+        }
 //        // default theme
 //        if (!ThemeStore.isConfigured(this, 3)) {
 //            ThemeStore.editTheme(this)

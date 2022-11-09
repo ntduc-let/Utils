@@ -78,7 +78,7 @@ class ActiUtilsActivity : AppCompatActivity() {
         binding.btnSleepDuration.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.System.canWrite(this)) {
-                    sleepDuration = 5000
+                    val sleepDuration = 5000
                     shortToast("Sleep after: ${sleepDuration}ms")
                 } else {
                     try {

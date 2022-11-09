@@ -1,6 +1,7 @@
 package com.ntduc.fileutils.model
 
 open class BaseFile(
+    var id: Long? = null,
     var title: String? = null,
     var displayName: String? = null,
     var mimeType: String? = null,

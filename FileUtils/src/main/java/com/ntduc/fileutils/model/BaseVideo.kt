@@ -1,6 +1,7 @@
 package com.ntduc.fileutils.model
 
 open class BaseVideo(
+    id: Long? = null,
     title: String? = null,
     displayName: String? = null,
     mimeType: String? = null,
@@ -16,4 +17,4 @@ open class BaseVideo(
     var bucketID: Long? = null,
     var bucketDisplayName: String? = null,
     var resolution: String? = null
-) : BaseFile(title, displayName, mimeType, size, dateAdded, dateModified, data)
+) : BaseFile(id, title, displayName, mimeType, size, dateAdded, dateModified, data)

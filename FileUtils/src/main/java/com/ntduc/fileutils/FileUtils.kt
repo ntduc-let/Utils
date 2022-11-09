@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.provider.BaseColumns
 import android.provider.MediaStore
+import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import com.ntduc.fileutils.model.BaseFile
@@ -199,6 +201,7 @@ fun Context.getFiles(
 
     val uri = MediaStore.Files.getContentUri("external")
     val projection = arrayOf(
+        BaseColumns._ID,
         MediaStore.Files.FileColumns.TITLE,
         MediaStore.Files.FileColumns.DISPLAY_NAME,
         MediaStore.Files.FileColumns.MIME_TYPE,
@@ -225,6 +228,7 @@ fun Context.getFiles(
         null,
         sortOrder
     )?.use { cursor ->
+        val col_id = cursor.getColumnIndex(BaseColumns._ID)
         val col_title = cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE)
         val col_displayName = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
         val col_mimeType = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)
@@ -234,6 +238,7 @@ fun Context.getFiles(
         val col_data = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
 
         while (cursor.moveToNext()) {
+            val id = cursor.getLong(col_id)
             val title = cursor.getString(col_title)
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
@@ -242,7 +247,7 @@ fun Context.getFiles(
             val dateModified = cursor.getLong(col_dateModified) * 1000
             val data = cursor.getString(col_data)
 
-            files.add(BaseFile(title, displayName, mimeType, size, dateAdded, dateModified, data))
+            files.add(BaseFile(id, title, displayName, mimeType, size, dateAdded, dateModified, data))
         }
         cursor.close()
     }
@@ -251,12 +256,14 @@ fun Context.getFiles(
 
 fun Context.getAudios(
     directoryPath: String = "",
-    types: List<String>
+    types: List<String>,
+    isMusic: Boolean = false
 ): List<BaseAudio> {
     val audios = ArrayList<BaseAudio>()
 
     val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
+        BaseColumns._ID,
         MediaStore.Audio.AudioColumns.TITLE,
         MediaStore.Audio.AudioColumns.DISPLAY_NAME,
         MediaStore.Audio.AudioColumns.MIME_TYPE,
@@ -270,11 +277,21 @@ fun Context.getAudios(
     )
     var selection = ""
     for (i in types.indices) {
-        if (i == 0) {
-            selection = "${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
-        } else {
-            selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
+        when (i) {
+            0 -> {
+                selection = "(${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
+            }
+            types.size-1 -> {
+                selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}')"
+            }
+            else -> {
+                selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
+            }
         }
+    }
+
+    if (isMusic){
+        selection += " AND ${MediaStore.Audio.AudioColumns.IS_MUSIC} = 1 AND ${MediaStore.Audio.AudioColumns.TITLE} != ''"
     }
 
     val sortOrder = "${MediaStore.Audio.AudioColumns.DATA} ASC"
@@ -286,6 +303,7 @@ fun Context.getAudios(
         null,
         sortOrder
     )?.use { cursor ->
+        val col_id = cursor.getColumnIndex(BaseColumns._ID)
         val col_title = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE)
         val col_displayName = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DISPLAY_NAME)
         val col_mimeType = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.MIME_TYPE)
@@ -298,6 +316,7 @@ fun Context.getAudios(
         val col_duration = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)
 
         while (cursor.moveToNext()) {
+            val id = cursor.getLong(col_id)
             val title = cursor.getString(col_title)
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
@@ -311,6 +330,7 @@ fun Context.getAudios(
 
             audios.add(
                 BaseAudio(
+                    id,
                     title,
                     displayName,
                     mimeType,
@@ -337,6 +357,7 @@ fun Context.getImages(
 
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
+        BaseColumns._ID,
         MediaStore.Images.ImageColumns.TITLE,
         MediaStore.Images.ImageColumns.DISPLAY_NAME,
         MediaStore.Images.ImageColumns.MIME_TYPE,
@@ -365,6 +386,7 @@ fun Context.getImages(
         null,
         sortOrder
     )?.use { cursor ->
+        val col_id = cursor.getColumnIndex(BaseColumns._ID)
         val col_title = cursor.getColumnIndex(MediaStore.Images.ImageColumns.TITLE)
         val col_displayName = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
         val col_mimeType = cursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)
@@ -376,6 +398,7 @@ fun Context.getImages(
         val col_width = cursor.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)
 
         while (cursor.moveToNext()) {
+            val id = cursor.getLong(col_id)
             val title = cursor.getString(col_title)
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
@@ -388,6 +411,7 @@ fun Context.getImages(
 
             images.add(
                 BaseImage(
+                    id,
                     title,
                     displayName,
                     mimeType,
@@ -413,6 +437,7 @@ fun Context.getVideos(
 
     val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
+        BaseColumns._ID,
         MediaStore.Video.VideoColumns.TITLE,
         MediaStore.Video.VideoColumns.DISPLAY_NAME,
         MediaStore.Video.VideoColumns.MIME_TYPE,
@@ -447,6 +472,7 @@ fun Context.getVideos(
         null,
         sortOrder
     )?.use { cursor ->
+        val col_id = cursor.getColumnIndex(BaseColumns._ID)
         val col_title = cursor.getColumnIndex(MediaStore.Video.VideoColumns.TITLE)
         val col_displayName = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DISPLAY_NAME)
         val col_mimeType = cursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)
@@ -465,6 +491,7 @@ fun Context.getVideos(
         val col_resolution = cursor.getColumnIndex(MediaStore.Video.VideoColumns.RESOLUTION)
 
         while (cursor.moveToNext()) {
+            val id = cursor.getLong(col_id)
             val title = cursor.getString(col_title)
             val displayName = cursor.getString(col_displayName)
             val mimeType = cursor.getString(col_mimeType)
@@ -483,6 +510,7 @@ fun Context.getVideos(
 
             videos.add(
                 BaseVideo(
+                    id,
                     title,
                     displayName,
                     mimeType,

@@ -1,5 +1,6 @@
 package com.ntduc.contextutils
 
+import android.Manifest
 import android.Manifest.permission.READ_PHONE_STATE
 import android.annotation.SuppressLint
 import android.content.*
@@ -316,6 +317,28 @@ fun Context.getColorCompat(color: Int) = ContextCompat.getColor(this, color)
 
 fun Context.getDrawableCompat(drawable: Int) = ContextCompat.getDrawable(this, drawable)
 
+//Chỉnh thời gian tắt màn hình
+inline var Context.sleepDuration: Int
+    @RequiresPermission(Manifest.permission.WRITE_SETTINGS)
+    set(value) {
+        Settings.System.putInt(
+            this.contentResolver,
+            Settings.System.SCREEN_OFF_TIMEOUT,
+            value
+        )
+    }
+    get() {
+        return try {
+            Settings.System.getInt(
+                this.contentResolver,
+                Settings.System.SCREEN_OFF_TIMEOUT
+            )
+        } catch (e: Settings.SettingNotFoundException) {
+            e.printStackTrace()
+            -123
+        }
+    }
+
 inline val Context.displayWidth: Int
     get() = resources.displayMetrics.widthPixels
 
@@ -334,3 +357,10 @@ val Context.isDarkTheme
         Configuration.UI_MODE_NIGHT_UNDEFINED -> false
         else -> true
     }
+
+fun Context.restartApp() {
+    val restartIntent = packageManager.getLaunchIntentForPackage(packageName)!!
+    restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    restartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    startActivity(restartIntent)
+}

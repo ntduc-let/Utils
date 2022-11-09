@@ -27,13 +27,10 @@ import androidx.annotation.Nullable;
 import com.ntduc.musicplayerutils.App;
 import com.ntduc.musicplayerutils.Constants;
 import com.ntduc.musicplayerutils.model.Song;
+import com.ntduc.musicplayerutils.repository.RealSongRepository;
 
 import java.util.List;
 
-import code.name.monkey.retromusic.App;
-import code.name.monkey.retromusic.Constants;
-import code.name.monkey.retromusic.model.Song;
-import code.name.monkey.retromusic.repository.RealSongRepository;
 
 /**
  * @author Andrew Neal, modified for Phonograph by Karim Abou Zeid

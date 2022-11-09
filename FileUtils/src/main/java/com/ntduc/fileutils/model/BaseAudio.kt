@@ -1,6 +1,7 @@
 package com.ntduc.fileutils.model
 
 open class BaseAudio(
+    id: Long? = null,
     title: String? = null,
     displayName: String? = null,
     mimeType: String? = null,
@@ -11,4 +12,4 @@ open class BaseAudio(
     var album: String? = null,
     var artist: String? = null,
     var duration: Long? = null
-) : BaseFile(title, displayName, mimeType, size, dateAdded, dateModified, data)
+) : BaseFile(id, title, displayName, mimeType, size, dateAdded, dateModified, data)
