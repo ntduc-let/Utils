@@ -2,9 +2,10 @@ package com.ntduc.musicplayerutils
 
 import com.ntduc.musicplayerutils.auto.AutoMusicProvider
 import com.ntduc.musicplayerutils.cast.RetroWebServer
-import com.ntduc.musicplayerutils.repository.RealUriRepository
-import com.ntduc.musicplayerutils.repository.UriRepository
+import com.ntduc.musicplayerutils.repository.RealSongRepository
+import com.ntduc.musicplayerutils.repository.SongRepository
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -82,8 +83,8 @@ private val dataModule = module {
 //    } bind Repository::class
 
     single {
-        RealUriRepository(get())
-    } bind UriRepository::class
+        RealSongRepository(get())
+    } bind SongRepository::class
 //
 //    single {
 //        RealGenreRepository(get(), get())

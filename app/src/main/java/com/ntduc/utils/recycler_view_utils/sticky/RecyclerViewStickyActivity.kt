@@ -32,7 +32,7 @@ class RecyclerViewStickyActivity : AppCompatActivity() {
         binding.rcv.adapter = adapter
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.rcv_sticky, menu)
         return super.onCreateOptionsMenu(menu)
     }

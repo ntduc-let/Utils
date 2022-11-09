@@ -2115,14 +2115,14 @@ open class VideoPlayerActivity : Activity() {
                 videoSurfaceView.holder.setFixedSize(format.width, format.height)
             }
             var rational = getRational(format)
-            if (Build.VERSION.SDK_INT >= 33 &&
-                packageManager.hasSystemFeature(PackageManager.FEATURE_EXPANDED_PICTURE_IN_PICTURE) &&
-                (rational.toFloat() > rationalLimitWide.toFloat() || rational.toFloat() < rationalLimitTall.toFloat())
-            ) {
-                (mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.setExpandedAspectRatio(
-                    rational
-                )
-            }
+//            if (Build.VERSION.SDK_INT >= 33 &&
+//                packageManager.hasSystemFeature(PackageManager.FEATURE_EXPANDED_PICTURE_IN_PICTURE) &&
+//                (rational.toFloat() > rationalLimitWide.toFloat() || rational.toFloat() < rationalLimitTall.toFloat())
+//            ) {
+//                (mPictureInPictureParamsBuilder as PictureInPictureParams.Builder?)!!.setExpandedAspectRatio(
+//                    rational
+//                )
+//            }
             if (rational.toFloat() > rationalLimitWide.toFloat()) rational =
                 rationalLimitWide else if (rational.toFloat() < rationalLimitTall.toFloat()) rational =
                 rationalLimitTall

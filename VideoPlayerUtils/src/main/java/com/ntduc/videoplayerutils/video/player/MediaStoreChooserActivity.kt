@@ -31,9 +31,9 @@ class MediaStoreChooserActivity : Activity() {
         subtitles = intent.getBooleanExtra(SUBTITLES, false)
         title = intent.getStringExtra(TITLE)
         var permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
-        if (Build.VERSION.SDK_INT >= 33 && applicationContext.applicationInfo.targetSdkVersion >= 33) {
-            permission = Manifest.permission.READ_MEDIA_VIDEO
-        }
+//        if (Build.VERSION.SDK_INT >= 33 && applicationContext.applicationInfo.targetSdkVersion >= 33) {
+//            permission = Manifest.permission.READ_MEDIA_VIDEO
+//        }
         if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
             start()
         } else {

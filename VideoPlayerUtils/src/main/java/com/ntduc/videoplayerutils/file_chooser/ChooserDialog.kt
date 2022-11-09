@@ -249,7 +249,9 @@ class ChooserDialog(activity: Activity, @StyleRes fileChooserTheme: Int) :
                 override fun onPermissionGranted(permissions: Array<out String?>?) {
                     var show = false
                     for (permission in permissions!!) {
-                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || Build.VERSION.SDK_INT >= 33 && permission == Manifest.permission.READ_MEDIA_VIDEO) {
+                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE
+//                            || Build.VERSION.SDK_INT >= 33 && permission == Manifest.permission.READ_MEDIA_VIDEO
+                        ) {
                             show = true
                             break
                         }
@@ -285,9 +287,9 @@ class ChooserDialog(activity: Activity, @StyleRes fileChooserTheme: Int) :
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) /*: new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}*/
-        if (Build.VERSION.SDK_INT >= 33 && _context.applicationInfo.targetSdkVersion >= 33) {
-            permissions = arrayOf(Manifest.permission.READ_MEDIA_VIDEO)
-        }
+//        if (Build.VERSION.SDK_INT >= 33 && _context.applicationInfo.targetSdkVersion >= 33) {
+//            permissions = arrayOf(Manifest.permission.READ_MEDIA_VIDEO)
+//        }
         checkPermissions(_context, _permissionListener, *permissions)
         return this
     }

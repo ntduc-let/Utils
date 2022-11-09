@@ -21,7 +21,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class GetAllAudioViewModel : ViewModel() {
-    var listSong: ArrayList<Song> = arrayListOf()
+//    var listSong: ArrayList<Song> = arrayListOf()
     var listAllAudio: MutableLiveData<List<MyFolderAudio>> = MutableLiveData(listOf())
     var isLoadListAllAudio = false
 
@@ -33,24 +33,24 @@ class GetAllAudioViewModel : ViewModel() {
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }
                 val result = ArrayList<MyAudio>()
-                listSong = arrayListOf()
+//                listSong = arrayListOf()
                 temp.forEach {
-                    val song = Song(
-                        id = it.id,
-                        title = it.title,
-                        trackNumber = null,
-                        year = null,
-                        duration = it.duration,
-                        data = it.data,
-                        dateModified = it.dateModified,
-                        albumId = null,
-                        albumName = it.album,
-                        artistId = null,
-                        artistName = it.artist,
-                        composer = null,
-                        albumArtist = null
-                    )
-                    listSong.add(song)
+//                    val song = Song(
+//                        id = it.id,
+//                        title = it.title,
+//                        trackNumber = null,
+//                        year = null,
+//                        duration = it.duration,
+//                        data = it.data,
+//                        dateModified = it.dateModified,
+//                        albumId = null,
+//                        albumName = it.album,
+//                        artistId = null,
+//                        artistName = it.artist,
+//                        composer = null,
+//                        albumArtist = null
+//                    )
+//                    listSong.add(song)
 
                     val myFile = MyFile(
                         it.title,
