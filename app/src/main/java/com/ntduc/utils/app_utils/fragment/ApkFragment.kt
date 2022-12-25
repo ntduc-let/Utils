@@ -1,14 +1,27 @@
 package com.ntduc.utils.app_utils.fragment
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.FileProvider
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.ntduc.apputils.installApk
+import com.ntduc.utils.app_utils.activity.AppViewModel
+import com.ntduc.utils.app_utils.adapter.ApkAdapter
 import com.ntduc.utils.databinding.FragmentApkBinding
+import java.io.File
+
 
 class ApkFragment : Fragment() {
     private lateinit var binding: FragmentApkBinding
+    private lateinit var adapter: ApkAdapter
+    private lateinit var viewModel: AppViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,9 +39,39 @@ class ApkFragment : Fragment() {
 
     private fun init(){
         initView()
+        initData()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        adapter.setOnInstallListener {
+            requireContext().installApk(path = it.myFile!!.data!!)
+        }
+    }
+
+    private fun initData() {
+        viewModel.listAllApk.observe(viewLifecycleOwner) {
+            if (viewModel.isLoadListAllApk) {
+                binding.layoutLoading.root.visibility = View.GONE
+                if (it.isEmpty()) {
+                    binding.layoutNoItem.root.visibility = View.VISIBLE
+                    binding.rcvList.visibility = View.INVISIBLE
+                } else {
+                    binding.layoutNoItem.root.visibility = View.GONE
+                    binding.rcvList.visibility = View.VISIBLE
+                    adapter.updateData(it)
+                }
+            } else {
+                binding.layoutLoading.root.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun initView() {
+        viewModel = ViewModelProvider(requireActivity())[AppViewModel::class.java]
 
+        adapter = ApkAdapter(requireContext())
+        binding.rcvList.adapter = adapter
+        binding.rcvList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
     }
 }

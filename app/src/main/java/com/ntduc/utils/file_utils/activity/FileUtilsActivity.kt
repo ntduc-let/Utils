@@ -11,11 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityFileUtilsBinding
 import com.ntduc.fileutils.*
-import com.ntduc.stringutils.asFile
 import com.ntduc.utils.file_utils.get_all_audio.activity.GetAllAudioActivity
 import com.ntduc.utils.file_utils.get_all_file.activity.GetAllFileActivity
 import com.ntduc.utils.file_utils.get_all_image.activity.GetAllImageActivity
 import com.ntduc.utils.file_utils.get_all_video.activity.GetAllVideoActivity
+import java.io.File
 
 
 class FileUtilsActivity : AppCompatActivity() {
@@ -41,8 +41,8 @@ class FileUtilsActivity : AppCompatActivity() {
                 val uri = docUri.getRealPath(this)
                 if (uri != null) {
                     if (copyFile(
-                            file = binding.txt.text.toString().asFile(),
-                            dest = uri.asFile(),
+                            file = File(binding.txt.text.toString()),
+                            dest = File(uri),
                             overwrite = true,
                             onCompleted = {
                                 Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
@@ -68,8 +68,8 @@ class FileUtilsActivity : AppCompatActivity() {
                 val uri = docUri.getRealPath(this)
                 if (uri != null) {
                     if (moveFile(
-                            file = binding.txt.text.toString().asFile(),
-                            dest = uri.asFile(),
+                            file = File(binding.txt.text.toString()),
+                            dest = File(uri),
                             overwrite = true,
                             onCompleted = {
                                 Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
@@ -105,7 +105,7 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             if (renameFile(
-                    binding.txt.text.toString().asFile(),
+                    File(binding.txt.text.toString()),
                     binding.edtRenameFile.text.toString(),
                     onCompleted = {
                         Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
@@ -141,7 +141,7 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            deleteFiles(listOf(binding.txt.text.toString().asFile()), onCompleted = {
+            deleteFiles(listOf(File(binding.txt.text.toString())), onCompleted = {
                 shortToast("Delete success")
             })
             binding.txt.text = ""
@@ -153,7 +153,7 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            shareFile(binding.txt.text.toString().asFile(), "com.ntduc.utils.provider")
+            shareFile(File(binding.txt.text.toString()), "com.ntduc.utils.provider")
         }
 
         binding.btnGetAllFile.setOnClickListener {

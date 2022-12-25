@@ -7,14 +7,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+val currentMillis get() = System.currentTimeMillis()
 val currentDate get() = Date(System.currentTimeMillis())
-
-val Date.calendar: Calendar
-    get() {
-        val calendar = currentCalendar
-        calendar.time = this
-        return calendar
-    }
+val currentCalendar get() = Calendar.getInstance()
 
 val Calendar.year: Int
     get() = get(Calendar.YEAR)
@@ -37,12 +32,19 @@ val Calendar.minute: Int
 val Calendar.second: Int
     get() = get(Calendar.SECOND)
 
+val Date.toCalendar: Calendar
+    get() {
+        val calendar = currentCalendar
+        calendar.time = this
+        return calendar
+    }
+
 fun Date.isFuture(): Boolean {
     return !Date().before(this)
 }
 
-fun Date.isPast(): Boolean {
-    return Date().before(this)
+fun Date.isTomorrow(): Boolean {
+    return DateUtils.isToday(this.time - DateUtils.DAY_IN_MILLIS)
 }
 
 fun Date.isToday(): Boolean {
@@ -53,30 +55,8 @@ fun Date.isYesterday(): Boolean {
     return DateUtils.isToday(this.time + DateUtils.DAY_IN_MILLIS)
 }
 
-fun Date.isTomorrow(): Boolean {
-    return DateUtils.isToday(this.time - DateUtils.DAY_IN_MILLIS)
-}
-
-fun Date.reset(): Date {
-    val calendar = Calendar.getInstance()
-    calendar.time = this
-    calendar.set(Calendar.HOUR_OF_DAY, 0)
-    calendar.set(Calendar.MINUTE, 0)
-    calendar.set(Calendar.SECOND, 0)
-    calendar.set(Calendar.MILLISECOND, 0)
-    return calendar.time
-}
-
-fun Date.getAge(): Int {
-    val birthday = Calendar.getInstance()
-    birthday.time = this
-    val today = Calendar.getInstance()
-
-    var age = today.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)
-    if (today.get(Calendar.DAY_OF_YEAR) < birthday.get(Calendar.DAY_OF_YEAR)) {
-        age -= 1
-    }
-    return age
+fun Date.isPast(): Boolean {
+    return Date().before(this)
 }
 
 private val DATEFORMAT = "dd-MM-yyyy HH:mm:ss"
@@ -124,15 +104,15 @@ fun extractSeconds(millis: Long): Long {
     return millis / 1000 % 60
 }
 
-val currentMillis: Long
-    get() = System.currentTimeMillis()
-
-val currentCalendar: Calendar
-    get() = Calendar.getInstance()
-
-fun convertDate(date: String, defaultFormat: String, formatWanted: String): String {
-    val format1 = SimpleDateFormat(defaultFormat, Locale.getDefault())
-    val format2 = SimpleDateFormat(formatWanted, Locale.getDefault())
+fun convertDate(
+    date: String,
+    formatDefault: String,
+    formatWanted: String,
+    localeDefault: Locale = Locale.getDefault(),
+    localeWanted: Locale = Locale.getDefault()
+): String {
+    val format1 = SimpleDateFormat(formatDefault, localeDefault)
+    val format2 = SimpleDateFormat(formatWanted, localeWanted)
     return try {
         format2.format(format1.parse(date) ?: date)
     } catch (e: ParseException) {
@@ -140,7 +120,11 @@ fun convertDate(date: String, defaultFormat: String, formatWanted: String): Stri
     }
 }
 
-fun getDateTimeFromMillis(millis: Long, dateFormat: String, locale: Locale = Locale.getDefault()): String =
+fun getDateTimeFromMillis(
+    millis: Long,
+    dateFormat: String,
+    locale: Locale = Locale.getDefault()
+): String =
     SimpleDateFormat(dateFormat, locale).format(Date(millis))
 
 const val TIME_12HOUR = "hh:mm:ss a"

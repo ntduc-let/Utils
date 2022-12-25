@@ -5,8 +5,6 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.random.Random
 
-val Int.length get() = toString().length
-
 //UCLN
 fun Int.gcd(n: Int): Int {
     return if (n == 0) this else n.gcd(this % n)
@@ -27,12 +25,6 @@ fun Number.round(@IntRange(from = 1L) decimalCount: Int): String {
     val formatter = DecimalFormat(expression.toString())
     formatter.roundingMode = RoundingMode.HALF_UP
     return formatter.format(this)
-}
-
-fun Int.forEach(callback: (i: Int) -> Unit) {
-    for (i in 0 until this) {
-        callback(i)
-    }
 }
 
 const val BYTES_TO_KB: Long = 1024

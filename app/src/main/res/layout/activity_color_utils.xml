@@ -19,13 +19,6 @@
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_getDisabledColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="DisabledColor"
-            android:textAllCaps="false" />
-
-        <Button
             android:id="@+id/btn_setColorAlpha"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

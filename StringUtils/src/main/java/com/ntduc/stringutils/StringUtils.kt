@@ -6,8 +6,7 @@ import android.text.*
 import android.text.style.*
 import android.util.Patterns
 import android.view.View
-import java.io.File
-import java.io.FileOutputStream
+import androidx.annotation.ColorInt
 import java.security.SecureRandom
 import java.util.*
 import java.util.regex.Pattern
@@ -32,14 +31,6 @@ fun String.isHttp() = this.matches(Regex("(http|https)://[^\\s]*"))
 
 fun CharSequence.isEmail() = isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
-fun String.asFile() = File(this)
-
-fun String.saveToFile(file: File) = FileOutputStream(file).bufferedWriter().use {
-    it.write(this)
-    it.flush()
-    it.close()
-}
-
 fun String.convertToCamelCase(): String {
     var titleText = ""
     if (this.isNotEmpty()) {
@@ -56,56 +47,6 @@ fun String.ellipsize(at: Int): String {
         return this.substring(0, at) + "..."
     }
     return this
-}
-
-val String?.asDouble: Double
-    get() = if (TextUtils.isEmpty(this)) 0.0 else try {
-        this!!.toDouble()
-    } catch (e: Exception) {
-        0.0
-    }
-
-val String?.asInt: Int
-    get() = if (TextUtils.isEmpty(this)) 0 else try {
-        this!!.toInt()
-    } catch (e: Exception) {
-        0
-    }
-
-val String?.asFloat: Float
-    get() = if (TextUtils.isEmpty(this)) 0f else try {
-        this!!.toFloat()
-    } catch (e: Exception) {
-        0f
-    }
-
-val CharSequence?.asInt: Int
-    get() = toString().asInt
-
-val CharSequence?.asFloat: Float
-    get() = toString().asFloat
-
-val CharSequence?.asDouble: Double
-    get() = toString().asDouble
-
-fun charToByte(c: Char): Byte {
-    return "0123456789ABCDEF".indexOf(c).toByte()
-}
-
-fun String.convertToBytes(): ByteArray {
-    if (this == "") {
-        return ByteArray(0)
-    }
-    val newHexString = this.trim().uppercase()
-    val length = newHexString.length / 2
-    val hexChars = newHexString.toCharArray()
-    val d = ByteArray(length)
-    for (i in 0 until length) {
-        val pos = i * 2
-        d[i] =
-            (charToByte(hexChars[pos]).toInt() shl 4 or charToByte(hexChars[pos + 1]).toInt()).toByte()
-    }
-    return d
 }
 
 fun CharSequence.setBackgroundColor(color: Int): CharSequence {
@@ -126,7 +67,7 @@ fun String.highlight(
     strikeLine: Boolean = false,
     bold: Boolean = false,
     italic: Boolean = false,
-    color: Int? = null
+    @ColorInt color: Int? = null
 ): SpannableString {
     val ss = SpannableString(this)
 

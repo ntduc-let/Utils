@@ -16,10 +16,6 @@ class ColorUtilsActivity : AppCompatActivity() {
             binding.btnRandomColor.setBackgroundColor(randomColor)
         }
 
-        binding.btnGetDisabledColor.setOnClickListener {
-            binding.btnGetDisabledColor.setBackgroundColor(getDisabledColor())
-        }
-
         binding.btnSetColorAlpha.setOnClickListener {
             binding.btnSetColorAlpha.setBackgroundColor(setColorAlpha(Color.RED, 0.5f))
         }

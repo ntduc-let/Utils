@@ -11,20 +11,6 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/btn_hideBottomBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Hide BottomBar"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_showBottomBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Show BottomBar"
-            android:textAllCaps="false" />
-
-        <Button
             android:id="@+id/btn_hideStatusBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,7 +49,7 @@
             android:id="@+id/btn_clearSecureFlag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Clear System UI"
+            android:text="Clear Secure Flag"
             android:textAllCaps="false" />
 
         <Button
@@ -78,13 +64,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hide Keyboard"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_supportsPictureInPicture"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Check Supports Picture In Picture"
             android:textAllCaps="false" />
 
         <LinearLayout
@@ -129,6 +108,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Set StatusBar Color"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_getNavigationBarHeight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get NavigationBar Height (px)"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_hideNavigationBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hide NavigationBar"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_showNavigationBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show NavigationBar"
             android:textAllCaps="false" />
 
         <Button

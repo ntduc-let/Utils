@@ -3,7 +3,9 @@ package com.ntduc.contextutils
 import android.Manifest
 import android.Manifest.permission.READ_PHONE_STATE
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.*
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.LocationManager
 import android.net.ConnectivityManager
@@ -21,6 +23,14 @@ import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 
+//Check PIP
+val Context.supportsPictureInPicture: Boolean
+    get() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && packageManager.hasSystemFeature(
+            PackageManager.FEATURE_PICTURE_IN_PICTURE
+        )
+    }
+
 val Context.isLocationEnabled: Boolean
     get() = (getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.isProviderEnabled(
         LocationManager.NETWORK_PROVIDER
@@ -32,11 +42,14 @@ val Context.deviceID
     get() = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
 
 /**
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
  * 0 = no connection info available
  * 1 = mobile data
  * 2 = wifi
  * 3 = vpn
  */
+@SuppressLint("MissingPermission")
 @IntRange(from = 0, to = 3)
 fun Context.getConnectionType(): Int {
     var result = 0 // Returns connection type. 0: none; 1: mobile data; 2: wifi; 3: vpn

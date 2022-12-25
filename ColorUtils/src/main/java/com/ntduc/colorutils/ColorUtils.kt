@@ -44,14 +44,6 @@ fun setColorAlpha(@ColorInt color: Int, @FloatRange(from = 0.0, to = 1.0) alpha:
     return Color.argb(alpha2, red, green, blue)
 }
 
-@ColorInt
-fun Context.getDisabledColor(): Int {
-    val primaryColor = resolveColor(android.R.attr.textColorPrimary)
-    val disabledColor = if (primaryColor.isColorDark) Color.BLACK else Color.WHITE
-    return disabledColor.adjustAlpha(0.3f)
-}
-
-/*==================================================================================================*/
 fun RadioButton.tint(@ColorInt color: Int) = tint(context.colorStateList(color))
 
 fun CheckBox.tint(@ColorInt color: Int) = tint(context.colorStateList(color))
@@ -95,7 +87,7 @@ fun Toolbar?.changeNavigateUpColor(@IdRes color: Int) {
         this?.navigationIcon?.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
     }
 }
-/*==================================================================================================*/
+
 @ColorInt
 fun getTitleTextColor(@ColorInt color: Int): Int {
     val darkness =

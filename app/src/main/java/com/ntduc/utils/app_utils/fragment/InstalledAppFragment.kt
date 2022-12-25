@@ -1,16 +1,19 @@
 package com.ntduc.utils.app_utils.fragment
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.utils.app_utils.activity.AppViewModel
 import com.ntduc.utils.app_utils.adapter.InstalledAppAdapter
 import com.ntduc.utils.databinding.FragmentInstalledAppBinding
+import com.ntduc.utils.model.MyApp
+
 
 class InstalledAppFragment : Fragment() {
     private lateinit var binding: FragmentInstalledAppBinding
@@ -34,10 +37,28 @@ class InstalledAppFragment : Fragment() {
     private fun init(){
         initView()
         initData()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        adapter.setOnUninstallListener {
+            uninstallApp(it)
+        }
+    }
+
+    private fun uninstallApp(app: MyApp) {
+        val intent = Intent(
+            Intent.ACTION_DELETE, Uri.fromParts(
+                "package",
+                app.packageName,
+                null
+            )
+        )
+        startActivity(intent)
     }
 
     private fun initData() {
-        viewModel.listAllApp.observe(this) {
+        viewModel.listAllApp.observe(viewLifecycleOwner) {
             if (viewModel.isLoadListAllApp) {
                 binding.layoutLoading.root.visibility = View.GONE
                 if (it.isEmpty()) {

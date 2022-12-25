@@ -34,6 +34,12 @@ class InstalledAppAdapter(
         holder.binding.img.setImageDrawable(item.icon)
         holder.binding.txtTitle.text = item.name
         holder.binding.txtDescription.text = item.packageName
+
+        holder.binding.btnAction.setOnClickListener {
+            onUninstallListener?.let {
+                it(item)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -44,5 +50,11 @@ class InstalledAppAdapter(
     fun updateData(newList: List<MyApp>) {
         list = newList
         notifyDataSetChanged()
+    }
+
+    private var onUninstallListener: ((MyApp) -> Unit)? = null
+
+    fun setOnUninstallListener(listener: (MyApp) -> Unit) {
+        onUninstallListener = listener
     }
 }

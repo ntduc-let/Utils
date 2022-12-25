@@ -1,19 +1,13 @@
 package com.ntduc.utils.file_utils.get_all_file.activity
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
-import com.ntduc.fileutils.getMimeType
 import com.ntduc.fileutils.openFile
-import com.ntduc.videoplayerutils.video.player.VideoPlayerActivity
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityGetAllFileBinding
-import com.ntduc.utils.file_utils.constant.ExtensionConstants
-import com.ntduc.utils.file_utils.constant.FileType
 import com.ntduc.utils.file_utils.get_all_file.adapter.GetAllFileAdapter
 import java.io.File
 
@@ -44,19 +38,7 @@ class GetAllFileActivity : AppCompatActivity() {
     private fun initEvent() {
         adapter.setOnOpenListener {
             if (it.data != null && File(it.data!!).exists()) {
-                when (ExtensionConstants.getTypeFile(it.data!!)) {
-                    FileType.VIDEO -> {
-                        val file = File(it.data!!)
-                        val uri = FileProvider.getUriForFile(this, "com.ntduc.utils.provider", file)
-                        val intentOpenVideo = Intent(this, VideoPlayerActivity::class.java)
-                        intentOpenVideo.setDataAndType(uri, file.getMimeType())
-                        intentOpenVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(intentOpenVideo)
-                    }
-                    else -> {
-                        openFile(File(it.data!!), "com.ntduc.utils.provider")
-                    }
-                }
+                openFile(File(it.data!!), "com.ntduc.utils.provider")
             } else {
                 shortToast("File does not exists")
             }

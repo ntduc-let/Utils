@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ntduc.apputils.getApps
+import com.ntduc.fileutils.getFiles
+import com.ntduc.utils.model.MyApk
 import com.ntduc.utils.model.MyApp
+import com.ntduc.utils.model.MyFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,6 +46,32 @@ class AppViewModel : ViewModel() {
                 }
                 listAllApp.postValue(result)
                 isLoadListAllApp = true
+            }
+        }
+    }
+
+    var listAllApk: MutableLiveData<List<MyApk>> = MutableLiveData(listOf())
+    var isLoadListAllApk = false
+
+    fun loadAllApk(context: Context) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val apps = context.getFiles(types = listOf("apk"))
+                val result = ArrayList<MyApk>()
+                apps.forEach {
+                    val myFile = MyFile(
+                        it.title,
+                        it.displayName,
+                        it.mimeType,
+                        it.size,
+                        it.dateAdded,
+                        it.dateModified,
+                        it.data
+                    )
+                    result.add(MyApk(myFile = myFile))
+                }
+                listAllApk.postValue(result)
+                isLoadListAllApk = true
             }
         }
     }

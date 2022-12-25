@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -40,28 +41,26 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation project(path: ':AnimationUtils')
-    implementation project(path: ':ToastUtils')
     implementation project(path: ':ActivityUtils')
-    implementation project(path: ':ColorUtils')
     implementation project(path: ':ContextUtils')
-    implementation project(path: ':ViewPager2Utils')
+    implementation project(path: ':FragmentUtils')
+    implementation project(path: ':NavigationUtils')
+    implementation project(path: ':ToastUtils')
+    implementation project(path: ':ColorUtils')
+    implementation project(path: ':StringUtils')
     implementation project(path: ':NumberUtils')
     implementation project(path: ':DateTimeUtils')
-    implementation project(path: ':StringUtils')
+    implementation project(path: ':GlideUtils')
+    implementation project(path: ':SharedPreferenceUtils')
+
+    implementation project(path: ':ViewPager2Utils')
     implementation project(path: ':FileUtils')
     implementation project(path: ':RecyclerViewUtils')
     implementation project(path: ':AppUtils')
-    implementation project(path: ':VideoPlayerUtils')
 
     // Coroutines kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
-
-    //Glide
-    implementation 'com.github.bumptech.glide:glide:4.14.2'
-    implementation project(path: ':MusicPlayerUtils')
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
     //Leak Canary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'

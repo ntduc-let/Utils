@@ -1,52 +1,24 @@
 package com.ntduc.activityutils
 
-import android.Manifest.permission.WRITE_SETTINGS
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.N
-import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.*
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-
-//Ẩn BottomBar
-fun Activity.hideBottomBar() {
-    WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-        controller.hide(WindowInsetsCompat.Type.navigationBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-    }
-}
-
-//Hiển thị BottomBar
-fun Activity.showBottomBar() {
-    WindowInsetsControllerCompat(
-        window,
-        window.decorView
-    ).show(WindowInsetsCompat.Type.navigationBars())
-}
-
+import androidx.fragment.app.Fragment
 
 //Đặt màu StatusBar
 fun Activity.setStatusBarColor(@ColorRes color: Int) {
@@ -78,6 +50,32 @@ fun Activity.showStatusBar() {
     ).show(WindowInsetsCompat.Type.statusBars())
 }
 
+//Ẩn NavigationBar
+fun Activity.hideNavigationBar() {
+    WindowInsetsControllerCompat(window, window.decorView).let { controller ->
+        controller.hide(WindowInsetsCompat.Type.navigationBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+}
+
+//Show NavigationBar
+fun Activity.showNavigationBar() {
+    WindowInsetsControllerCompat(
+        window,
+        window.decorView
+    ).show(WindowInsetsCompat.Type.navigationBars())
+}
+
+// Chiều cao NavigationBar (px)
+val Activity.getNavigationBarHeight: Int
+    get() {
+        val rectangle = Rect()
+        val displayMetrics = DisplayMetrics()
+        window.decorView.getWindowVisibleDisplayFrame(rectangle)
+        windowManager.defaultDisplay.getRealMetrics(displayMetrics)
+        return displayMetrics.heightPixels - (rectangle.top + rectangle.height())
+    }
 
 //Đặt màu NavigationBar
 fun Activity.setNavigationBarColor(@ColorRes color: Int) {
@@ -180,12 +178,6 @@ fun Activity.lockCurrentScreenOrientation() {
     }
 }
 
-
-//Check PIP
-val Activity.supportsPictureInPicture: Boolean
-    get() {
-        return SDK_INT >= N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
-    }
 
 //Kích thước Activity (px)
 val Activity.displaySizePixels: Point

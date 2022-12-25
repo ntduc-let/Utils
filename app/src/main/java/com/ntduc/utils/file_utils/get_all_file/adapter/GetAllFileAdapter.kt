@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.ntduc.glideutils.loadImg
 import com.ntduc.numberutils.formatBytes
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
@@ -82,47 +83,31 @@ class GetAllFileAdapter(
                 holder.binding.txtHeader.text = item.title
             }
             is ItemDocumentViewHolder -> {
-                val file = File(item.data!!)
-                if (file.isDirectory) {
-                    holder.binding.img.setImageResource(R.drawable.ic_folder)
-                } else {
-                    var requestOptions = RequestOptions()
-                    requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
+                when (ExtensionConstants.getTypeFile(item.data!!)) {
+                    FileType.MUSIC -> {
+                        val image = try {
+                            val mData = MediaMetadataRetriever()
+                            mData.setDataSource(item.data)
+                            val art = mData.embeddedPicture
+                            BitmapFactory.decodeByteArray(art, 0, art!!.size)
+                        } catch (e: Exception) {
+                            null
+                        }
 
-                    when (ExtensionConstants.getTypeFile(file.path)) {
-                        FileType.IMAGE, FileType.VIDEO -> {
-                            Glide.with(context)
-                                .applyDefaultRequestOptions(RequestOptions())
-                                .load(file.path)
-                                .apply(requestOptions)
-                                .placeholder(R.drawable.ic_empty)
-                                .error(ExtensionConstants.getIconFile(item.data ?: ""))
-                                .into(holder.binding.img)
-                        }
-                        FileType.MUSIC -> {
-                            val image = try {
-                                val mData = MediaMetadataRetriever()
-                                mData.setDataSource(item.data)
-                                val art = mData.embeddedPicture
-                                BitmapFactory.decodeByteArray(art, 0, art!!.size)
-                            } catch (e: Exception) {
-                                null
-                            }
-                            Glide.with(context)
-                                .applyDefaultRequestOptions(RequestOptions())
-                                .load(image)
-                                .apply(requestOptions)
-                                .placeholder(R.drawable.ic_empty)
-                                .error(ExtensionConstants.getIconFile(item.data ?: ""))
-                                .into(holder.binding.img)
-                        }
-                        else -> {
-                            holder.binding.img.setImageResource(
-                                ExtensionConstants.getIconFile(
-                                    item.data ?: ""
-                                )
-                            )
-                        }
+                        context.loadImg(
+                            imgUrl = image,
+                            view = holder.binding.img,
+                            error = ExtensionConstants.getIconFile(item.data!!),
+                            placeHolder = R.drawable.ic_empty
+                        )
+                    }
+                    else -> {
+                        context.loadImg(
+                            imgUrl = item.data!!,
+                            view = holder.binding.img,
+                            error = ExtensionConstants.getIconFile(item.data!!),
+                            placeHolder = R.drawable.ic_empty
+                        )
                     }
                 }
 

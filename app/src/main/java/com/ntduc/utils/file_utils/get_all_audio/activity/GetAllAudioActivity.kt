@@ -1,18 +1,14 @@
 package com.ntduc.utils.file_utils.get_all_audio.activity
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
-import com.ntduc.fileutils.getMimeType
+import com.ntduc.fileutils.openFile
 import com.ntduc.utils.databinding.ActivityGetAllAudioBinding
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.file_utils.get_all_audio.adapter.GetAllAudioAdapter
-import com.ntduc.utils.player_utils.CustomVideoPlayerActivity
-import com.ntduc.videoplayerutils.video.player.VideoPlayerActivity
 import java.io.File
 
 class GetAllAudioActivity : AppCompatActivity() {
@@ -42,12 +38,7 @@ class GetAllAudioActivity : AppCompatActivity() {
     private fun initEvent() {
         adapter.setOnOpenListener {
             if (it.myFile?.data != null && File(it.myFile!!.data!!).exists()) {
-
-//                val intentOpenVideo = Intent(this, com.ntduc.musicplayerutils.activities.AbsMusicPlayerActivity::class.java)
-//                intentOpenVideo.putParcelableArrayListExtra(com.ntduc.musicplayerutils.activities.AbsMusicPlayerActivity.API_PLAYLIST, viewModel.listSong)
-//                intentOpenVideo.putExtra(com.ntduc.musicplayerutils.activities.AbsMusicPlayerActivity.API_CURRENT_PATH, it.myFile!!.data)
-//                intentOpenVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                startActivity(intentOpenVideo)
+                openFile(File(it.myFile!!.data!!), "com.ntduc.utils.provider")
             } else {
                 shortToast("File does not exists")
             }

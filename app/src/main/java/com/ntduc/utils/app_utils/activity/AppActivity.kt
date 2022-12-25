@@ -25,6 +25,7 @@ class AppActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.loadAllApp(this)
+        viewModel.loadAllApk(this)
     }
 
     private fun init(){

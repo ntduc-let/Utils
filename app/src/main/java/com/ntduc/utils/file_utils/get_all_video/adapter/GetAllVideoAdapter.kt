@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.ntduc.datetimeutils.formatAsTime
+import com.ntduc.glideutils.loadImg
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ItemHeaderBinding
@@ -79,16 +80,12 @@ class GetAllVideoAdapter(
                 holder.binding.txtHeader.text = item.myFile?.title
             }
             is ItemVideoViewHolder -> {
-                var requestOptions = RequestOptions()
-                requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
-
-                Glide.with(context)
-                    .applyDefaultRequestOptions(RequestOptions())
-                    .load(item.myFile?.data)
-                    .apply(requestOptions)
-                    .placeholder(R.drawable.ic_empty)
-                    .error(ExtensionConstants.getIconFile(item.myFile?.data ?: ""))
-                    .into(holder.binding.img)
+                context.loadImg(
+                    imgUrl = item.myFile!!.data,
+                    view = holder.binding.img,
+                    error = ExtensionConstants.getIconFile(item.myFile!!.data!!),
+                    placeHolder = R.drawable.ic_empty
+                )
 
                 holder.binding.txtTime.text = item.duration?.formatAsTime()
 

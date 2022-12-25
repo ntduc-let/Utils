@@ -12,18 +12,19 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ActivityUtils" />
-            <option value="$PROJECT_DIR$/AnimationUtils" />
             <option value="$PROJECT_DIR$/AppUtils" />
             <option value="$PROJECT_DIR$/ColorUtils" />
             <option value="$PROJECT_DIR$/ContextUtils" />
             <option value="$PROJECT_DIR$/DateTimeUtils" />
             <option value="$PROJECT_DIR$/FileUtils" />
-            <option value="$PROJECT_DIR$/MusicPlayerUtils" />
+            <option value="$PROJECT_DIR$/FragmentUtils" />
+            <option value="$PROJECT_DIR$/GlideUtils" />
+            <option value="$PROJECT_DIR$/NavigationUtils" />
             <option value="$PROJECT_DIR$/NumberUtils" />
             <option value="$PROJECT_DIR$/RecyclerViewUtils" />
+            <option value="$PROJECT_DIR$/SharedPreferenceUtils" />
             <option value="$PROJECT_DIR$/StringUtils" />
             <option value="$PROJECT_DIR$/ToastUtils" />
-            <option value="$PROJECT_DIR$/VideoPlayerUtils" />
             <option value="$PROJECT_DIR$/ViewPager2Utils" />
             <option value="$PROJECT_DIR$/app" />
           </set>

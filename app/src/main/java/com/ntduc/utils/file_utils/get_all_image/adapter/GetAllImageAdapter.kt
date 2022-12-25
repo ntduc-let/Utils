@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.ntduc.glideutils.loadImg
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ItemHeaderBottomSelectBinding
@@ -133,16 +134,12 @@ class GetAllImageAdapter(
                     params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT
 
-                    var requestOptions = RequestOptions()
-                    requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(16))
-
-                    Glide.with(context)
-                        .applyDefaultRequestOptions(RequestOptions())
-                        .load(item.myImage?.myFile?.data)
-                        .apply(requestOptions)
-                        .placeholder(R.drawable.ic_empty)
-                        .error(ExtensionConstants.getIconFile(item.myImage?.myFile?.data ?: ""))
-                        .into(holder.binding.img)
+                    context.loadImg(
+                        imgUrl = item.myImage!!.myFile!!.data,
+                        view = holder.binding.img,
+                        error = ExtensionConstants.getIconFile(item.myImage!!.myFile!!.data!!),
+                        placeHolder = R.drawable.ic_empty
+                    )
 
                     holder.binding.root.setOnClickListener {
                         onOpenListener?.let {

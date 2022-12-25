@@ -24,7 +24,6 @@ fun Context.showConfirmationDialog(
     dialog.show()
 }
 
-
 fun Context.showSinglePicker(
     title: String,
     choices: Array<String>,

@@ -14,7 +14,7 @@ import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityZipBinding
 import com.ntduc.fileutils.copyFile
 import com.ntduc.fileutils.getRealPath
-import com.ntduc.stringutils.asFile
+import java.io.File
 
 class ZipActivity : AppCompatActivity() {
     private lateinit var binding: ActivityZipBinding
@@ -30,8 +30,8 @@ class ZipActivity : AppCompatActivity() {
                 val uri = docUri.getRealPath(this)
                 if (uri != null) {
                     if (copyFile(
-                            file = binding.txt.text.toString().asFile(),
-                            dest = uri.asFile(),
+                            file = File(binding.txt.text.toString()),
+                            dest = File(uri),
                             overwrite = true,
                             onCompleted = {
                                 Log.d("aaaaaaaaaaaaaaaa", "onCompleted")

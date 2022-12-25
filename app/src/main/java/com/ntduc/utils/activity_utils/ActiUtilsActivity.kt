@@ -18,11 +18,14 @@ class ActiUtilsActivity : AppCompatActivity() {
         val binding = ActivityActiUtilsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnHideBottomBar.setOnClickListener {
-            hideBottomBar()
+        binding.btnHideNavigationBar.setOnClickListener {
+            hideNavigationBar()
         }
-        binding.btnShowBottomBar.setOnClickListener {
-            showBottomBar()
+        binding.btnShowNavigationBar.setOnClickListener {
+            showNavigationBar()
+        }
+        binding.btnGetNavigationBarHeight.setOnClickListener {
+            shortToast("NavigationBar Height: $getNavigationBarHeight px")
         }
         binding.btnHideStatusBar.setOnClickListener {
             hideStatusBar()
@@ -47,9 +50,6 @@ class ActiUtilsActivity : AppCompatActivity() {
         }
         binding.btnHideKeyboard.setOnClickListener {
             hideKeyboard()
-        }
-        binding.btnSupportsPictureInPicture.setOnClickListener {
-            shortToast("Hỗ trợ PIP: $supportsPictureInPicture")
         }
         binding.btnBrightness.setOnClickListener {
             brightness = binding.edtBrightness.text.toString().toFloat()
@@ -91,10 +91,6 @@ class ActiUtilsActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-
-        binding.btnHideBottomBar.setOnClickListener {
-            hideBottomBar()
         }
 
         binding.btnLockOrientation.setOnClickListener {

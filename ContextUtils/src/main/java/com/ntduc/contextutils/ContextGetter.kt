@@ -188,21 +188,10 @@ val Context.isLandscape get() = resources.configuration.orientation == Configura
  */
 val Context.isPortrait get() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-
-/**
- * get Height of status bar
- */
-val Context.getStatusBarHeight: Int
-    get() {
-        val resourceId = this.resources.getIdentifier("status_bar_height", "dimen", "android")
-        return this.resources.getDimensionPixelSize(resourceId)
-    }
-
 val Context.getDeviceUsableMemory: Long
     get() {
-        val am = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
         val memoryInfo = ActivityManager.MemoryInfo()
-        am.getMemoryInfo(memoryInfo)
+        activityManager.getMemoryInfo(memoryInfo)
         return memoryInfo.availMem / (1024 * 1024)
     }
 

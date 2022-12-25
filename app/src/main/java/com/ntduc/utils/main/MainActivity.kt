@@ -14,14 +14,16 @@ import androidx.core.content.ContextCompat
 import com.ntduc.contextutils.showConfirmationDialog
 import com.ntduc.utils.BuildConfig
 import com.ntduc.utils.activity_utils.ActiUtilsActivity
-import com.ntduc.utils.animation_utils.AnimUtilsActivity
 import com.ntduc.utils.app_utils.activity.AppActivity
 import com.ntduc.utils.color_utils.ColorUtilsActivity
 import com.ntduc.utils.context_utils.ContextUtilsActivity
 import com.ntduc.utils.databinding.ActivityMainBinding
 import com.ntduc.utils.file_utils.activity.FileUtilsActivity
+import com.ntduc.utils.fragment_utils.activity.FragmentUtilsActivity
+import com.ntduc.utils.navigation_utils.activity.NavUtilsActivity
 import com.ntduc.utils.string_utils.StringUtilsActivity
 import com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity
+import com.ntduc.utils.sp_utils.SpActivity
 import com.ntduc.utils.view_pager_2_utils.activity.ViewPager2UtilsActivity
 
 class MainActivity : AppCompatActivity() {
@@ -50,25 +52,35 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ActiUtilsActivity::class.java))
         }
 
-        binding.btnAnimationUtils.setOnClickListener {
-            startActivity(Intent(this, AnimUtilsActivity::class.java))
+        binding.btnContextUtils.setOnClickListener {
+            startActivity(Intent(this, ContextUtilsActivity::class.java))
+        }
+
+        binding.btnFragmentUtils.setOnClickListener {
+            startActivity(Intent(this, FragmentUtilsActivity::class.java))
+        }
+
+        binding.btnNavigationUtils.setOnClickListener {
+            startActivity(Intent(this, NavUtilsActivity::class.java))
         }
 
         binding.btnColorUtils.setOnClickListener {
             startActivity(Intent(this, ColorUtilsActivity::class.java))
         }
 
-        binding.btnContextUtils.setOnClickListener {
-            startActivity(Intent(this, ContextUtilsActivity::class.java))
+        binding.btnStringUtils.setOnClickListener {
+            startActivity(Intent(this, StringUtilsActivity::class.java))
+        }
+
+        binding.btnSPUtils.setOnClickListener {
+            startActivity(Intent(this, SpActivity::class.java))
         }
 
         binding.btnViewPager2Utils.setOnClickListener {
             startActivity(Intent(this, ViewPager2UtilsActivity::class.java))
         }
 
-        binding.btnStringUtils.setOnClickListener {
-            startActivity(Intent(this, StringUtilsActivity::class.java))
-        }
+
 
         binding.btnFileUtils.setOnClickListener {
             if (checkPermissionReadAllFile()) {
