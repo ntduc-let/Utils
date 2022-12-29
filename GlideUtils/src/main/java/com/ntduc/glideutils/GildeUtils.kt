@@ -20,8 +20,19 @@ fun Context.loadImg(imgUrl: Any?, view: AppCompatImageView) {
         .into(view)
 }
 
+fun Context.loadImg(imgUrl: Any?, view: ImageView) {
+    Glide.with(this)
+        .load(imgUrl)
+        .into(view)
+}
 
 fun Context.loadImg(imgUrl: Any?, view: AppCompatImageView, error: Drawable?) {
+    Glide.with(this)
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+fun Context.loadImg(imgUrl: Any?, view: ImageView, error: Drawable?) {
     Glide.with(this)
         .load(imgUrl)
         .error(error)
@@ -35,7 +46,22 @@ fun Context.loadImg(imgUrl: Any?, view: AppCompatImageView, @DrawableRes error: 
         .into(view)
 }
 
+fun Context.loadImg(imgUrl: Any?, view: ImageView, @DrawableRes error: Int) {
+    Glide.with(this)
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
 fun Context.loadImg(imgUrl: Any?, view: AppCompatImageView, error: Drawable?, placeHolder: Drawable?) {
+    Glide.with(this)
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(view)
+}
+
+fun Context.loadImg(imgUrl: Any?, view: ImageView, error: Drawable?, placeHolder: Drawable?) {
     Glide.with(this)
         .load(imgUrl)
         .placeholder(placeHolder)
@@ -52,6 +78,14 @@ fun Context.loadImg(imgUrl: Any?, view: AppCompatImageView, @DrawableRes error: 
         .into(view)
 }
 
+fun Context.loadImg(imgUrl: Any?, view: ImageView, @DrawableRes error: Int, @DrawableRes placeHolder: Int) {
+    Glide.with(this)
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(view)
+}
+
 
 fun Context.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView) {
     Glide.with(this)
@@ -60,7 +94,22 @@ fun Context.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView) {
         .into(view)
 }
 
+fun Context.loadImgNoCache(imgUrl: Any?, view: ImageView) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .into(view)
+}
+
 fun Context.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView, error: Drawable?) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
+fun Context.loadImgNoCache(imgUrl: Any?, view: ImageView, error: Drawable?) {
     Glide.with(this)
         .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
         .load(imgUrl)
@@ -76,7 +125,24 @@ fun Context.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView, @DrawableRes 
         .into(view)
 }
 
+fun Context.loadImgNoCache(imgUrl: Any?, view: ImageView, @DrawableRes error: Int) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
 fun Context.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView, error: Drawable?, placeHolder: Drawable?) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(view)
+}
+
+fun Context.loadImgNoCache(imgUrl: Any?, view: ImageView, error: Drawable?, placeHolder: Drawable?) {
     Glide.with(this)
         .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
         .load(imgUrl)
@@ -94,7 +160,25 @@ fun AppCompatImageView.loadImgNoCache(imgUrl: Any?, error: Drawable?, placeHolde
         .into(this)
 }
 
+fun ImageView.loadImgNoCache(imgUrl: Any?, error: Drawable?, placeHolder: Drawable?) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(this)
+}
+
 fun AppCompatImageView.loadImgNoCache(imgUrl: Any?, @DrawableRes error: Int, @DrawableRes placeHolder: Int) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(this)
+}
+
+fun ImageView.loadImgNoCache(imgUrl: Any?, @DrawableRes error: Int, @DrawableRes placeHolder: Int) {
     Glide.with(this)
         .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
         .load(imgUrl)
@@ -111,8 +195,20 @@ fun Context.loadImgWithTransformation(imgUrl: Any?, view: AppCompatImageView, tr
         .into(view)
 }
 
+fun Context.loadImgWithTransformation(imgUrl: Any?, view: ImageView, transformation: RequestOptions) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(transformation)
+        .load(imgUrl)
+        .into(view)
+}
 
 fun View.loadImg(imgUrl: Any?, view: AppCompatImageView) {
+    Glide.with(this)
+        .load(imgUrl)
+        .into(view)
+}
+
+fun View.loadImg(imgUrl: Any?, view: ImageView) {
     Glide.with(this)
         .load(imgUrl)
         .into(view)
@@ -126,6 +222,13 @@ fun View.loadImg(imgUrl: Any?, view: AppCompatImageView, error: Drawable?) {
         .into(view)
 }
 
+fun View.loadImg(imgUrl: Any?, view: ImageView, error: Drawable?) {
+    Glide.with(this)
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
 fun View.loadImg(imgUrl: Any?, view: AppCompatImageView, @DrawableRes error: Int) {
     Glide.with(this)
         .load(imgUrl)
@@ -133,7 +236,22 @@ fun View.loadImg(imgUrl: Any?, view: AppCompatImageView, @DrawableRes error: Int
         .into(view)
 }
 
+fun View.loadImg(imgUrl: Any?, view: ImageView, @DrawableRes error: Int) {
+    Glide.with(this)
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
 fun View.loadImg(imgUrl: Any?, view: AppCompatImageView, error: Drawable?, placeHolder: Drawable?) {
+    Glide.with(this)
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(view)
+}
+
+fun View.loadImg(imgUrl: Any?, view: ImageView, error: Drawable?, placeHolder: Drawable?) {
     Glide.with(this)
         .load(imgUrl)
         .placeholder(placeHolder)
@@ -149,6 +267,14 @@ fun View.loadImg(imgUrl: Any?, view: AppCompatImageView, @DrawableRes error: Int
         .into(view)
 }
 
+fun View.loadImg(imgUrl: Any?, view: ImageView, @DrawableRes error: Int, @DrawableRes placeHolder: Int) {
+    Glide.with(this)
+        .load(imgUrl)
+        .placeholder(placeHolder)
+        .error(error)
+        .into(view)
+}
+
 
 fun View.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView) {
     Glide.with(this)
@@ -157,7 +283,22 @@ fun View.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView) {
         .into(view)
 }
 
+fun View.loadImgNoCache(imgUrl: Any?, view: ImageView) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .into(view)
+}
+
 fun View.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView, error: Drawable?) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
+fun View.loadImgNoCache(imgUrl: Any?, view: ImageView, error: Drawable?) {
     Glide.with(this)
         .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
         .load(imgUrl)
@@ -173,6 +314,14 @@ fun View.loadImgNoCache(imgUrl: Any?, view: AppCompatImageView, @DrawableRes err
         .into(view)
 }
 
+fun View.loadImgNoCache(imgUrl: Any?, view: ImageView, @DrawableRes error: Int) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+        .load(imgUrl)
+        .error(error)
+        .into(view)
+}
+
 fun AppCompatImageView.loadImgNoCache(image: Any?) {
     Glide.with(this)
         .load(image)
@@ -180,8 +329,21 @@ fun AppCompatImageView.loadImgNoCache(image: Any?) {
         .into(this)
 }
 
+fun ImageView.loadImgNoCache(image: Any?) {
+    Glide.with(this)
+        .load(image)
+        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+        .into(this)
+}
 
 fun View.loadImgWithTransformation(imgUrl: Any?, view: AppCompatImageView, transformation: RequestOptions) {
+    Glide.with(this)
+        .applyDefaultRequestOptions(transformation)
+        .load(imgUrl)
+        .into(view)
+}
+
+fun View.loadImgWithTransformation(imgUrl: Any?, view: ImageView, transformation: RequestOptions) {
     Glide.with(this)
         .applyDefaultRequestOptions(transformation)
         .load(imgUrl)
@@ -196,7 +358,22 @@ fun AppCompatImageView.loadImgNoCache(image: Any?, options: () -> BaseRequestOpt
         .into(this)
 }
 
+fun ImageView.loadImgNoCache(image: Any?, options: () -> BaseRequestOptions<*>) {
+    Glide.with(this)
+        .load(image)
+        .apply(options())
+        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+        .into(this)
+}
+
 fun AppCompatImageView.loadImage(image: Any?, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>) {
+    Glide.with(this)
+        .load(image)
+        .thisStuff()
+        .into(this)
+}
+
+fun ImageView.loadImage(image: Any?, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>) {
     Glide.with(this)
         .load(image)
         .thisStuff()
@@ -211,6 +388,14 @@ fun AppCompatImageView.loadImage(image: Any?, thisStuff: RequestBuilder<Drawable
         .into(this)
 }
 
+fun ImageView.loadImage(image: Any?, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>, options: () -> BaseRequestOptions<*>) {
+    Glide.with(this)
+        .load(image)
+        .thisStuff()
+        .apply(options())
+        .into(this)
+}
+
 fun Context.loadImage(image: Any?, appCompatImageView: AppCompatImageView, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>) {
     Glide.with(this)
         .load(image)
@@ -218,12 +403,25 @@ fun Context.loadImage(image: Any?, appCompatImageView: AppCompatImageView, thisS
         .into(appCompatImageView)
 }
 
+fun Context.loadImage(image: Any?, imageView: ImageView, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>) {
+    Glide.with(this)
+        .load(image)
+        .thisStuff()
+        .into(imageView)
+}
 
 fun View.loadImage(image: Any?, appCompatImageView: AppCompatImageView, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>) {
     Glide.with(this)
         .load(image)
         .thisStuff()
         .into(appCompatImageView)
+}
+
+fun View.loadImage(image: Any?, imageView: ImageView, thisStuff: RequestBuilder<Drawable>.() -> RequestBuilder<Drawable>) {
+    Glide.with(this)
+        .load(image)
+        .thisStuff()
+        .into(imageView)
 }
 
 fun ImageView.loadBase64Image(base64Image: String?) {
