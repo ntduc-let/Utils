@@ -1,5 +1,8 @@
 package com.ntduc.numberutils
 
+import android.content.Context
+import android.content.res.Resources
+import android.util.TypedValue
 import androidx.annotation.IntRange
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -50,3 +53,39 @@ fun randomNumber(fromNo: Int = 0, toNo: Int = 1000, noToBeGenerated: Int = 20) =
 
 fun randomNumber(fromNo: Double = 0.0, toNo: Double = 1000.0, noToBeGenerated: Int = 20) =
     List(noToBeGenerated) { Random.nextDouble(fromNo, toNo) }
+
+var Int.dp: Int
+    get() {
+        val metrics = Resources.getSystem().displayMetrics
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), metrics).toInt()
+    }
+    set(_) {}
+
+
+var Float.dp: Float
+    get() {
+        val metrics = Resources.getSystem().displayMetrics
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, metrics)
+    }
+    set(_) {}
+
+
+fun Number.dpToPx(context: Context? = null): Float {
+    val res = context?.resources ?: Resources.getSystem()
+    return this.toFloat() * res.displayMetrics.density
+}
+
+fun Number.pxToDp(context: Context? = null): Float {
+    val res = context?.resources ?: Resources.getSystem()
+    return this.toFloat() / res.displayMetrics.density
+}
+
+fun Number.spToPx(context: Context? = null): Float {
+    val res = context?.resources ?: Resources.getSystem()
+    return this.toFloat() * res.displayMetrics.scaledDensity
+}
+
+fun Number.pxToSp(context: Context? = null): Float {
+    val res = context?.resources ?: Resources.getSystem()
+    return this.toFloat() / res.displayMetrics.scaledDensity
+}

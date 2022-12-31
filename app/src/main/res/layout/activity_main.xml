@@ -32,6 +32,13 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_ViewUtils"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ViewUtils"
+            android:textAllCaps="false" />
+
+        <Button
             android:id="@+id/btn_NavigationUtils"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

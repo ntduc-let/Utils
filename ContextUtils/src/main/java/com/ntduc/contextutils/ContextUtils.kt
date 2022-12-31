@@ -16,6 +16,7 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.TextUtils.isEmpty
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi

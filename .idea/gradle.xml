@@ -26,6 +26,7 @@
             <option value="$PROJECT_DIR$/StringUtils" />
             <option value="$PROJECT_DIR$/ToastUtils" />
             <option value="$PROJECT_DIR$/ViewPager2Utils" />
+            <option value="$PROJECT_DIR$/ViewUtils" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

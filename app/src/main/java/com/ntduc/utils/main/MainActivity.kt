@@ -25,6 +25,7 @@ import com.ntduc.utils.string_utils.StringUtilsActivity
 import com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity
 import com.ntduc.utils.sp_utils.SpActivity
 import com.ntduc.utils.view_pager_2_utils.activity.ViewPager2UtilsActivity
+import com.ntduc.utils.view_utils.activity.ViewUtilsActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,6 +59,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnFragmentUtils.setOnClickListener {
             startActivity(Intent(this, FragmentUtilsActivity::class.java))
+        }
+
+        binding.btnViewUtils.setOnClickListener {
+            startActivity(Intent(this, ViewUtilsActivity::class.java))
         }
 
         binding.btnNavigationUtils.setOnClickListener {

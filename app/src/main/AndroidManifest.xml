@@ -55,64 +55,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
-        <activity
-            android:name=".sp_utils.SpActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".navigation_utils.activity.NavUtilsActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+        <activity android:name=".view_utils.activity.ViewUtilsActivity" />
+        <activity android:name=".sp_utils.SpActivity" />
+        <activity android:name=".navigation_utils.activity.NavUtilsActivity" />
         <activity android:name=".fragment_utils.activity.FragmentUtilsActivity" />
-        <activity
-            android:name=".app_utils.activity.AppActivity"
-            android:exported="true"
-            android:launchMode="singleTop" />
-        <activity
-            android:name="com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.ntduc.utils.file_utils.activity.ZipActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.ntduc.utils.file_utils.get_all_video.activity.GetAllVideoActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.ntduc.utils.file_utils.get_all_image.activity.GetAllImageActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.ntduc.utils.file_utils.get_all_audio.activity.GetAllAudioActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.ntduc.utils.file_utils.get_all_file.activity.GetAllFileActivity"
-            android:exported="true" />
-        <activity
-            android:name=".file_utils.activity.FileUtilsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".string_utils.StringUtilsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".view_pager_2_utils.activity.ViewPager2UtilsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".context_utils.ContextUtilsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".color_utils.ColorUtilsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity_utils.ActiUtilsActivity"
-            android:exported="true" />
+        <activity android:name=".app_utils.activity.AppActivity" />
+        <activity android:name="com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity" />
+        <activity android:name="com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity" />
+        <activity android:name="com.ntduc.utils.file_utils.activity.ZipActivity" />
+        <activity android:name="com.ntduc.utils.file_utils.get_all_video.activity.GetAllVideoActivity" />
+        <activity android:name="com.ntduc.utils.file_utils.get_all_image.activity.GetAllImageActivity" />
+        <activity android:name="com.ntduc.utils.file_utils.get_all_audio.activity.GetAllAudioActivity" />
+        <activity android:name="com.ntduc.utils.file_utils.get_all_file.activity.GetAllFileActivity" />
+        <activity android:name=".file_utils.activity.FileUtilsActivity" />
+        <activity android:name=".string_utils.StringUtilsActivity" />
+        <activity android:name=".view_pager_2_utils.activity.ViewPager2UtilsActivity" />
+        <activity android:name=".context_utils.ContextUtilsActivity" />
+        <activity android:name=".color_utils.ColorUtilsActivity" />
+        <activity android:name=".activity_utils.ActiUtilsActivity" />
         <activity
             android:name=".main.MainActivity"
             android:exported="true">
