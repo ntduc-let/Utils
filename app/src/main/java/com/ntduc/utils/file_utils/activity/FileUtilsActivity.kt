@@ -1,5 +1,6 @@
 package com.ntduc.utils.file_utils.activity
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -40,13 +41,10 @@ class FileUtilsActivity : AppCompatActivity() {
                 )
                 val uri = docUri.getRealPath(this)
                 if (uri != null) {
-                    if (copyFile(
-                            file = File(binding.txt.text.toString()),
-                            dest = File(uri),
-                            overwrite = true,
-                            onCompleted = {
-                                Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
-                            })
+                    if (File(binding.txt.text.toString()).copyTo(
+                            context = this,
+                            dest = File(uri)
+                        )
                     ) {
                         shortToast("Copy Success")
                     } else {
@@ -67,13 +65,10 @@ class FileUtilsActivity : AppCompatActivity() {
                 )
                 val uri = docUri.getRealPath(this)
                 if (uri != null) {
-                    if (moveFile(
-                            file = File(binding.txt.text.toString()),
-                            dest = File(uri),
-                            overwrite = true,
-                            onCompleted = {
-                                Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
-                            })
+                    if (File("/storage/emulated/0/Testtttttt").moveTo(
+                            context = this,
+                            dest = File("/storage/emulated/0/Test2")
+                        )
                     ) {
                         shortToast("Move Success")
                     } else {
@@ -104,12 +99,10 @@ class FileUtilsActivity : AppCompatActivity() {
                 shortToast("Please enter name file")
                 return@setOnClickListener
             }
-            if (renameFile(
-                    File(binding.txt.text.toString()),
-                    binding.edtRenameFile.text.toString(),
-                    onCompleted = {
-                        Log.d("aaaaaaaaaaaaaaaa", "onCompleted")
-                    })
+            if (File(binding.txt.text.toString()).renameTo(
+                    this,
+                    binding.edtRenameFile.text.toString()
+                )
             ) {
                 shortToast("Rename success")
                 binding.txt.text = ""
@@ -125,6 +118,7 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             selectFolderCopyFile()
+            Log.d("ntduc_debug", "onCreate: ${binding.txt.text}")
         }
 
         binding.btnMoveFile.setOnClickListener {
@@ -141,10 +135,12 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            deleteFiles(listOf(File(binding.txt.text.toString())), onCompleted = {
+            if (File(binding.txt.text.toString()).delete(this)) {
                 shortToast("Delete success")
-            })
-            binding.txt.text = ""
+                binding.txt.text = ""
+            } else {
+                shortToast("Delete Error")
+            }
         }
 
         binding.btnShareFile.setOnClickListener {
@@ -153,7 +149,7 @@ class FileUtilsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            shareFile(File(binding.txt.text.toString()), "com.ntduc.utils.provider")
+            File(binding.txt.text.toString()).share(this, "com.ntduc.utils.provider")
         }
 
         binding.btnGetAllFile.setOnClickListener {
@@ -170,10 +166,6 @@ class FileUtilsActivity : AppCompatActivity() {
 
         binding.btnGetAllVideo.setOnClickListener {
             startActivity(Intent(this, GetAllVideoActivity::class.java))
-        }
-
-        binding.btnZip.setOnClickListener {
-            startActivity(Intent(this, ZipActivity::class.java))
         }
     }
 

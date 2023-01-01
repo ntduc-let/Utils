@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import com.ntduc.fileutils.openFile
+import com.ntduc.fileutils.open
 import com.ntduc.utils.databinding.ActivityGetAllAudioBinding
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
 import com.ntduc.toastutils.shortToast
@@ -38,7 +38,7 @@ class GetAllAudioActivity : AppCompatActivity() {
     private fun initEvent() {
         adapter.setOnOpenListener {
             if (it.myFile?.data != null && File(it.myFile!!.data!!).exists()) {
-                openFile(File(it.myFile!!.data!!), "com.ntduc.utils.provider")
+                File(it.myFile!!.data!!).open(this, "com.ntduc.utils.provider")
             } else {
                 shortToast("File does not exists")
             }

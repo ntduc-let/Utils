@@ -24,7 +24,7 @@ class GetAllAudioViewModel : ViewModel() {
     fun loadAllAudio(context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val audios = context.getAudios(types = ExtensionConstants.MUSIC.toList(), isMusic = true)
+                val audios = context.getAudios()
                 val temp = audios.sortedWith { o1, o2 ->
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }

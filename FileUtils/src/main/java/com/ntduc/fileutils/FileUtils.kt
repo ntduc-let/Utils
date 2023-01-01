@@ -5,41 +5,39 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
-import android.net.Uri
 import android.provider.BaseColumns
 import android.provider.MediaStore
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import com.ntduc.fileutils.constant.FileType
 import com.ntduc.fileutils.model.BaseFile
 import com.ntduc.fileutils.model.BaseAudio
 import com.ntduc.fileutils.model.BaseImage
 import com.ntduc.fileutils.model.BaseVideo
 import java.io.*
 
-fun File.getMimeType(): String? {
-    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-}
+fun File.mimeType(): String? = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
 
-fun Context.renameFile(file: File, name: String, onCompleted: (File) -> Unit): Boolean {
+fun File.renameTo(context: Context, newName: String): Boolean {
     try {
         val pathNew =
-            if (file.isDirectory) "${file.parentFile?.path}/${name}" else "${file.parentFile?.path}/${name}.${file.extension}"
+            if (this.isDirectory)
+                "${this.parentFile?.path ?: ""}/${newName}"
+            else
+                "${this.parentFile?.path ?: ""}/${newName}.${this.extension}"
+
         val fileNew = File(pathNew)
         if (fileNew.exists()) {
             return false
         }
 
-        if (file.renameTo(fileNew)) {
-            var index = 0
+        if (this.renameTo(fileNew)) {
             MediaScannerConnection.scanFile(
-                this, listOf(file.path, fileNew.path).toTypedArray(), null
-            ) { _, _ ->
-                index++
-                if (index == listOf(file.path, fileNew.path).size) {
-                    onCompleted(fileNew)
-                }
-            }
+                context,
+                listOf(this.path, fileNew.path).toTypedArray(),
+                null,
+                null
+            )
             return true
         }
     } catch (e: Exception) {
@@ -48,154 +46,144 @@ fun Context.renameFile(file: File, name: String, onCompleted: (File) -> Unit): B
     return false
 }
 
-fun Context.copyFile(
-    file: File,
+fun File.copyTo(
+    context: Context,
     dest: File,
     overwrite: Boolean = false,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    onCompleted: (File) -> Unit
+    bufferSize: Int = DEFAULT_BUFFER_SIZE
 ): Boolean {
-    val pathDest = if (dest.isDirectory) "${dest.path}/${file.name}" else dest.path
+    if (!this.exists() || !dest.isDirectory) return false
+    val pathDest = "${dest.path}/${this.name}"
 
-    try {
-        file.copyTo(File(pathDest), overwrite, bufferSize)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return false
-    }
+    if (this.isDirectory) {
+        val fileDest = File(pathDest)
+        if (fileDest.exists()) return false
+        fileDest.mkdirs()
+        if (this.listFiles() == null) return false
 
-    MediaScannerConnection.scanFile(this, listOf(pathDest).toTypedArray(), null) { _, _ ->
-        onCompleted(File(pathDest))
-    }
-    return true
-}
-
-fun Context.moveFile(
-    file: File,
-    dest: File,
-    overwrite: Boolean = false,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    onCompleted: (File) -> Unit
-): Boolean {
-    val pathDest = if (dest.isDirectory) "${dest.path}/${file.name}" else dest.path
-
-    try {
-        file.copyTo(File(pathDest), overwrite, bufferSize)
-        file.delete()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return false
-    }
-
-    var index = 0
-    MediaScannerConnection.scanFile(
-        this, listOf(file.path, pathDest).toTypedArray(), null
-    ) { _, _ ->
-        index++
-        if (index == 2) {
-            onCompleted(File(pathDest))
+        var result = true
+        for (file in this.listFiles()!!) {
+            if (!file.copyTo(context, fileDest, overwrite, bufferSize)) {
+                result = false
+            }
         }
-    }
-    return true
-}
-
-fun Context.moveFiles(
-    files: List<File>,
-    dest: File,
-    overwrite: Boolean = false,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    onCompleted: () -> Unit
-) {
-    var index = 0
-
-    files.forEach {
-        val pathDest = if (dest.isDirectory) "${dest.path}/${it.name}" else dest.path
-
+        return result
+    } else {
         try {
-            it.copyTo(File(pathDest), overwrite, bufferSize)
-            it.delete()
+            this.copyTo(File(pathDest), overwrite, bufferSize)
         } catch (e: Exception) {
             e.printStackTrace()
+            return false
+        }
+
+        MediaScannerConnection.scanFile(context, listOf(pathDest).toTypedArray(), null, null)
+        return true
+    }
+}
+
+fun File.moveTo(
+    context: Context,
+    dest: File,
+    overwrite: Boolean = false,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE
+): Boolean {
+    if (!this.exists() || !dest.isDirectory) return false
+    val pathDest = "${dest.path}/${this.name}"
+
+    if (this.isDirectory) {
+        val fileDest = File(pathDest)
+        if (fileDest.exists()) return false
+        fileDest.mkdirs()
+        if (this.listFiles() == null) return false
+
+        var result = true
+        for (file in this.listFiles()!!) {
+            if (!file.moveTo(context, fileDest, overwrite, bufferSize)) {
+                result = false
+            }
+        }
+        this.delete()
+        return result
+    } else {
+        try {
+            this.copyTo(File(pathDest), overwrite, bufferSize)
+            this.delete()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
 
         MediaScannerConnection.scanFile(
-            this, listOf(it.path, pathDest).toTypedArray(), null
-        ) { _, _ ->
-            index++
-            if (index == files.size * 2) {
-                onCompleted()
-            }
-        }
+            context,
+            listOf(this.path, pathDest).toTypedArray(),
+            null,
+            null
+        )
+        return true
     }
 }
 
-fun Context.deleteFiles(files: List<File>, onCompleted: () -> Unit) {
-    var index = 0
-    for (file in files) {
-        if (file.delete()) {
-            MediaScannerConnection.scanFile(
-                this, listOf(file.path).toTypedArray(), null
-            ) { _, _ ->
-                index++
-                if (index == files.size) {
-                    onCompleted()
-                }
-            }
-        } else {
-            index++
-            if (index == files.size) {
-                onCompleted()
-            }
-        }
+fun File.delete(context: Context): Boolean {
+    try {
+        deleteRecursively()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return false
     }
+    MediaScannerConnection.scanFile(context, listOf(this.path).toTypedArray(), null, null)
+    return true
 }
 
 @SuppressLint("QueryPermissionsNeeded")
-fun Context.shareFile(file: File, authority: String) {
-    val uri = FileProvider.getUriForFile(this, authority, file)
+fun File.share(context: Context, authority: String) {
+    if (!this.exists()) return
+
+    val uri = FileProvider.getUriForFile(context, authority, this)
     val intentShareFile = Intent(Intent.ACTION_SEND)
-    val titleFull = file.name
-    intentShareFile.type = file.getMimeType()
+    val titleFull = this.name
+    intentShareFile.type = this.mimeType()
     intentShareFile.putExtra(Intent.EXTRA_STREAM, uri)
     intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     val chooser = Intent.createChooser(intentShareFile, titleFull)
     val resInfoList =
-        packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+        context.packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
     for (resolveInfo in resInfoList) {
         val packageName = resolveInfo.activityInfo.packageName
-        grantUriPermission(
+        context.grantUriPermission(
             packageName,
             uri,
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
     }
-    startActivity(chooser)
+    context.startActivity(chooser)
 }
 
 @SuppressLint("QueryPermissionsNeeded")
-fun Context.openFile(file: File, authority: String) {
-    val uri = FileProvider.getUriForFile(this, authority, file)
+fun File.open(context: Context, authority: String) {
+    if (!this.exists()) return
+
+    val uri = FileProvider.getUriForFile(context, authority, this)
     val intentOpenFile = Intent(Intent.ACTION_VIEW)
-    val titleFull = file.name
-    intentOpenFile.setDataAndType(uri, file.getMimeType())
+    val titleFull = this.name
+    intentOpenFile.setDataAndType(uri, this.mimeType())
     intentOpenFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     val chooser = Intent.createChooser(intentOpenFile, titleFull)
     val resInfoList =
-        packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+        context.packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
     for (resolveInfo in resInfoList) {
         val packageName = resolveInfo.activityInfo.packageName
-        grantUriPermission(
+        context.grantUriPermission(
             packageName,
             uri,
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
     }
-    startActivity(chooser)
+    context.startActivity(chooser)
 }
 
 fun Context.getFiles(
     directoryPath: String = "",
-    types: List<String>
+    types: List<String> = listOf(*FileType.ALL)
 ): List<BaseFile> {
     val files = ArrayList<BaseFile>()
 
@@ -247,7 +235,18 @@ fun Context.getFiles(
             val dateModified = cursor.getLong(col_dateModified) * 1000
             val data = cursor.getString(col_data)
 
-            files.add(BaseFile(id, title, displayName, mimeType, size, dateAdded, dateModified, data))
+            files.add(
+                BaseFile(
+                    id,
+                    title,
+                    displayName,
+                    mimeType,
+                    size,
+                    dateAdded,
+                    dateModified,
+                    data
+                )
+            )
         }
         cursor.close()
     }
@@ -256,8 +255,7 @@ fun Context.getFiles(
 
 fun Context.getAudios(
     directoryPath: String = "",
-    types: List<String>,
-    isMusic: Boolean = false
+    types: List<String> = listOf(*FileType.AUDIO)
 ): List<BaseAudio> {
     val audios = ArrayList<BaseAudio>()
 
@@ -277,21 +275,11 @@ fun Context.getAudios(
     )
     var selection = ""
     for (i in types.indices) {
-        when (i) {
-            0 -> {
-                selection = "(${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
-            }
-            types.size-1 -> {
-                selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}')"
-            }
-            else -> {
-                selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
-            }
+        if (i == 0) {
+            selection = "${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
+        } else {
+            selection += " OR ${MediaStore.Audio.AudioColumns.DATA} LIKE '$directoryPath/%.${types[i]}'"
         }
-    }
-
-    if (isMusic){
-        selection += " AND ${MediaStore.Audio.AudioColumns.IS_MUSIC} = 1 AND ${MediaStore.Audio.AudioColumns.TITLE} != ''"
     }
 
     val sortOrder = "${MediaStore.Audio.AudioColumns.DATA} ASC"
@@ -351,7 +339,7 @@ fun Context.getAudios(
 
 fun Context.getImages(
     directoryPath: String = "",
-    types: List<String>
+    types: List<String> = listOf(*FileType.IMAGE)
 ): List<BaseImage> {
     val images = ArrayList<BaseImage>()
 
@@ -431,7 +419,7 @@ fun Context.getImages(
 
 fun Context.getVideos(
     directoryPath: String = "",
-    types: List<String>
+    types: List<String> = listOf(*FileType.VIDEO)
 ): List<BaseVideo> {
     val videos = ArrayList<BaseVideo>()
 

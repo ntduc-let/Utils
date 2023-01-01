@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import com.ntduc.fileutils.openFile
+import com.ntduc.fileutils.open
 import com.ntduc.recyclerviewutils.sticky.StickyHeadersLinearLayoutManager
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityGetAllFileBinding
@@ -38,7 +38,7 @@ class GetAllFileActivity : AppCompatActivity() {
     private fun initEvent() {
         adapter.setOnOpenListener {
             if (it.data != null && File(it.data!!).exists()) {
-                openFile(File(it.data!!), "com.ntduc.utils.provider")
+                File(it.data!!).open(this, "com.ntduc.utils.provider")
             } else {
                 shortToast("File does not exists")
             }

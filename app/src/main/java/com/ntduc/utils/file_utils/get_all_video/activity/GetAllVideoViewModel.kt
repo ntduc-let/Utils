@@ -28,7 +28,7 @@ class GetAllVideoViewModel : ViewModel() {
         listUri.value = arrayListOf()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val videos = context.getVideos(types = ExtensionConstants.VIDEO.toList())
+                val videos = context.getVideos()
                 val temp = videos.sortedWith { o1, o2 ->
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }

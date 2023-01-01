@@ -23,7 +23,7 @@ class GetAllFileViewModel : ViewModel() {
     fun loadAllFile(context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val images = context.getFiles(types = ExtensionConstants.ALL)
+                val images = context.getFiles()
                 val temp = images.sortedWith { o1, o2 ->
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }

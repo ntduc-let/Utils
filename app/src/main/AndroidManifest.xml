@@ -62,7 +62,6 @@
         <activity android:name=".app_utils.activity.AppActivity" />
         <activity android:name="com.ntduc.utils.recycler_view_utils.sticky.RecyclerViewStickyActivity" />
         <activity android:name="com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity" />
-        <activity android:name="com.ntduc.utils.file_utils.activity.ZipActivity" />
         <activity android:name="com.ntduc.utils.file_utils.get_all_video.activity.GetAllVideoActivity" />
         <activity android:name="com.ntduc.utils.file_utils.get_all_image.activity.GetAllImageActivity" />
         <activity android:name="com.ntduc.utils.file_utils.get_all_audio.activity.GetAllAudioActivity" />

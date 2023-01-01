@@ -24,7 +24,7 @@ class GetAllImageViewModel : ViewModel() {
     fun loadAllPhoto(context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val images = context.getImages(types = ExtensionConstants.IMAGE.toList())
+                val images = context.getImages()
                 val temp = images.sortedWith { o1, o2 ->
                     o2.dateModified!!.compareTo(o1.dateModified!!)
                 }
