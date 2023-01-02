@@ -1,5 +1,8 @@
 package com.ntduc.securityutils
 
+import android.os.Build
+import android.security.keystore.KeyProperties
+import androidx.annotation.RequiresApi
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -10,30 +13,22 @@ import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-
-/**
- * Created by hristijan on 3/28/19 to long live and prosper !
- */
+@RequiresApi(Build.VERSION_CODES.M)
 object FileEncryption {
-
+    private val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
+    private val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
+    private val PADDING = "PKCS5padding"
+    private val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
     private val BUFFER_SIZE = 1024
-    private val ENCRYPTOR = "AES/CBC/PKCS5padding"
-    private val SECRET_KEY = "AES"
-
-    /**
-     * Store the secret key and the cypher string to your server not locally
-     */
 
     @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class, IOException::class)
     fun encryptToFile(secretKey: String, cypherSpecString: String, input: InputStream, output: OutputStream) {
         var out = output
         try {
             val iv = IvParameterSpec(cypherSpecString.toByteArray(Charsets.UTF_8))
-            val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8),
-                    SECRET_KEY
-            )
+            val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), ALGORITHM)
 
-            val cipher = Cipher.getInstance(ENCRYPTOR)
+            val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.ENCRYPT_MODE, keyspec, iv)
             out = CipherOutputStream(output, cipher)
 
@@ -54,11 +49,9 @@ object FileEncryption {
         var out = output
         try {
             val iv = IvParameterSpec(cypherSpecString.toByteArray(Charsets.UTF_8))
-            val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8),
-                    SECRET_KEY
-            )
+            val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), ALGORITHM)
 
-            val cipher = Cipher.getInstance(ENCRYPTOR)
+            val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.DECRYPT_MODE, keyspec, iv)
             out = CipherOutputStream(output, cipher)
 

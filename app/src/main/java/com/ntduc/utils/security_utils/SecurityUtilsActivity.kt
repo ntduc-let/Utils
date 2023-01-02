@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.annotation.RequiresApi
 import com.ntduc.contextutils.inflater
 import com.ntduc.securityutils.AndroidEncryption
+import com.ntduc.securityutils.FileEncryption
 import com.ntduc.utils.databinding.ActivitySecurityUtilsBinding
 import java.io.File
 import java.io.FileInputStream
@@ -31,19 +32,28 @@ class SecurityUtilsActivity : AppCompatActivity() {
     private fun initEvent() {
         binding.btnEncrypt.setOnClickListener {
             binding.txt.text = AndroidEncryption.encrypt(binding.edt.text.toString())
-//            val s = binding.edt.text.toString()
-//            val file = File(filesDir, "secret.txt")
-//            if (!file.exists()){
-//                file.createNewFile()
-//            }
-//            val fos = FileOutputStream(file)
-//            binding.txt.text = AndroidEncryption.encrypt(s, fos)
         }
 
         binding.btnDecrypt.setOnClickListener {
             binding.edt.setText(AndroidEncryption.decrypt(binding.txt.text.toString()))
-//            val file = File(filesDir, "secret.txt")
-//            binding.edt.setText("${AndroidEncryption.decrypt(FileInputStream(file))}")
+        }
+
+        binding.btnEncryptFile.setOnClickListener {
+            FileEncryption.encryptToFile(
+                "1234567891234567",
+                "1234567891234567",
+                FileInputStream(File("/storage/emulated/0/abc.jpg")),
+                FileOutputStream(File("/storage/emulated/0/test.jpg"))
+            )
+        }
+
+        binding.btnDecryptFile.setOnClickListener {
+            FileEncryption.decryptToFile(
+                "1234567891234567",
+                "1234567891234567",
+                FileInputStream(File("/storage/emulated/0/test.jpg")),
+                FileOutputStream(File("/storage/emulated/0/abcdef.jpg"))
+            )
         }
     }
 }

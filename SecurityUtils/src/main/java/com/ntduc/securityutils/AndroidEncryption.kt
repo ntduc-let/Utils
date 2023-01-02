@@ -5,8 +5,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.annotation.RequiresApi
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.security.*
 import java.util.*
 import javax.crypto.*
@@ -38,16 +37,6 @@ object AndroidEncryption {
         return ""
     }
 
-    fun encrypt(input: String, outputStream: OutputStream): String? {
-        try {
-            return encryptStream(input, outputStream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
-
     fun decrypt(text: String): String {
         try {
             val bytes: ByteArray? = decryptString(text)
@@ -57,17 +46,6 @@ object AndroidEncryption {
         }
 
         return ""
-    }
-
-    fun decrypt(inputStream: InputStream): String? {
-        try {
-            val bytes: ByteArray? = decryptStream(inputStream)
-            return bytes?.let { String(it, Charsets.UTF_8) }.toString()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return null
     }
 
     private fun generateKey(): SecretKey {
@@ -93,7 +71,11 @@ object AndroidEncryption {
     private fun encryptString(input: String): String {
         try {
             val encryptCipher = Cipher.getInstance(TRANSFORMATION)
-            encryptCipher!!.init(Cipher.ENCRYPT_MODE, getSecretKey(), GCMParameterSpec(128, FIXED_IV.toByteArray()))
+            encryptCipher!!.init(
+                Cipher.ENCRYPT_MODE,
+                getSecretKey(),
+                GCMParameterSpec(128, FIXED_IV.toByteArray())
+            )
             val encodedBytes = encryptCipher.doFinal(input.toByteArray())
             return Base64.encodeToString(encodedBytes, Base64.DEFAULT)
         } catch (e: NoSuchAlgorithmException) {
@@ -118,7 +100,11 @@ object AndroidEncryption {
     private fun decryptString(encrypted: String): ByteArray? {
         try {
             val decryptCipher = Cipher.getInstance(TRANSFORMATION)
-            decryptCipher!!.init(Cipher.DECRYPT_MODE, getSecretKey(), GCMParameterSpec(128, FIXED_IV.toByteArray()))
+            decryptCipher!!.init(
+                Cipher.DECRYPT_MODE,
+                getSecretKey(),
+                GCMParameterSpec(128, FIXED_IV.toByteArray())
+            )
             val barr = Base64.decode(encrypted, Base64.DEFAULT)
             return decryptCipher.doFinal(barr)
         } catch (e: NoSuchAlgorithmException) {
@@ -133,43 +119,6 @@ object AndroidEncryption {
             e.printStackTrace()
         } catch (e: BadPaddingException) {
             e.printStackTrace()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
-
-    private fun encryptStream(input: String, outputStream: OutputStream): String? {
-        try {
-            val encryptCipher = Cipher.getInstance(TRANSFORMATION)
-            encryptCipher!!.init(Cipher.ENCRYPT_MODE, getSecretKey(), GCMParameterSpec(128, FIXED_IV.toByteArray()))
-            val encodedBytes = encryptCipher.doFinal(input.toByteArray())
-            outputStream.use {
-                it.write(encodedBytes.size)
-                it.write(encodedBytes)
-            }
-            return Base64.encodeToString(encodedBytes, Base64.DEFAULT)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
-
-    private fun decryptStream(inputStream: InputStream): ByteArray? {
-        try {
-            val decryptCipher = Cipher.getInstance(TRANSFORMATION)
-            decryptCipher!!.init(Cipher.DECRYPT_MODE, getSecretKey(), GCMParameterSpec(128, FIXED_IV.toByteArray()))
-
-            inputStream.use {
-                val encryptedBytesSize = it.read()
-                val encryptedBytes = ByteArray(encryptedBytesSize)
-                it.read(encryptedBytes)
-
-                val barr = Base64.decode(String(encryptedBytes, Charsets.UTF_8), Base64.DEFAULT)
-                return decryptCipher.doFinal(barr)
-            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

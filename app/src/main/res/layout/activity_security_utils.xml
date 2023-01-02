@@ -34,6 +34,20 @@
             android:layout_height="wrap_content"
             android:text="decrypt"
             android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_encryptFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="encryptFile"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_decryptFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="decryptFile"
+            android:textAllCaps="false" />
     </LinearLayout>
 
 </ScrollView>
