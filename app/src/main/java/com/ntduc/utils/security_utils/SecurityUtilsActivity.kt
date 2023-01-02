@@ -11,6 +11,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
+
 @RequiresApi(Build.VERSION_CODES.M)
 class SecurityUtilsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySecurityUtilsBinding
@@ -28,10 +29,6 @@ class SecurityUtilsActivity : AppCompatActivity() {
     }
 
     private fun initEvent() {
-        binding.btnGenerateKey.setOnClickListener {
-            AndroidEncryption.generateKey(this)
-        }
-
         binding.btnEncrypt.setOnClickListener {
             binding.txt.text = AndroidEncryption.encrypt(binding.edt.text.toString())
 //            val s = binding.edt.text.toString()
