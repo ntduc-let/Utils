@@ -18,7 +18,7 @@ import java.io.*
 
 fun File.mimeType(): String? = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
 
-fun File.renameTo(context: Context, newName: String): Boolean {
+fun File.renameTo(context: Context, newName: String): File? {
     try {
         val pathNew =
             if (this.isDirectory)
@@ -28,7 +28,7 @@ fun File.renameTo(context: Context, newName: String): Boolean {
 
         val fileNew = File(pathNew)
         if (fileNew.exists()) {
-            return false
+            return null
         }
 
         if (this.renameTo(fileNew)) {
@@ -38,12 +38,12 @@ fun File.renameTo(context: Context, newName: String): Boolean {
                 null,
                 null
             )
-            return true
+            return fileNew
         }
     } catch (e: Exception) {
         e.printStackTrace()
     }
-    return false
+    return null
 }
 
 fun File.copyTo(
