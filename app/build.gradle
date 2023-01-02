@@ -53,15 +53,16 @@ dependencies {
     implementation project(path: ':DateTimeUtils')
     implementation project(path: ':GlideUtils')
     implementation project(path: ':SharedPreferenceUtils')
+    implementation project(path: ':FileUtils')
 
     implementation project(path: ':ViewPager2Utils')
-    implementation project(path: ':FileUtils')
     implementation project(path: ':RecyclerViewUtils')
     implementation project(path: ':AppUtils')
 
     // Coroutines kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation project(path: ':SecurityUtils')
 
     //Leak Canary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'

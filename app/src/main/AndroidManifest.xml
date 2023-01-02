@@ -55,6 +55,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Utils"
         tools:targetApi="31">
+        <activity android:name=".security_utils.SecurityUtilsActivity" />
         <activity android:name=".view_utils.activity.ViewUtilsActivity" />
         <activity android:name=".sp_utils.SpActivity" />
         <activity android:name=".navigation_utils.activity.NavUtilsActivity" />

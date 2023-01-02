@@ -81,6 +81,13 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_SecurityUtils"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SecurityUtils"
+            android:textAllCaps="false" />
+
+        <Button
             android:id="@+id/btn_RecyclerViewUtils"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

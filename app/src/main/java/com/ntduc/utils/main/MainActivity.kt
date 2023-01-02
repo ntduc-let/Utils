@@ -23,6 +23,7 @@ import com.ntduc.utils.fragment_utils.activity.FragmentUtilsActivity
 import com.ntduc.utils.navigation_utils.activity.NavUtilsActivity
 import com.ntduc.utils.string_utils.StringUtilsActivity
 import com.ntduc.utils.recycler_view_utils.RecyclerUtilsActivity
+import com.ntduc.utils.security_utils.SecurityUtilsActivity
 import com.ntduc.utils.sp_utils.SpActivity
 import com.ntduc.utils.view_pager_2_utils.activity.ViewPager2UtilsActivity
 import com.ntduc.utils.view_utils.activity.ViewUtilsActivity
@@ -81,18 +82,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SpActivity::class.java))
         }
 
-        binding.btnViewPager2Utils.setOnClickListener {
-            startActivity(Intent(this, ViewPager2UtilsActivity::class.java))
-        }
-
-
-
         binding.btnFileUtils.setOnClickListener {
             if (checkPermissionReadAllFile()) {
                 startActivity(Intent(this, FileUtilsActivity::class.java))
             } else {
                 requestPermissionReadAllFile()
             }
+        }
+
+        binding.btnSecurityUtils.setOnClickListener {
+            startActivity(Intent(this, SecurityUtilsActivity::class.java))
+        }
+
+        binding.btnViewPager2Utils.setOnClickListener {
+            startActivity(Intent(this, ViewPager2UtilsActivity::class.java))
         }
 
         binding.btnRecyclerViewUtils.setOnClickListener {
