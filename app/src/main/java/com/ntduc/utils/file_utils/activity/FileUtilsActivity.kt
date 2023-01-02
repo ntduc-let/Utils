@@ -102,7 +102,7 @@ class FileUtilsActivity : AppCompatActivity() {
             if (File(binding.txt.text.toString()).renameTo(
                     this,
                     binding.edtRenameFile.text.toString()
-                )
+                ) != null
             ) {
                 shortToast("Rename success")
                 binding.txt.text = ""
