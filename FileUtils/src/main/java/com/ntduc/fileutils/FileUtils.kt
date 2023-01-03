@@ -181,6 +181,28 @@ fun File.open(context: Context, authority: String) {
     context.startActivity(chooser)
 }
 
+fun File.readToString(): String {
+    var text: String
+    FileInputStream(this).use { inpS ->
+        inpS.bufferedReader().use {
+            text = it.readText()
+            it.close()
+        }
+        inpS.close()
+    }
+    return text
+}
+
+fun File.writeToFile(text: String) {
+    FileOutputStream(this).use { outS ->
+        outS.bufferedWriter().use {
+            it.append(text)
+            it.close()
+        }
+        outS.close()
+    }
+}
+
 fun Context.getFiles(
     directoryPath: String = "",
     types: List<String> = listOf(*FileType.ALL)
