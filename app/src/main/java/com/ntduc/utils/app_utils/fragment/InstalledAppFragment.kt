@@ -1,14 +1,21 @@
 package com.ntduc.utils.app_utils.fragment
 
+import android.app.Activity
+import android.app.Activity.RESULT_OK
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ntduc.apputils.openApp
+import com.ntduc.apputils.uninstallApp
 import com.ntduc.utils.app_utils.activity.AppViewModel
 import com.ntduc.utils.app_utils.adapter.InstalledAppAdapter
 import com.ntduc.utils.databinding.FragmentInstalledAppBinding
@@ -34,7 +41,7 @@ class InstalledAppFragment : Fragment() {
         init()
     }
 
-    private fun init(){
+    private fun init() {
         initView()
         initData()
         initEvent()
@@ -42,19 +49,11 @@ class InstalledAppFragment : Fragment() {
 
     private fun initEvent() {
         adapter.setOnUninstallListener {
-            uninstallApp(it)
+            requireActivity().uninstallApp(it.packageName!!)
         }
-    }
-
-    private fun uninstallApp(app: MyApp) {
-        val intent = Intent(
-            Intent.ACTION_DELETE, Uri.fromParts(
-                "package",
-                app.packageName,
-                null
-            )
-        )
-        startActivity(intent)
+        adapter.setOnOpenListener {
+            requireActivity().openApp(it.packageName!!)
+        }
     }
 
     private fun initData() {
@@ -80,6 +79,7 @@ class InstalledAppFragment : Fragment() {
 
         adapter = InstalledAppAdapter(requireContext())
         binding.rcvList.adapter = adapter
-        binding.rcvList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.rcvList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
     }
 }

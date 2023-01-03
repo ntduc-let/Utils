@@ -1,13 +1,17 @@
 package com.ntduc.utils.app_utils.fragment
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,7 +49,7 @@ class ApkFragment : Fragment() {
 
     private fun initEvent() {
         adapter.setOnInstallListener {
-            requireContext().installApk(path = it.myFile!!.data!!)
+            requireActivity().installApk(it.myFile!!.data!!, "com.ntduc.utils.provider")
         }
     }
 

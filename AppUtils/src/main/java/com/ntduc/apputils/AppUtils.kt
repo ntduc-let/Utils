@@ -1,19 +1,15 @@
 package com.ntduc.apputils
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInstaller
-import android.content.pm.PackageInstaller.SessionParams
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.core.content.FileProvider
 import com.ntduc.apputils.model.BaseApp
 import java.io.File
-import java.io.IOException
 
 
 @SuppressLint("QueryPermissionsNeeded")
@@ -67,84 +63,50 @@ fun Context.getApps(
     return apps
 }
 
+fun Activity.openApp(packageName: String) {
+    var intent: Intent? = packageManager.getLaunchIntentForPackage(packageName)
+    if (intent == null) {
+        intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse("market://details?id=$packageName")
+    }
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivityForResult(intent, REQUEST_CODE_OPEN_APP)
+}
+
+/*
+* <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+ */
+fun Activity.uninstallApp(packageName: String) {
+    val intent = Intent(
+        Intent.ACTION_DELETE,
+        Uri.fromParts("package", packageName, null)
+    )
+    startActivityForResult(intent, REQUEST_CODE_UNINSTALL_APP)
+}
+
+/*
+* <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+ */
+fun Activity.installApk(path: String, authority: String) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        val uri = FileProvider.getUriForFile(this, authority, File(path))
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.setDataAndType(uri, "application/vnd.android.package-archive")
+        startActivityForResult(intent, REQUEST_CODE_INSTALL_APP)
+    } else {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(Uri.fromFile(File(path)), "application/vnd.android.package-archive")
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivityForResult(intent, REQUEST_CODE_INSTALL_APP)
+    }
+}
+
 private fun isSystemApplication(appInfo: ApplicationInfo): Boolean {
     return appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
 }
 
-private const val PACKAGE_INSTALLED_ACTION =
-    "com.android.apis.content.SESSION_API_PACKAGE_INSTALLED"
-
-fun Context.installApk(path : String) {
-    var session: PackageInstaller.Session? = null
-    try {
-        val packageInstaller = packageManager.packageInstaller
-        val params = SessionParams(
-            SessionParams.MODE_FULL_INSTALL
-        )
-        val sessionId = packageInstaller.createSession(params)
-        session = packageInstaller.openSession(sessionId)
-        addApkToInstallSession("app-debug.apk", session)
-        // Create an install status receiver.
-        val intent = Intent(this, this::class.java)
-        intent.action = PACKAGE_INSTALLED_ACTION
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val statusReceiver = pendingIntent.intentSender
-        // Commit the session (this will start the installation workflow).
-        session.commit(statusReceiver)
-    } catch (e: IOException) {
-        throw RuntimeException("Couldn't install package", e)
-    } catch (e: RuntimeException) {
-        session?.abandon()
-        throw e
-    }
-}
-
-@Throws(IOException::class)
-private fun Context.addApkToInstallSession(assetName: String, session: PackageInstaller.Session) {
-    // It's recommended to pass the file size to openWrite(). Otherwise installation may fail
-    // if the disk is almost full.
-    session.openWrite("package", 0, -1).use { packageInSession ->
-        assets.open(assetName).use { inputStream ->
-            val buffer = ByteArray(16384)
-            var n: Int
-            while (inputStream.read(buffer).also { n = it } >= 0) {
-                packageInSession.write(buffer, 0, n)
-            }
-        }
-    }
-}
-
-/**
- * Returns a Uri pointing to the APK to install.
- */
-private fun Context.getApkUri(assetName: String, authority: String): Uri? {
-    // Before N, a MODE_WORLD_READABLE file could be passed via the ACTION_INSTALL_PACKAGE
-    // Intent. Since N, MODE_WORLD_READABLE files are forbidden, and a FileProvider is
-    // recommended.
-    val useFileProvider = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-    // Copy the given asset out into a file so that it can be installed.
-    // Returns the path to the file.
-    val tempFilename = "tmp.apk"
-    val buffer = ByteArray(16384)
-    val fileMode = if (useFileProvider) Context.MODE_PRIVATE else Context.MODE_WORLD_READABLE
-    try {
-        assets.open(assetName).use { inputStream ->
-            openFileOutput(tempFilename, fileMode).use { fout ->
-                var n: Int
-                while (inputStream.read(buffer).also { n = it } >= 0) {
-                    fout.write(buffer, 0, n)
-                }
-            }
-        }
-    } catch (e: IOException) {
-        Log.i("InstallApk", "Failed to write temporary APK file", e)
-    }
-    return if (useFileProvider) {
-        val toInstall = File(this.filesDir, tempFilename)
-        FileProvider.getUriForFile(
-            this, authority, toInstall
-        )
-    } else {
-        Uri.fromFile(getFileStreamPath(tempFilename))
-    }
-}
+const val REQUEST_CODE_OPEN_APP = 100
+const val REQUEST_CODE_INSTALL_APP = 200
+const val REQUEST_CODE_UNINSTALL_APP = 300

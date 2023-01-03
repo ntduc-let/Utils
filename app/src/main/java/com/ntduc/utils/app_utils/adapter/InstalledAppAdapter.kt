@@ -40,6 +40,12 @@ class InstalledAppAdapter(
                 it(item)
             }
         }
+
+        holder.binding.root.setOnClickListener {
+            onOpenListener?.let {
+                it(item)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -56,5 +62,11 @@ class InstalledAppAdapter(
 
     fun setOnUninstallListener(listener: (MyApp) -> Unit) {
         onUninstallListener = listener
+    }
+
+    private var onOpenListener: ((MyApp) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (MyApp) -> Unit) {
+        onOpenListener = listener
     }
 }
