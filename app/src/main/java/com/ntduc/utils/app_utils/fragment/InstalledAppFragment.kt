@@ -1,13 +1,6 @@
 package com.ntduc.utils.app_utils.fragment
 
-import android.app.Activity
-import android.app.Activity.RESULT_OK
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +12,6 @@ import com.ntduc.apputils.uninstallApp
 import com.ntduc.utils.app_utils.activity.AppViewModel
 import com.ntduc.utils.app_utils.adapter.InstalledAppAdapter
 import com.ntduc.utils.databinding.FragmentInstalledAppBinding
-import com.ntduc.utils.model.MyApp
-
 
 class InstalledAppFragment : Fragment() {
     private lateinit var binding: FragmentInstalledAppBinding

@@ -11,7 +11,9 @@ import android.os.Environment
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.contextutils.showConfirmationDialog
+import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.BuildConfig
 import com.ntduc.utils.activity_utils.ActiUtilsActivity
 import com.ntduc.utils.app_utils.activity.AppActivity
@@ -50,39 +52,39 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnActivityUtils.setOnClickListener {
+        binding.btnActivityUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, ActiUtilsActivity::class.java))
         }
 
-        binding.btnContextUtils.setOnClickListener {
+        binding.btnContextUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, ContextUtilsActivity::class.java))
         }
 
-        binding.btnFragmentUtils.setOnClickListener {
+        binding.btnFragmentUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, FragmentUtilsActivity::class.java))
         }
 
-        binding.btnViewUtils.setOnClickListener {
+        binding.btnViewUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, ViewUtilsActivity::class.java))
         }
 
-        binding.btnNavigationUtils.setOnClickListener {
+        binding.btnNavigationUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, NavUtilsActivity::class.java))
         }
 
-        binding.btnColorUtils.setOnClickListener {
+        binding.btnColorUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, ColorUtilsActivity::class.java))
         }
 
-        binding.btnStringUtils.setOnClickListener {
+        binding.btnStringUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, StringUtilsActivity::class.java))
         }
 
-        binding.btnSPUtils.setOnClickListener {
+        binding.btnSPUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, SpActivity::class.java))
         }
 
-        binding.btnFileUtils.setOnClickListener {
+        binding.btnFileUtils.setOnClickShrinkEffectListener {
             if (checkPermissionReadAllFile()) {
                 startActivity(Intent(this, FileUtilsActivity::class.java))
             } else {
@@ -90,19 +92,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnSecurityUtils.setOnClickListener {
-            startActivity(Intent(this, SecurityUtilsActivity::class.java))
+        binding.btnSecurityUtils.setOnClickShrinkEffectListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                startActivity(Intent(this, SecurityUtilsActivity::class.java))
+            }else{
+                shortToast("Not support")
+            }
         }
 
-        binding.btnViewPager2Utils.setOnClickListener {
+        binding.btnViewPager2Utils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, ViewPager2UtilsActivity::class.java))
         }
 
-        binding.btnRecyclerViewUtils.setOnClickListener {
+        binding.btnRecyclerViewUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, RecyclerUtilsActivity::class.java))
         }
 
-        binding.btnAppUtils.setOnClickListener {
+        binding.btnAppUtils.setOnClickShrinkEffectListener {
             startActivity(Intent(this, AppActivity::class.java))
         }
     }

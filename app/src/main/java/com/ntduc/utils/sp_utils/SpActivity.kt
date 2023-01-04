@@ -3,11 +3,10 @@ package com.ntduc.utils.sp_utils
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.contextutils.inflater
 import com.ntduc.sharedpreferenceutils.*
 import com.ntduc.toastutils.shortToast
-import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ActivitySpBinding
 
 class SpActivity : AppCompatActivity(), (SharedPreferences, String?) -> Unit {
@@ -39,27 +38,27 @@ class SpActivity : AppCompatActivity(), (SharedPreferences, String?) -> Unit {
     }
 
     private fun initEvent() {
-        binding.btnPutString.setOnClickListener {
+        binding.btnPutString.setOnClickShrinkEffectListener {
             sp.putString(KEY_STRING, binding.edt.text.toString())
             binding.txt.text = sp.getString(KEY_STRING, null)
         }
-        binding.btnCommitString.setOnClickListener {
+        binding.btnCommitString.setOnClickShrinkEffectListener {
             sp.commitString(KEY_STRING, binding.edt.text.toString())
             binding.txt.text = sp.getString(KEY_STRING, null)
         }
-        binding.btnClear.setOnClickListener {
+        binding.btnClear.setOnClickShrinkEffectListener {
             sp.clear()
             binding.txt.text = sp.getString(KEY_STRING, null)
         }
-        binding.btnCommitClear.setOnClickListener {
+        binding.btnCommitClear.setOnClickShrinkEffectListener {
             sp.commitClear()
             binding.txt.text = sp.getString(KEY_STRING, null)
         }
-        binding.btnRemove.setOnClickListener {
+        binding.btnRemove.setOnClickShrinkEffectListener {
             sp.remove(KEY_STRING)
             binding.txt.text = sp.getString(KEY_STRING, null)
         }
-        binding.btnCommitRemove.setOnClickListener {
+        binding.btnCommitRemove.setOnClickShrinkEffectListener {
             sp.commitRemove(KEY_STRING)
             binding.txt.text = sp.getString(KEY_STRING, null)
         }

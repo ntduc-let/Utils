@@ -1,17 +1,9 @@
 package com.ntduc.utils.app_utils.fragment
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,8 +11,6 @@ import com.ntduc.apputils.installApk
 import com.ntduc.utils.app_utils.activity.AppViewModel
 import com.ntduc.utils.app_utils.adapter.ApkAdapter
 import com.ntduc.utils.databinding.FragmentApkBinding
-import java.io.File
-
 
 class ApkFragment : Fragment() {
     private lateinit var binding: FragmentApkBinding

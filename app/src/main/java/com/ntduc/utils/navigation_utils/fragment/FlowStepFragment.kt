@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.navigationutils.navigateToActionListener
 import com.ntduc.utils.R
 import com.ntduc.utils.databinding.FragmentFlowStepBinding
@@ -31,6 +32,6 @@ class FlowStepFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.nextButton.setOnClickListener(navigateToActionListener(R.id.next_action))
+        binding.nextButton.setOnClickShrinkEffectListener(navigateToActionListener(R.id.next_action))
     }
 }

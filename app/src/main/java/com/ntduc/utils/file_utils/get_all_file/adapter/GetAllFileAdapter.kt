@@ -10,10 +10,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
+import com.ntduc.clickeffectutils.OnMultiClickListener
 import com.ntduc.glideutils.loadImg
 import com.ntduc.numberutils.formatBytes
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
@@ -24,7 +21,6 @@ import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import com.ntduc.utils.file_utils.constant.FileType
 import com.ntduc.utils.model.MyFile
 import com.ntduc.utils.model.MyFolderFile
-import java.io.File
 import java.util.ArrayList
 
 class GetAllFileAdapter(
@@ -113,11 +109,15 @@ class GetAllFileAdapter(
 
                 holder.binding.txtTitle.text = item.displayName
                 holder.binding.txtDescription.text = item.size?.formatBytes()
-                holder.binding.root.setOnClickListener {
-                    onOpenListener?.let {
-                        it(item)
+                holder.binding.root.setOnClickListener(object : OnMultiClickListener() {
+                    override fun onSingleClick(v: View?) {
+                        onOpenListener?.let {
+                            it(item)
+                        }
                     }
-                }
+
+                    override fun onDoubleClick(v: View?) {}
+                })
             }
         }
     }

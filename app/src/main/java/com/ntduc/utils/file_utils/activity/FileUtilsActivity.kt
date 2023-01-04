@@ -1,6 +1,5 @@
 package com.ntduc.utils.file_utils.activity
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,6 +8,7 @@ import android.provider.DocumentsContract
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityFileUtilsBinding
 import com.ntduc.fileutils.*
@@ -85,19 +85,19 @@ class FileUtilsActivity : AppCompatActivity() {
         binding = ActivityFileUtilsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnSelectFile.setOnClickListener {
+        binding.btnSelectFile.setOnClickShrinkEffectListener {
             selectFile()
         }
 
-        binding.btnRenameFile.setOnClickListener {
+        binding.btnRenameFile.setOnClickShrinkEffectListener {
             if (binding.txt.text.trim().isEmpty()) {
                 shortToast("Please select file")
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
 
             if (binding.edtRenameFile.text.trim().isEmpty()) {
                 shortToast("Please enter name file")
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
             if (File(binding.txt.text.toString()).renameTo(
                     this,
@@ -112,27 +112,27 @@ class FileUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnCopyFile.setOnClickListener {
+        binding.btnCopyFile.setOnClickShrinkEffectListener {
             if (binding.txt.text.trim().isEmpty()) {
                 shortToast("Please select file")
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
             selectFolderCopyFile()
             Log.d("ntduc_debug", "onCreate: ${binding.txt.text}")
         }
 
-        binding.btnMoveFile.setOnClickListener {
+        binding.btnMoveFile.setOnClickShrinkEffectListener {
             if (binding.txt.text.trim().isEmpty()) {
                 shortToast("Please select file")
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
             selectFolderMoveFile()
         }
 
-        binding.btnDeleteFile.setOnClickListener {
+        binding.btnDeleteFile.setOnClickShrinkEffectListener {
             if (binding.txt.text.trim().isEmpty()) {
                 shortToast("Please select file")
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
 
             if (File(binding.txt.text.toString()).delete(this)) {
@@ -143,28 +143,28 @@ class FileUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnShareFile.setOnClickListener {
+        binding.btnShareFile.setOnClickShrinkEffectListener {
             if (binding.txt.text.trim().isEmpty()) {
                 shortToast("Please select file")
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
 
             File(binding.txt.text.toString()).share(this, "com.ntduc.utils.provider")
         }
 
-        binding.btnGetAllFile.setOnClickListener {
+        binding.btnGetAllFile.setOnClickShrinkEffectListener {
             startActivity(Intent(this, GetAllFileActivity::class.java))
         }
 
-        binding.btnGetAllAudio.setOnClickListener {
+        binding.btnGetAllAudio.setOnClickShrinkEffectListener {
             startActivity(Intent(this, GetAllAudioActivity::class.java))
         }
 
-        binding.btnGetAllImage.setOnClickListener {
+        binding.btnGetAllImage.setOnClickShrinkEffectListener {
             startActivity(Intent(this, GetAllImageActivity::class.java))
         }
 
-        binding.btnGetAllVideo.setOnClickListener {
+        binding.btnGetAllVideo.setOnClickShrinkEffectListener {
             startActivity(Intent(this, GetAllVideoActivity::class.java))
         }
     }

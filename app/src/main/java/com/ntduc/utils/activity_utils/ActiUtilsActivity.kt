@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import com.ntduc.activityutils.*
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.BuildConfig
 import com.ntduc.utils.R
@@ -18,64 +19,64 @@ class ActiUtilsActivity : AppCompatActivity() {
         val binding = ActivityActiUtilsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnHideNavigationBar.setOnClickListener {
+        binding.btnHideNavigationBar.setOnClickShrinkEffectListener {
             hideNavigationBar()
         }
-        binding.btnShowNavigationBar.setOnClickListener {
+        binding.btnShowNavigationBar.setOnClickShrinkEffectListener {
             showNavigationBar()
         }
-        binding.btnGetNavigationBarHeight.setOnClickListener {
+        binding.btnGetNavigationBarHeight.setOnClickShrinkEffectListener {
             shortToast("NavigationBar Height: $getNavigationBarHeight px")
         }
-        binding.btnHideStatusBar.setOnClickListener {
+        binding.btnHideStatusBar.setOnClickShrinkEffectListener {
             hideStatusBar()
         }
-        binding.btnShowStatusBar.setOnClickListener {
+        binding.btnShowStatusBar.setOnClickShrinkEffectListener {
             showStatusBar()
         }
-        binding.btnEnterFullScreenMode.setOnClickListener {
+        binding.btnEnterFullScreenMode.setOnClickShrinkEffectListener {
             enterFullScreenMode()
         }
-        binding.btnExitFullScreenMode.setOnClickListener {
+        binding.btnExitFullScreenMode.setOnClickShrinkEffectListener {
             exitFullScreenMode()
         }
-        binding.btnAddSecureFlag.setOnClickListener {
+        binding.btnAddSecureFlag.setOnClickShrinkEffectListener {
             addSecureFlag()
         }
-        binding.btnClearSecureFlag.setOnClickListener {
+        binding.btnClearSecureFlag.setOnClickShrinkEffectListener {
             clearSecureFlag()
         }
-        binding.btnShowKeyboard.setOnClickListener {
+        binding.btnShowKeyboard.setOnClickShrinkEffectListener {
             showKeyboard(binding.edtBrightness)
         }
-        binding.btnHideKeyboard.setOnClickListener {
+        binding.btnHideKeyboard.setOnClickShrinkEffectListener {
             hideKeyboard()
         }
-        binding.btnBrightness.setOnClickListener {
+        binding.btnBrightness.setOnClickShrinkEffectListener {
             brightness = binding.edtBrightness.text.toString().toFloat()
         }
-        binding.btnGetStatusBarHeight.setOnClickListener {
+        binding.btnGetStatusBarHeight.setOnClickShrinkEffectListener {
             shortToast("StatusBar Height: $getStatusBarHeight px")
         }
-        binding.btnDisplaySizePixels.setOnClickListener {
+        binding.btnDisplaySizePixels.setOnClickShrinkEffectListener {
             shortToast("Display Size: ${displaySizePixels.x} px, ${displaySizePixels.y} px")
         }
-        binding.btnSetStatusBarColor.setOnClickListener {
+        binding.btnSetStatusBarColor.setOnClickShrinkEffectListener {
             setStatusBarColor(R.color.teal_200)
         }
-        binding.btnSetNavigationBarColor.setOnClickListener {
+        binding.btnSetNavigationBarColor.setOnClickShrinkEffectListener {
             setNavigationBarColor(R.color.teal_200)
         }
-        binding.btnSetNavigationBarDividerColor.setOnClickListener {
+        binding.btnSetNavigationBarDividerColor.setOnClickShrinkEffectListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 setNavigationBarDividerColor(R.color.teal_200)
             }
         }
-        binding.btnRestart.setOnClickListener {
+        binding.btnRestart.setOnClickShrinkEffectListener {
             restart()
         }
 
-        binding.btnSleepDuration.setOnClickListener {
+        binding.btnSleepDuration.setOnClickShrinkEffectListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.System.canWrite(this)) {
                     val sleepDuration = 5000
@@ -93,35 +94,35 @@ class ActiUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnLockOrientation.setOnClickListener {
+        binding.btnLockOrientation.setOnClickShrinkEffectListener {
             lockOrientation()
         }
 
-        binding.btnUnlockScreenOrientation.setOnClickListener {
+        binding.btnUnlockScreenOrientation.setOnClickShrinkEffectListener {
             unlockScreenOrientation()
         }
 
-        binding.btnLockCurrentScreenOrientation.setOnClickListener {
+        binding.btnLockCurrentScreenOrientation.setOnClickShrinkEffectListener {
             lockCurrentScreenOrientation()
         }
 
-        binding.btnShowBackButton.setOnClickListener {
+        binding.btnShowBackButton.setOnClickShrinkEffectListener {
             showBackButton()
         }
 
-        binding.btnHideBackButton.setOnClickListener {
+        binding.btnHideBackButton.setOnClickShrinkEffectListener {
             hideBackButton()
         }
 
-        binding.btnShowToolbar.setOnClickListener {
+        binding.btnShowToolbar.setOnClickShrinkEffectListener {
             showToolbar()
         }
 
-        binding.btnHideToolbar.setOnClickListener {
+        binding.btnHideToolbar.setOnClickShrinkEffectListener {
             hideToolbar()
         }
 
-        binding.btnCustomBackButton.setOnClickListener {
+        binding.btnCustomBackButton.setOnClickShrinkEffectListener {
             customBackButton(R.drawable.ic_launcher_foreground)
         }
     }

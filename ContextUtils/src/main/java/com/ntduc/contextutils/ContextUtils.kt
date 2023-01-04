@@ -3,7 +3,6 @@ package com.ntduc.contextutils
 import android.Manifest
 import android.Manifest.permission.READ_PHONE_STATE
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -16,7 +15,6 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.TextUtils.isEmpty
 import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi

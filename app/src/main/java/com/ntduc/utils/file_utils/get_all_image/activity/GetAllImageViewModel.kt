@@ -11,7 +11,6 @@ import com.ntduc.fileutils.getImages
 import com.ntduc.utils.model.MyFile
 import com.ntduc.utils.model.MyFolderImage
 import com.ntduc.utils.model.MyImage
-import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*

@@ -10,12 +10,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.numberutils.formatBytes
 import com.ntduc.utils.R
 import com.ntduc.utils.databinding.ItemApkBinding
 import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import com.ntduc.utils.model.MyApk
-
 
 class ApkAdapter(
     val context: Context,
@@ -69,7 +69,7 @@ class ApkAdapter(
         holder.binding.txtTitle.text = item.myFile?.displayName
         holder.binding.txtDescription.text = (item.myFile?.size?:0).formatBytes()
 
-        holder.binding.btnAction.setOnClickListener {
+        holder.binding.btnAction.setOnClickShrinkEffectListener {
             onInstallListener?.let {
                 it(item)
             }

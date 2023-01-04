@@ -31,9 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.TransitionManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.ntduc.viewutils.setMargins
 
 fun View.visible() {
     this.visibility = View.VISIBLE

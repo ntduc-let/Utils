@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.contextutils.*
 import com.ntduc.toastutils.shortToast
 import com.ntduc.utils.databinding.ActivityContextUtilsBinding
@@ -16,34 +17,34 @@ class ContextUtilsActivity : AppCompatActivity() {
         val binding = ActivityContextUtilsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnShowDialog.setOnClickListener {
+        binding.btnShowDialog.setOnClickShrinkEffectListener {
             showDialog("Title", "showDialog")
         }
-        binding.btnShowConfirmationDialog.setOnClickListener {
+        binding.btnShowConfirmationDialog.setOnClickShrinkEffectListener {
             showConfirmationDialog("", "showDialog", onResponse = {
                 shortToast(it.toString())
             }, cancelable = false)
         }
-        binding.btnShowSinglePicker.setOnClickListener {
+        binding.btnShowSinglePicker.setOnClickShrinkEffectListener {
             showSinglePicker("Title", listOf("Một", "Hai", "Ba").toTypedArray(), onResponse = {
                 shortToast(it.toString())
             }, 0)
         }
-        binding.btnShowMultiPicker.setOnClickListener {
+        binding.btnShowMultiPicker.setOnClickShrinkEffectListener {
             showMultiPicker("Title", listOf("Một", "Hai", "Ba").toTypedArray(), onResponse = { index, isChecked ->
                 if (isChecked) shortToast(index.toString())
             }, listOf(true, true, false).toBooleanArray())
         }
 
-        binding.btnIsLocationEnabled.setOnClickListener {
+        binding.btnIsLocationEnabled.setOnClickShrinkEffectListener {
             shortToast("IsLocationEnabled $isLocationEnabled")
         }
 
-        binding.btnDeviceID.setOnClickListener {
+        binding.btnDeviceID.setOnClickShrinkEffectListener {
             shortToast("DeviceID $deviceID")
         }
 
-        binding.btnGetConnectionType.setOnClickListener {
+        binding.btnGetConnectionType.setOnClickShrinkEffectListener {
             when(getConnectionType()){
                 0 -> shortToast("No Connection")
                 1 -> shortToast("Mobile Data")
@@ -52,7 +53,7 @@ class ContextUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnDeviceNetworkType.setOnClickListener {
+        binding.btnDeviceNetworkType.setOnClickShrinkEffectListener {
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.READ_PHONE_STATE
@@ -60,7 +61,7 @@ class ContextUtilsActivity : AppCompatActivity() {
             ) {
                 ActivityCompat.requestPermissions(this,
                     listOf(Manifest.permission.READ_PHONE_STATE).toTypedArray(), 100);
-                return@setOnClickListener
+                return@setOnClickShrinkEffectListener
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 when(deviceNetworkType()){
@@ -74,31 +75,31 @@ class ContextUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnOpenEmail.setOnClickListener {
+        binding.btnOpenEmail.setOnClickShrinkEffectListener {
             openEmail {
                 shortToast("openEmail")
             }
         }
 
-        binding.btnSendEmail.setOnClickListener {
+        binding.btnSendEmail.setOnClickShrinkEffectListener {
             sendEmail(listOf("savatar2204@gmail.com", "savatar2205@gmail.com").toTypedArray(), "subject", "text", onCantHandleAction = {
                 shortToast("sendEmail")
             })
         }
 
-        binding.btnSendSMS.setOnClickListener {
+        binding.btnSendSMS.setOnClickShrinkEffectListener {
             sendSMS("0813615988")
         }
 
-        binding.btnWatchYoutube.setOnClickListener {
+        binding.btnWatchYoutube.setOnClickShrinkEffectListener {
             watchYoutube("LCAHVao0kkE")
         }
 
-        binding.btnOpenGoogleMaps.setOnClickListener {
+        binding.btnOpenGoogleMaps.setOnClickShrinkEffectListener {
             openGoogleMaps("Hà Nội")
         }
 
-        binding.btnGetTextFromClipboard.setOnClickListener {
+        binding.btnGetTextFromClipboard.setOnClickShrinkEffectListener {
             shortToast(getTextFromClipboard().toString())
         }
     }

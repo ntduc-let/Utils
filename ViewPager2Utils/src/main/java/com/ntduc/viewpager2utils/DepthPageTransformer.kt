@@ -1,7 +1,6 @@
 package com.ntduc.viewpager2utils
 
 import android.view.View
-import androidx.viewpager2.widget.ViewPager2
 import kotlin.math.abs
 
 open class DepthPageTransformer : ABaseTransformer() {

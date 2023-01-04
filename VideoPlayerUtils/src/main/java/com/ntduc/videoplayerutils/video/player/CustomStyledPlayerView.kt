@@ -68,7 +68,7 @@ open class CustomStyledPlayerView constructor(
         exoProgress = findViewById(R.id.exo_progress)
         mScaleDetector = ScaleGestureDetector(context, this)
         if (!Utils.isTvBox(getContext())) {
-            exoErrorMessage.setOnClickListener {
+            exoErrorMessage.setOnClickShrinkEffectListener {
                 if (VideoPlayerActivity.locked) {
                     VideoPlayerActivity.locked = false
                     Utils.showText(this@CustomStyledPlayerView, "", MESSAGE_TIMEOUT_LONG.toLong())

@@ -1,9 +1,8 @@
 package com.ntduc.utils.fragment_utils.activity
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.contextutils.inflater
 import com.ntduc.datetimeutils.currentMillis
 import com.ntduc.fragmentutils.*
@@ -37,7 +36,7 @@ class FragmentUtilsActivity : AppCompatActivity() {
             binding.note.text = backStackCount.toString()
         }
 
-        binding.addFragment.setOnClickListener {
+        binding.addFragment.setOnClickShrinkEffectListener {
             val currentTime = currentMillis
             val fragment = DefaultFragment().newInstance(currentTime.toString())
             addFragment(
@@ -48,7 +47,7 @@ class FragmentUtilsActivity : AppCompatActivity() {
             )
         }
 
-        binding.replaceFragment.setOnClickListener {
+        binding.replaceFragment.setOnClickShrinkEffectListener {
             val currentTime = currentMillis
             val fragment = DefaultFragment().newInstance(currentTime.toString())
             replaceFragment(
@@ -59,7 +58,7 @@ class FragmentUtilsActivity : AppCompatActivity() {
             )
         }
 
-        binding.hideFragment.setOnClickListener {
+        binding.hideFragment.setOnClickShrinkEffectListener {
             val currentFragment = currentFragment(binding.container.id)
             if (currentFragment != null) {
                 hideFragment(currentFragment)
@@ -68,7 +67,7 @@ class FragmentUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.showFragment.setOnClickListener {
+        binding.showFragment.setOnClickShrinkEffectListener {
             val currentFragment = currentFragment(binding.container.id)
             if (currentFragment != null) {
                 showFragment(currentFragment)
@@ -77,7 +76,7 @@ class FragmentUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.removeFragment.setOnClickListener {
+        binding.removeFragment.setOnClickShrinkEffectListener {
             val currentFragment = currentFragment(binding.container.id)
             if (currentFragment != null) {
                 removeFragment(currentFragment)
@@ -86,11 +85,11 @@ class FragmentUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.popFragment.setOnClickListener {
+        binding.popFragment.setOnClickShrinkEffectListener {
             popFragment()
         }
 
-        binding.popFragmentName.setOnClickListener {
+        binding.popFragmentName.setOnClickShrinkEffectListener {
             val nameFragment = binding.nameFragment.text.toString()
             if (nameFragment.isNotEmpty()) {
                 popFragment(nameFragment, 0)
@@ -99,16 +98,16 @@ class FragmentUtilsActivity : AppCompatActivity() {
             }
         }
 
-        binding.clearAllFragments.setOnClickListener {
+        binding.clearAllFragments.setOnClickShrinkEffectListener {
             clearAllFragments()
         }
 
-        binding.currentFragment.setOnClickListener {
+        binding.currentFragment.setOnClickShrinkEffectListener {
             val currentFragment = currentFragment(binding.container.id)
             shortToast("currentFragment: ${currentFragment?.tag}")
         }
 
-        binding.printBackStack.setOnClickListener {
+        binding.printBackStack.setOnClickShrinkEffectListener {
             printBackStack()
         }
     }

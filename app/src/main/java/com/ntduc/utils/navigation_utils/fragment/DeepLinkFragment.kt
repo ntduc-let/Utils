@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.navigationutils.createDeepLink
 import com.ntduc.utils.R
 import com.ntduc.utils.databinding.FragmentDeepLinkBinding
@@ -25,7 +26,7 @@ class DeepLinkFragment : Fragment() {
 
         binding.text.text = arguments?.getString("myarg")
 
-        binding.sendNotificationButton.setOnClickListener {
+        binding.sendNotificationButton.setOnClickShrinkEffectListener {
             val args = Bundle()
             args.putString("myarg", binding.argsEditText.text.toString())
 

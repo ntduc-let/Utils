@@ -140,7 +140,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                     _c.get()!!._list!!.layoutParams = params
                 }
             }
-            _c.get()!!._neutralBtn?.setOnClickListener(View.OnClickListener {
+            _c.get()!!._neutralBtn?.setOnClickShrinkEffectListener(View.OnClickListener {
                 if (_c.get()!!._newFolderView != null
                     && _c.get()!!._newFolderView!!.visibility == View.VISIBLE
                 ) {
@@ -266,7 +266,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                     showOptions.run()
 
                     // Event Listeners.
-                    createDir.setOnClickListener(object : View.OnClickListener {
+                    createDir.setOnClickShrinkEffectListener(object : View.OnClickListener {
                         private var input: EditText? = null
                         override fun onClick(view: View) {
                             //Toast.makeText(getBaseContext(), "new folder clicked", Toast
@@ -336,7 +336,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                                     )
                                 }
                                 root.addView(overlay, params)
-                                overlay.setOnClickListener(null)
+                                overlay.setOnClickShrinkEffectListener(null)
                                 overlay.visibility = View.INVISIBLE
                                 _c.get()!!._newFolderView = overlay
 
@@ -499,7 +499,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                                     }
                                     false
                                 }
-                                cancel.setOnClickListener {
+                                cancel.setOnClickShrinkEffectListener {
                                     hideKeyboardFrom(
                                         _c.get()!!._context, input
                                     )
@@ -512,7 +512,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                                         _c.get()!!._list!!.isFocusable = true
                                     }
                                 }
-                                ok.setOnClickListener {
+                                ok.setOnClickShrinkEffectListener {
                                     hideKeyboardFrom(
                                         _c.get()!!._context, input
                                     )
@@ -564,7 +564,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                             }
                         }
                     })
-                    delete.setOnClickListener {
+                    delete.setOnClickShrinkEffectListener {
                         //Toast.makeText(_c.get()._context, "delete clicked", Toast.LENGTH_SHORT).show();
                         hideOptions.run()
                         if (_c.get()!!._chooseMode == ChooserDialog.CHOOSE_MODE_SELECT_MULTIPLE) {
@@ -587,7 +587,7 @@ internal class onShowListener(c: ChooserDialog) : DialogInterface.OnShowListener
                             _c.get()!!._positiveBtn?.visibility = View.INVISIBLE
                             _c.get()!!._chooseMode = ChooserDialog.CHOOSE_MODE_NORMAL
                             _c.get()!!.refreshDirs()
-                            return@setOnClickListener
+                            return@setOnClickShrinkEffectListener
                         }
                         _c.get()!!._chooseMode =
                             if (_c.get()!!._chooseMode != ChooserDialog.CHOOSE_MODE_DELETE) ChooserDialog.CHOOSE_MODE_DELETE else ChooserDialog.CHOOSE_MODE_NORMAL

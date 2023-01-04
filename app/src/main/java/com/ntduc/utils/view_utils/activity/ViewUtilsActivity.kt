@@ -2,6 +2,7 @@ package com.ntduc.utils.view_utils.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.contextutils.inflater
 import com.ntduc.utils.databinding.ActivityViewUtilsBinding
 import com.ntduc.viewutils.*
@@ -27,11 +28,11 @@ class ViewUtilsActivity : AppCompatActivity() {
     }
 
     private fun initEvent() {
-        binding.btnRotateAnimation.setOnClickListener {
+        binding.btnRotateAnimation.setOnClickShrinkEffectListener {
             binding.image.rotateAnimation(180f, 1000)
         }
 
-        binding.btnBlink.setOnClickListener {
+        binding.btnBlink.setOnClickShrinkEffectListener {
             binding.image.blink(1000)
         }
     }

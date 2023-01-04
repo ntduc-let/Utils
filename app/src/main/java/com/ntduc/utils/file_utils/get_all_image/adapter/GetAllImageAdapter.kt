@@ -8,10 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
+import com.ntduc.clickeffectutils.OnMultiClickListener
 import com.ntduc.glideutils.loadImg
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
 import com.ntduc.utils.R
@@ -141,11 +138,15 @@ class GetAllImageAdapter(
                         placeHolder = R.drawable.ic_empty
                     )
 
-                    holder.binding.root.setOnClickListener {
-                        onOpenListener?.let {
-                            it(item.myImage!!)
+                    holder.binding.root.setOnClickListener(object : OnMultiClickListener() {
+                        override fun onSingleClick(v: View?) {
+                            onOpenListener?.let {
+                                it(item.myImage!!)
+                            }
                         }
-                    }
+
+                        override fun onDoubleClick(v: View?) {}
+                    })
                 }
             }
         }

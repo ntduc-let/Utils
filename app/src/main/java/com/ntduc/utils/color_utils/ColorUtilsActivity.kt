@@ -3,6 +3,7 @@ package com.ntduc.utils.color_utils
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.colorutils.*
 import com.ntduc.utils.databinding.ActivityColorUtilsBinding
 
@@ -12,11 +13,11 @@ class ColorUtilsActivity : AppCompatActivity() {
         val binding = ActivityColorUtilsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnRandomColor.setOnClickListener {
+        binding.btnRandomColor.setOnClickShrinkEffectListener {
             binding.btnRandomColor.setBackgroundColor(randomColor)
         }
 
-        binding.btnSetColorAlpha.setOnClickListener {
+        binding.btnSetColorAlpha.setOnClickShrinkEffectListener {
             binding.btnSetColorAlpha.setBackgroundColor(setColorAlpha(Color.RED, 0.5f))
         }
 

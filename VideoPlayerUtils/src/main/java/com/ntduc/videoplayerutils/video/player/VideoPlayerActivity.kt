@@ -372,7 +372,7 @@ open class VideoPlayerActivity : Activity() {
 
         buttonVolume = findViewById(R.id.btn_volume)
         buttonVolume!!.visibility = getVisibilityVolume()
-        buttonVolume!!.setOnClickListener {
+        buttonVolume!!.setOnClickShrinkEffectListener {
             muteVolume(
                 this,
                 mAudioManager!!,
@@ -398,7 +398,7 @@ open class VideoPlayerActivity : Activity() {
         buttonOpen!!.visibility = getVisibilityFolderOpen()
 
         //Tải Video
-        buttonOpen!!.setOnClickListener {
+        buttonOpen!!.setOnClickShrinkEffectListener {
             openFile(
                 mPrefs!!.mediaUri
             )
@@ -430,7 +430,7 @@ open class VideoPlayerActivity : Activity() {
                 buttonPiP!!.contentDescription = getString(R.string.button_pip)
                 buttonPiP!!.setImageResource(getDrawableResPictureInPictureAlt())
                 buttonPiP!!.visibility = getVisibilityPictureInPictureAlt()
-                buttonPiP!!.setOnClickListener { enterPiP() }
+                buttonPiP!!.setOnClickShrinkEffectListener { enterPiP() }
             }
         }
 
@@ -440,7 +440,7 @@ open class VideoPlayerActivity : Activity() {
         buttonAspectRatio!!.contentDescription = getString(R.string.button_crop)
         updatebuttonAspectRatioIcon()
         buttonAspectRatio!!.visibility = getVisibilityAspectRatio()
-        buttonAspectRatio!!.setOnClickListener {
+        buttonAspectRatio!!.setOnClickShrinkEffectListener {
             playerView!!.setScale(1f)
             if (playerView!!.resizeMode == AspectRatioFrameLayout.RESIZE_MODE_FIT) {
                 playerView!!.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
@@ -466,7 +466,7 @@ open class VideoPlayerActivity : Activity() {
         buttonRotation!!.contentDescription = getString(R.string.button_rotate)
         updateButtonRotation()
         buttonRotation!!.visibility = getVisibilityRotation()
-        buttonRotation!!.setOnClickListener {
+        buttonRotation!!.setOnClickShrinkEffectListener {
             mPrefs!!.orientation = getNextOrientation(
                 mPrefs!!.orientation
             )
@@ -487,8 +487,8 @@ open class VideoPlayerActivity : Activity() {
         buttonMore = playerView!!.findViewById(R.id.btn_more)
         buttonMore!!.visibility = getVisibilityMore()
 
-        buttonBack!!.setOnClickListener { onBackPressed() }
-        buttonMore!!.setOnClickListener { enterMore(it) }
+        buttonBack!!.setOnClickShrinkEffectListener { onBackPressed() }
+        buttonMore!!.setOnClickShrinkEffectListener { enterMore(it) }
 
         //Gửi video
         titleView!!.setOnLongClickListener {
@@ -592,12 +592,12 @@ open class VideoPlayerActivity : Activity() {
 //        //Thiết lập btn xóa video
 //        val buttonDelete = findViewById<View>(R.id.delete)
 //        buttonDelete.visibility = getVisibilityDelete()
-//        buttonDelete.setOnClickListener { askDeleteMedia() }
+//        buttonDelete.setOnClickShrinkEffectListener { askDeleteMedia() }
 
 //        //Thiết lập btn next video
 //        val buttonNext = findViewById<View>(R.id.next)
 //        buttonNext.visibility = getVisibilityNext()
-//        buttonNext.setOnClickListener {
+//        buttonNext.setOnClickShrinkEffectListener {
 //            if (!isTvBox && mPrefs!!.askScope) {
 //                askForScope(loadSubtitlesOnCancel = false, skipToNextOnCancel = true)
 //            } else {
@@ -606,7 +606,7 @@ open class VideoPlayerActivity : Activity() {
 //        }
 
         //Thiết lập btn pause/play video
-        exoPlayPause!!.setOnClickListener { dispatchPlayPause() }
+        exoPlayPause!!.setOnClickShrinkEffectListener { dispatchPlayPause() }
 
         //Ngăn các thao tác double tap trong controller
         // Prevent double tap actions in controller

@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.utils.databinding.ItemAppBinding
 import com.ntduc.utils.model.MyApp
 
@@ -35,13 +36,13 @@ class InstalledAppAdapter(
         holder.binding.txtTitle.text = item.name
         holder.binding.txtDescription.text = item.packageName
 
-        holder.binding.btnAction.setOnClickListener {
+        holder.binding.btnAction.setOnClickShrinkEffectListener {
             onUninstallListener?.let {
                 it(item)
             }
         }
 
-        holder.binding.root.setOnClickListener {
+        holder.binding.root.setOnClickShrinkEffectListener {
             onOpenListener?.let {
                 it(item)
             }

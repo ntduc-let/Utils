@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.annotation.RequiresApi
+import com.ntduc.clickeffectutils.setOnClickShrinkEffectListener
 import com.ntduc.contextutils.inflater
 import com.ntduc.securityutils.AndroidEncryption
 import com.ntduc.securityutils.FileEncryption
@@ -30,15 +31,15 @@ class SecurityUtilsActivity : AppCompatActivity() {
     }
 
     private fun initEvent() {
-        binding.btnEncrypt.setOnClickListener {
+        binding.btnEncrypt.setOnClickShrinkEffectListener {
             binding.txt.text = AndroidEncryption.encrypt(binding.edt.text.toString())
         }
 
-        binding.btnDecrypt.setOnClickListener {
+        binding.btnDecrypt.setOnClickShrinkEffectListener {
             binding.edt.setText(AndroidEncryption.decrypt(binding.txt.text.toString()))
         }
 
-        binding.btnEncryptFile.setOnClickListener {
+        binding.btnEncryptFile.setOnClickShrinkEffectListener {
             FileEncryption.encryptToFile(
                 "1234567891234567",
                 "1234567891234567",
@@ -47,7 +48,7 @@ class SecurityUtilsActivity : AppCompatActivity() {
             )
         }
 
-        binding.btnDecryptFile.setOnClickListener {
+        binding.btnDecryptFile.setOnClickShrinkEffectListener {
             FileEncryption.decryptToFile(
                 "1234567891234567",
                 "1234567891234567",

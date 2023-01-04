@@ -8,10 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
+import com.ntduc.clickeffectutils.OnMultiClickListener
 import com.ntduc.datetimeutils.formatAsTime
 import com.ntduc.glideutils.loadImg
 import com.ntduc.recyclerviewutils.sticky.StickyHeaders
@@ -89,11 +86,15 @@ class GetAllVideoAdapter(
 
                 holder.binding.txtTime.text = item.duration?.formatAsTime()
 
-                holder.binding.root.setOnClickListener {
-                    onOpenListener?.let {
-                        it(item)
+                holder.binding.root.setOnClickListener(object : OnMultiClickListener() {
+                    override fun onSingleClick(v: View?) {
+                        onOpenListener?.let {
+                            it(item)
+                        }
                     }
-                }
+
+                    override fun onDoubleClick(v: View?) {}
+                })
             }
         }
     }
