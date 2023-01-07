@@ -17,12 +17,10 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.PowerManager
 import android.util.Log
-import com.ntduc.musicplayerutils.R
-import com.ntduc.musicplayerutils.extensions.showToast
 import com.ntduc.musicplayerutils.extensions.uri
 import com.ntduc.musicplayerutils.model.Song
-import com.ntduc.musicplayerutils.service.playback.Playback.PlaybackCallbacks
-import com.ntduc.musicplayerutils.util.PreferenceUtil.isGapLessPlayback
+import com.ntduc.musicplayerutils.service.playback.Playback
+import com.ntduc.musicplayerutils.utils.PreferenceUtil.isGapLessPlayback
 
 /**
  * @author Andrew Neal, Karim Abou Zeid (kabouzeid)
@@ -30,7 +28,7 @@ import com.ntduc.musicplayerutils.util.PreferenceUtil.isGapLessPlayback
 class MultiPlayer(context: Context) : LocalPlayback(context) {
     private var mCurrentMediaPlayer = MediaPlayer()
     private var mNextMediaPlayer: MediaPlayer? = null
-    override var callbacks: PlaybackCallbacks? = null
+    override var callbacks: Playback.PlaybackCallbacks? = null
 
     /**
      * @return True if the player is ready to go, false otherwise
@@ -52,7 +50,7 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
         completion: (success: Boolean) -> Unit,
     ) {
         isInitialized = false
-        setDataSourceImpl(mCurrentMediaPlayer, song.data.toString()) { success ->
+        setDataSourceImpl(mCurrentMediaPlayer, song.uri.toString()) { success ->
             isInitialized = success
             if (isInitialized) {
                 setNextDataSource(null)
@@ -246,8 +244,6 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
         mCurrentMediaPlayer.release()
         mCurrentMediaPlayer = MediaPlayer()
         mCurrentMediaPlayer.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK)
-        context.showToast(R.string.unplayable_file)
-//        logE(what.toString() + extra)
         return false
     }
 

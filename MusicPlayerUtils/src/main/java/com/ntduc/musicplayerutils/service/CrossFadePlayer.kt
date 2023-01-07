@@ -5,15 +5,13 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.media.PlaybackParams
 import android.os.PowerManager
-import com.ntduc.musicplayerutils.R
-import com.ntduc.musicplayerutils.extensions.showToast
 import com.ntduc.musicplayerutils.extensions.uri
 import com.ntduc.musicplayerutils.helper.MusicPlayerRemote
 import com.ntduc.musicplayerutils.model.Song
 import com.ntduc.musicplayerutils.service.AudioFader.Companion.createFadeAnimator
-import com.ntduc.musicplayerutils.service.playback.Playback.PlaybackCallbacks
-import com.ntduc.musicplayerutils.util.PreferenceUtil
-import com.ntduc.musicplayerutils.util.VersionUtils.hasMarshmallow
+import com.ntduc.musicplayerutils.service.playback.Playback
+import com.ntduc.musicplayerutils.utils.PreferenceUtil
+import com.ntduc.musicplayerutils.utils.VersionUtils.hasMarshmallow
 import kotlinx.coroutines.*
 
 /** @author Prathamesh M */
@@ -34,7 +32,7 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
     private var mIsInitialized = false
     private var hasDataSource: Boolean = false /* Whether first player has DataSource */
     private var crossFadeAnimator: Animator? = null
-    override var callbacks: PlaybackCallbacks? = null
+    override var callbacks: Playback.PlaybackCallbacks? = null
     private var crossFadeDuration = PreferenceUtil.crossFadeDuration
     var isCrossFading = false
 
@@ -256,8 +254,6 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
         player2 = MediaPlayer()
         mIsInitialized = true
         mp?.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK)
-        context.showToast(R.string.unplayable_file)
-//        logE(what.toString() + extra)
         return false
     }
 

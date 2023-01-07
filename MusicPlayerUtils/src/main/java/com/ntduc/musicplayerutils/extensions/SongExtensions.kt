@@ -3,7 +3,7 @@ package com.ntduc.musicplayerutils.extensions
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat.QueueItem
 import com.ntduc.musicplayerutils.model.Song
-import com.ntduc.musicplayerutils.util.MusicUtil
+import com.ntduc.musicplayerutils.utils.MusicUtil
 
 val Song.uri get() = MusicUtil.getSongFileUri(songId = id)
 

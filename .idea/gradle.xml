@@ -20,6 +20,7 @@
             <option value="$PROJECT_DIR$/FileUtils" />
             <option value="$PROJECT_DIR$/FragmentUtils" />
             <option value="$PROJECT_DIR$/GlideUtils" />
+            <option value="$PROJECT_DIR$/MusicPlayerUtils" />
             <option value="$PROJECT_DIR$/NavigationUtils" />
             <option value="$PROJECT_DIR$/NumberUtils" />
             <option value="$PROJECT_DIR$/RecyclerViewUtils" />

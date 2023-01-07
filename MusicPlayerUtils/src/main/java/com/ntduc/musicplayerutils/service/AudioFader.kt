@@ -5,7 +5,7 @@ import android.animation.ValueAnimator
 import android.media.MediaPlayer
 import androidx.core.animation.doOnEnd
 import com.ntduc.musicplayerutils.service.playback.Playback
-import com.ntduc.musicplayerutils.util.PreferenceUtil
+import com.ntduc.musicplayerutils.utils.PreferenceUtil
 
 class AudioFader {
     companion object {

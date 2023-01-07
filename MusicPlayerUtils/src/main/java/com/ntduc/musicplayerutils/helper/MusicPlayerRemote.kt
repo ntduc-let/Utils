@@ -22,28 +22,23 @@ import android.net.Uri
 import android.os.Environment.getExternalStorageDirectory
 import android.os.IBinder
 import android.provider.DocumentsContract
-import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.ntduc.musicplayerutils.R
-import com.ntduc.musicplayerutils.extensions.showToast
+import com.ntduc.musicplayerutils.MusicApp
 import com.ntduc.musicplayerutils.model.Song
-import com.ntduc.musicplayerutils.repository.SongRepository
+import com.ntduc.musicplayerutils.repository.RealSongRepository
 import com.ntduc.musicplayerutils.service.CastPlayer
 import com.ntduc.musicplayerutils.service.MusicService
-import com.ntduc.musicplayerutils.service.MusicService.Companion.QUEUE_CHANGED
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 import java.util.*
 import kotlin.collections.set
 
 
-object MusicPlayerRemote : KoinComponent {
-    val TAG: String = MusicPlayerRemote::class.java.simpleName
+object MusicPlayerRemote {
     private val mConnectionMap = WeakHashMap<Context, ServiceBinder>()
     var musicService: MusicService? = null
 
-    private val songRepository by inject<SongRepository>()
+    @SuppressLint("StaticFieldLeak")
+    private val songRepository = RealSongRepository(MusicApp.getContext())
 
     @JvmStatic
     val isPlaying: Boolean
@@ -298,7 +293,6 @@ object MusicPlayerRemote : KoinComponent {
                 queue.add(song)
                 openQueue(queue, 0, false)
             }
-            musicService?.showToast(R.string.added_title_to_playing_queue)
             return true
         }
         return false
@@ -312,12 +306,6 @@ object MusicPlayerRemote : KoinComponent {
             } else {
                 openQueue(songs, 0, false)
             }
-            val toast =
-                if (songs.size == 1) musicService!!.resources.getString(R.string.added_title_to_playing_queue) else musicService!!.resources.getString(
-                    R.string.added_x_titles_to_playing_queue,
-                    songs.size
-                )
-            musicService?.showToast(toast, Toast.LENGTH_SHORT)
             return true
         }
         return false
@@ -332,7 +320,6 @@ object MusicPlayerRemote : KoinComponent {
                 queue.add(song)
                 openQueue(queue, 0, false)
             }
-            musicService?.showToast(R.string.added_title_to_playing_queue)
             return true
         }
         return false
@@ -345,12 +332,6 @@ object MusicPlayerRemote : KoinComponent {
             } else {
                 openQueue(songs, 0, false)
             }
-            val toast =
-                if (songs.size == 1) musicService!!.resources.getString(R.string.added_title_to_playing_queue) else musicService!!.resources.getString(
-                    R.string.added_x_titles_to_playing_queue,
-                    songs.size
-                )
-            musicService?.showToast(toast)
             return true
         }
         return false
@@ -438,12 +419,6 @@ object MusicPlayerRemote : KoinComponent {
             }
             if (songs != null && songs.isNotEmpty()) {
                 openQueue(songs, 0, true)
-            } else {
-                try {
-                    context.showToast(R.string.unplayable_file)
-                } catch (e: Exception) {
-//                    logE("The file is not listed in the media store")
-                }
             }
         }
     }

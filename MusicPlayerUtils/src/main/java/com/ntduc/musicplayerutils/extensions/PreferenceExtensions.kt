@@ -12,24 +12,10 @@
  * See the GNU General Public License for more details.
  *
  */
-package com.ntduc.musicplayerutils.interfaces
+package com.ntduc.musicplayerutils.extensions
 
-interface IMusicServiceEventListener {
-    fun onServiceConnected()
+import android.content.SharedPreferences
 
-    fun onServiceDisconnected()
-
-    fun onQueueChanged()
-
-    fun onFavoriteStateChanged()
-
-    fun onPlayingMetaChanged()
-
-    fun onPlayStateChanged()
-
-    fun onRepeatModeChanged()
-
-    fun onShuffleModeChanged()
-
-    fun onMediaStoreChanged()
+fun SharedPreferences.getStringOrDefault(key: String, default: String): String {
+    return getString(key, default) ?: default
 }

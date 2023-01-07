@@ -8,20 +8,17 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.PlaybackParams
-import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
-import com.ntduc.musicplayerutils.R
-import com.ntduc.musicplayerutils.extensions.showToast
 import com.ntduc.musicplayerutils.service.playback.Playback
-import com.ntduc.musicplayerutils.util.PreferenceUtil.isAudioFocusEnabled
-import com.ntduc.musicplayerutils.util.PreferenceUtil.playbackPitch
-import com.ntduc.musicplayerutils.util.PreferenceUtil.playbackSpeed
-import com.ntduc.musicplayerutils.util.VersionUtils
+import com.ntduc.musicplayerutils.utils.PreferenceUtil.isAudioFocusEnabled
+import com.ntduc.musicplayerutils.utils.PreferenceUtil.playbackPitch
+import com.ntduc.musicplayerutils.utils.PreferenceUtil.playbackSpeed
+import com.ntduc.musicplayerutils.utils.VersionUtils
 
 abstract class LocalPlayback(val context: Context) : Playback, MediaPlayer.OnErrorListener,
     MediaPlayer.OnCompletionListener {
@@ -90,9 +87,6 @@ abstract class LocalPlayback(val context: Context) : Playback, MediaPlayer.OnErr
 
     @CallSuper
     override fun start(): Boolean {
-        if (!requestFocus()) {
-            context.showToast(R.string.audio_focus_denied)
-        }
         registerBecomingNoisyReceiver()
         return true
     }

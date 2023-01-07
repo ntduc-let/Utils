@@ -12,7 +12,7 @@
  * See the GNU General Public License for more details.
  */
 
-package com.ntduc.musicplayerutils.util
+package com.ntduc.musicplayerutils.utils
 
 
 import android.Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE

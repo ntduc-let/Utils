@@ -20,7 +20,6 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.ntduc.musicplayerutils.R
 import com.ntduc.musicplayerutils.model.Song
 
 
@@ -49,11 +48,10 @@ abstract class PlayingNotification(context: Context) :
             if (notificationChannel == null) {
                 notificationChannel = NotificationChannel(
                     NOTIFICATION_CHANNEL_ID,
-                    context.getString(R.string.playing_notification_name),
+                    "Playing notification",
                     NotificationManager.IMPORTANCE_LOW
                 )
-                notificationChannel.description =
-                    context.getString(R.string.playing_notification_description)
+                notificationChannel.description = "The playing notification provides actions for play/pause etc."
                 notificationChannel.enableLights(false)
                 notificationChannel.enableVibration(false)
                 notificationChannel.setShowBadge(false)

@@ -1,4 +1,4 @@
-package com.ntduc.musicplayerutils.util
+package com.ntduc.musicplayerutils.utils
 
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast

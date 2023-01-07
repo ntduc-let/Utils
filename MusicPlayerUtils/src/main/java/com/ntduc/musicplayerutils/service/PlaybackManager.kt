@@ -5,7 +5,7 @@ import android.content.Intent
 import android.media.audiofx.AudioEffect
 import com.ntduc.musicplayerutils.model.Song
 import com.ntduc.musicplayerutils.service.playback.Playback
-import com.ntduc.musicplayerutils.util.PreferenceUtil
+import com.ntduc.musicplayerutils.utils.PreferenceUtil
 
 
 class PlaybackManager(val context: Context) {
