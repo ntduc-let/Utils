@@ -17,5 +17,5 @@ package com.ntduc.musicplayerutils.extensions
 import android.content.SharedPreferences
 
 fun SharedPreferences.getStringOrDefault(key: String, default: String): String {
-    return getString(key, default) ?: default
+  return getString(key, default) ?: default
 }

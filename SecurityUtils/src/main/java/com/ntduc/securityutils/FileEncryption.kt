@@ -15,54 +15,64 @@ import javax.crypto.spec.SecretKeySpec
 
 @RequiresApi(Build.VERSION_CODES.M)
 object FileEncryption {
-    private val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
-    private val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
-    private val PADDING = "PKCS5padding"
-    private val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
-    private val BUFFER_SIZE = 1024
-
-    @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class, IOException::class)
-    fun encryptToFile(secretKey: String, cypherSpecString: String, input: InputStream, output: OutputStream) {
-        var out = output
-        try {
-            val iv = IvParameterSpec(cypherSpecString.toByteArray(Charsets.UTF_8))
-            val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), ALGORITHM)
-
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, keyspec, iv)
-            out = CipherOutputStream(output, cipher)
-
-            val buffer = ByteArray(BUFFER_SIZE)
-
-            var bytesRead: Int
-            while (input.read(buffer).also { bytesRead = it } > 0) {
-                out.write(buffer, 0, bytesRead)
-            }
-        } finally {
-            out.close()
-        }
+  private val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
+  private val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
+  private val PADDING = "PKCS5padding"
+  private val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
+  private val BUFFER_SIZE = 1024
+  
+  @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class, IOException::class)
+  fun encryptToFile(
+    secretKey: String,
+    cypherSpecString: String,
+    input: InputStream,
+    output: OutputStream
+  ) {
+    var out = output
+    try {
+      val iv = IvParameterSpec(cypherSpecString.toByteArray(Charsets.UTF_8))
+      val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), ALGORITHM)
+      
+      val cipher = Cipher.getInstance(TRANSFORMATION)
+      cipher.init(Cipher.ENCRYPT_MODE, keyspec, iv)
+      out = CipherOutputStream(output, cipher)
+      
+      val buffer = ByteArray(BUFFER_SIZE)
+      
+      var bytesRead: Int
+      while (input.read(buffer).also { bytesRead = it } > 0) {
+        out.write(buffer, 0, bytesRead)
+      }
+    } finally {
+      out.close()
     }
-
-
-    @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class, IOException::class)
-    fun decryptToFile(secretKey: String, cypherSpecString: String, input: InputStream, output: OutputStream) {
-        var out = output
-        try {
-            val iv = IvParameterSpec(cypherSpecString.toByteArray(Charsets.UTF_8))
-            val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), ALGORITHM)
-
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.DECRYPT_MODE, keyspec, iv)
-            out = CipherOutputStream(output, cipher)
-
-            val buffer = ByteArray(BUFFER_SIZE)
-
-            var bytesRead: Int
-            while (input.read(buffer).also { bytesRead = it } > 0) {
-                out.write(buffer, 0, bytesRead)
-            }
-        } finally {
-            out.close()
-        }
+  }
+  
+  
+  @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class, IOException::class)
+  fun decryptToFile(
+    secretKey: String,
+    cypherSpecString: String,
+    input: InputStream,
+    output: OutputStream
+  ) {
+    var out = output
+    try {
+      val iv = IvParameterSpec(cypherSpecString.toByteArray(Charsets.UTF_8))
+      val keyspec = SecretKeySpec(secretKey.toByteArray(Charsets.UTF_8), ALGORITHM)
+      
+      val cipher = Cipher.getInstance(TRANSFORMATION)
+      cipher.init(Cipher.DECRYPT_MODE, keyspec, iv)
+      out = CipherOutputStream(output, cipher)
+      
+      val buffer = ByteArray(BUFFER_SIZE)
+      
+      var bytesRead: Int
+      while (input.read(buffer).also { bytesRead = it } > 0) {
+        out.write(buffer, 0, bytesRead)
+      }
+    } finally {
+      out.close()
     }
+  }
 }

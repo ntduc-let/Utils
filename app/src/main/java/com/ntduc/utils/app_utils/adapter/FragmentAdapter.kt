@@ -7,21 +7,21 @@ import com.ntduc.utils.app_utils.fragment.ApkFragment
 import com.ntduc.utils.app_utils.fragment.InstalledAppFragment
 
 class FragmentAdapter(
-    fa: FragmentActivity,
+  fa: FragmentActivity,
 ) : FragmentStateAdapter(fa) {
-    private val listFragment = listOf(
-        InstalledAppFragment(),
-        ApkFragment()
-    )
-
-    override fun createFragment(position: Int): Fragment {
-        if (position < listFragment.size) {
-            return listFragment[position]
-        }
-        return listFragment[0]
+  private val listFragment = listOf(
+    InstalledAppFragment(),
+    ApkFragment()
+  )
+  
+  override fun createFragment(position: Int): Fragment {
+    if (position < listFragment.size) {
+      return listFragment[position]
     }
-
-    override fun getItemCount(): Int {
-        return listFragment.size
-    }
+    return listFragment[0]
+  }
+  
+  override fun getItemCount(): Int {
+    return listFragment.size
+  }
 }

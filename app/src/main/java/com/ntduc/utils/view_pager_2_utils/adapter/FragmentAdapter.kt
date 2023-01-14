@@ -8,22 +8,22 @@ import com.ntduc.utils.view_pager_2_utils.fragment.SecondFragment
 import com.ntduc.utils.view_pager_2_utils.fragment.ThreeFragment
 
 class FragmentAdapter(
-    fa: FragmentActivity
+  fa: FragmentActivity
 ) : FragmentStateAdapter(fa) {
-
-    override fun createFragment(position: Int): Fragment {
-        return when(position){
-            0 -> OneFragment()
-            1 -> SecondFragment()
-            2 -> ThreeFragment()
-            3 -> OneFragment()
-            4 -> SecondFragment()
-            5 -> ThreeFragment()
-            else -> OneFragment()
-        }
+  
+  override fun createFragment(position: Int): Fragment {
+    return when (position) {
+      0 -> OneFragment()
+      1 -> SecondFragment()
+      2 -> ThreeFragment()
+      3 -> OneFragment()
+      4 -> SecondFragment()
+      5 -> ThreeFragment()
+      else -> OneFragment()
     }
-
-    override fun getItemCount(): Int {
-        return 6
-    }
+  }
+  
+  override fun getItemCount(): Int {
+    return 6
+  }
 }

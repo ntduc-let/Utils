@@ -11,95 +11,96 @@ import com.ntduc.fileutils.getAudios
 import com.ntduc.utils.model.MyAudio
 import com.ntduc.utils.model.MyFile
 import com.ntduc.utils.model.MyFolderAudio
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 class GetAllAudioViewModel : ViewModel() {
-    var listAllAudio: MutableLiveData<List<MyFolderAudio>> = MutableLiveData(listOf())
-    var isLoadListAllAudio = false
-
-    fun loadAllAudio(context: Context) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val audios = context.getAudios()
-                val temp = audios.sortedWith { o1, o2 ->
-                    o2.dateModified!!.compareTo(o1.dateModified!!)
-                }
-                val result = ArrayList<MyAudio>()
-                temp.forEach {
-                    val myFile = MyFile(
-                        it.title,
-                        it.displayName,
-                        it.mimeType,
-                        it.size,
-                        it.dateAdded,
-                        it.dateModified,
-                        it.data
-                    )
-                    val myAudio = MyAudio(myFile, it.album, it.artist, it.duration)
-                    result.add(myAudio)
-                }
-                loadRecentAudio(result)
-            }
+  var listAllAudio: MutableLiveData<List<MyFolderAudio>> = MutableLiveData(listOf())
+  var isLoadListAllAudio = false
+  
+  fun loadAllAudio(context: Context) {
+    viewModelScope.launch {
+      withContext(Dispatchers.IO) {
+        val audios = context.getAudios()
+        val temp = audios.sortedWith { o1, o2 ->
+          o2.dateModified!!.compareTo(o1.dateModified!!)
         }
-    }
-
-    private fun loadRecentAudio(list: List<MyAudio>) {
-        val listRecent = filterRecentAudio(list)
-        listAllAudio.postValue(listRecent)
-        isLoadListAllAudio = true
-    }
-
-    private fun filterRecentAudio(audios: List<MyAudio>): ArrayList<MyFolderAudio> {
-        val listFolderAudio = ArrayList<MyFolderAudio>()
-        for (audio in audios) {
-            val pos = checkFolderAudioByTime(audio, listFolderAudio)
-            if (pos >= 0) {
-                listFolderAudio[pos].list.add(audio)
-            } else {
-                val file = File(audio.myFile!!.data!!)
-                val folder = MyFile(
-                    getNameFolderByTime(file.lastModified()),
-                    getNameFolderByTime(file.lastModified()),
-                    "",
-                    file.length(),
-                    file.lastModified(),
-                    file.lastModified(),
-                    file.parentFile?.path ?: ""
-                )
-                val folderAudio = MyFolderAudio(folder)
-                folderAudio.list.add(audio)
-
-                listFolderAudio.add(folderAudio)
-            }
+        val result = ArrayList<MyAudio>()
+        temp.forEach {
+          val myFile = MyFile(
+            it.title,
+            it.displayName,
+            it.mimeType,
+            it.size,
+            it.dateAdded,
+            it.dateModified,
+            it.data
+          )
+          val myAudio = MyAudio(myFile, it.album, it.artist, it.duration)
+          result.add(myAudio)
         }
-        return listFolderAudio
+        loadRecentAudio(result)
+      }
     }
-
-    private fun checkFolderAudioByTime(
-        audio: MyAudio,
-        listFolderAudio: ArrayList<MyFolderAudio>
-    ): Int {
-        for (i in listFolderAudio.indices) {
-            if (getNameFolderByTime(audio.myFile!!.dateModified) == listFolderAudio[i].folder.title) {
-                return i
-            }
-        }
-        return -1
+  }
+  
+  private fun loadRecentAudio(list: List<MyAudio>) {
+    val listRecent = filterRecentAudio(list)
+    listAllAudio.postValue(listRecent)
+    isLoadListAllAudio = true
+  }
+  
+  private fun filterRecentAudio(audios: List<MyAudio>): ArrayList<MyFolderAudio> {
+    val listFolderAudio = ArrayList<MyFolderAudio>()
+    for (audio in audios) {
+      val pos = checkFolderAudioByTime(audio, listFolderAudio)
+      if (pos >= 0) {
+        listFolderAudio[pos].list.add(audio)
+      } else {
+        val file = File(audio.myFile!!.data!!)
+        val folder = MyFile(
+          getNameFolderByTime(file.lastModified()),
+          getNameFolderByTime(file.lastModified()),
+          "",
+          file.length(),
+          file.lastModified(),
+          file.lastModified(),
+          file.parentFile?.path ?: ""
+        )
+        val folderAudio = MyFolderAudio(folder)
+        folderAudio.list.add(audio)
+        
+        listFolderAudio.add(folderAudio)
+      }
     }
-
-    private fun getNameFolderByTime(time: Long?): String {
-        if (time == null) return "Unknown"
-
-        val date = Date(time)
-        return if (date.isToday()) {
-            "Today"
-        } else if (date.isYesterday()) {
-            "Yesterday"
-        } else {
-            getDateTimeFromMillis(time, "MMM dd", Locale.ENGLISH)
-        }
+    return listFolderAudio
+  }
+  
+  private fun checkFolderAudioByTime(
+    audio: MyAudio,
+    listFolderAudio: ArrayList<MyFolderAudio>
+  ): Int {
+    for (i in listFolderAudio.indices) {
+      if (getNameFolderByTime(audio.myFile!!.dateModified) == listFolderAudio[i].folder.title) {
+        return i
+      }
     }
+    return -1
+  }
+  
+  private fun getNameFolderByTime(time: Long?): String {
+    if (time == null) return "Unknown"
+    
+    val date = Date(time)
+    return if (date.isToday()) {
+      "Today"
+    } else if (date.isYesterday()) {
+      "Yesterday"
+    } else {
+      getDateTimeFromMillis(time, "MMM dd", Locale.ENGLISH)
+    }
+  }
 }

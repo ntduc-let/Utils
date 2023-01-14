@@ -19,133 +19,132 @@ import com.ntduc.utils.file_utils.constant.ExtensionConstants
 import com.ntduc.utils.model.MyFile
 import com.ntduc.utils.model.MyFolderVideo
 import com.ntduc.utils.model.MyVideo
-import java.util.ArrayList
 
 class GetAllVideoAdapter(
-    val context: Context,
-    private var listFolderVideo: List<MyFolderVideo> = listOf()
+  val context: Context,
+  private var listFolderVideo: List<MyFolderVideo> = listOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders, StickyHeaders.ViewSetup {
-    private var list: ArrayList<MyVideo> = ArrayList()
-
+  private var list: ArrayList<MyVideo> = ArrayList()
+  
+  init {
+    initData()
+  }
+  
+  private fun initData() {
+    listFolderVideo.forEach { folder ->
+      list.add(MyVideo(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
+      folder.list.forEach {
+        list.add(it)
+      }
+    }
+  }
+  
+  inner class ItemHeaderViewHolder(binding: ItemHeaderBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    internal val binding: ItemHeaderBinding
+    
     init {
-        initData()
+      this.binding = binding
     }
-
-    private fun initData() {
-        listFolderVideo.forEach { folder ->
-            list.add(MyVideo(myFile = MyFile(title = "${folder.folder.title} (${folder.list.size})")))
-            folder.list.forEach {
-                list.add(it)
-            }
-        }
+  }
+  
+  inner class ItemVideoViewHolder(binding: ItemVideoBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    internal val binding: ItemVideoBinding
+    
+    init {
+      this.binding = binding
     }
-
-    inner class ItemHeaderViewHolder(binding: ItemHeaderBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        internal val binding: ItemHeaderBinding
-
-        init {
-            this.binding = binding
-        }
+  }
+  
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    return if (viewType == HEADER_ITEM) {
+      val binding = ItemHeaderBinding.inflate(LayoutInflater.from(context), parent, false)
+      ItemHeaderViewHolder(binding)
+    } else {
+      val binding = ItemVideoBinding.inflate(LayoutInflater.from(context), parent, false)
+      ItemVideoViewHolder(binding)
     }
-
-    inner class ItemVideoViewHolder(binding: ItemVideoBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        internal val binding: ItemVideoBinding
-
-        init {
-            this.binding = binding
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == HEADER_ITEM) {
-            val binding = ItemHeaderBinding.inflate(LayoutInflater.from(context), parent, false)
-            ItemHeaderViewHolder(binding)
-        } else {
-            val binding = ItemVideoBinding.inflate(LayoutInflater.from(context), parent, false)
-            ItemVideoViewHolder(binding)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = list[position]
-
-        when (holder) {
-            is ItemHeaderViewHolder -> {
-                holder.binding.txtHeader.text = item.myFile?.title
-            }
-            is ItemVideoViewHolder -> {
-                context.loadImg(
-                    imgUrl = item.myFile!!.data,
-                    view = holder.binding.img,
-                    error = ExtensionConstants.getIconFile(item.myFile!!.data!!),
-                    placeHolder = R.drawable.ic_empty
-                )
-
-                holder.binding.txtTime.text = item.duration?.formatAsTime()
-
-                holder.binding.root.setOnClickListener(object : OnMultiClickListener() {
-                    override fun onSingleClick(v: View?) {
-                        onOpenListener?.let {
-                            it(item)
-                        }
-                    }
-
-                    override fun onDoubleClick(v: View?) {}
-                })
-            }
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return if (list[position].myFile?.data == null) HEADER_ITEM else super.getItemViewType(
-            position
+  }
+  
+  @SuppressLint("SetTextI18n")
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    val item = list[position]
+    
+    when (holder) {
+      is ItemHeaderViewHolder -> {
+        holder.binding.txtHeader.text = item.myFile?.title
+      }
+      is ItemVideoViewHolder -> {
+        context.loadImg(
+          imgUrl = item.myFile!!.data,
+          view = holder.binding.img,
+          error = ExtensionConstants.getIconFile(item.myFile!!.data!!),
+          placeHolder = R.drawable.ic_empty
         )
-    }
-
-    override fun isStickyHeader(position: Int): Boolean {
-        return getItemViewType(position) == HEADER_ITEM
-    }
-
-    override fun setupStickyHeaderView(stickyHeader: View) {
-        ViewCompat.setElevation(stickyHeader, 0F)
-    }
-
-    override fun teardownStickyHeaderView(stickyHeader: View) {
-        ViewCompat.setElevation(stickyHeader, 0F)
-    }
-
-    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        val lp: ViewGroup.LayoutParams = holder.itemView.layoutParams
-        if (lp is StaggeredGridLayoutManager.LayoutParams) {
-            if (isStickyHeader(holder.layoutPosition)) {
-                val p: StaggeredGridLayoutManager.LayoutParams = lp
-                p.isFullSpan = true
+        
+        holder.binding.txtTime.text = item.duration?.formatAsTime()
+        
+        holder.binding.root.setOnClickListener(object : OnMultiClickListener() {
+          override fun onSingleClick(v: View?) {
+            onOpenListener?.let {
+              it(item)
             }
-        }
+          }
+          
+          override fun onDoubleClick(v: View?) {}
+        })
+      }
     }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newList: List<MyFolderVideo>) {
-        listFolderVideo = newList
-        initData()
-        notifyDataSetChanged()
+  }
+  
+  override fun getItemCount(): Int {
+    return list.size
+  }
+  
+  override fun getItemViewType(position: Int): Int {
+    return if (list[position].myFile?.data == null) HEADER_ITEM else super.getItemViewType(
+      position
+    )
+  }
+  
+  override fun isStickyHeader(position: Int): Boolean {
+    return getItemViewType(position) == HEADER_ITEM
+  }
+  
+  override fun setupStickyHeaderView(stickyHeader: View) {
+    ViewCompat.setElevation(stickyHeader, 0F)
+  }
+  
+  override fun teardownStickyHeaderView(stickyHeader: View) {
+    ViewCompat.setElevation(stickyHeader, 0F)
+  }
+  
+  override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+    super.onViewAttachedToWindow(holder)
+    val lp: ViewGroup.LayoutParams = holder.itemView.layoutParams
+    if (lp is StaggeredGridLayoutManager.LayoutParams) {
+      if (isStickyHeader(holder.layoutPosition)) {
+        val p: StaggeredGridLayoutManager.LayoutParams = lp
+        p.isFullSpan = true
+      }
     }
-
-    companion object {
-        private const val HEADER_ITEM = 123
-    }
-
-    private var onOpenListener: ((MyVideo) -> Unit)? = null
-
-    fun setOnOpenListener(listener: (MyVideo) -> Unit) {
-        onOpenListener = listener
-    }
+  }
+  
+  @SuppressLint("NotifyDataSetChanged")
+  fun updateData(newList: List<MyFolderVideo>) {
+    listFolderVideo = newList
+    initData()
+    notifyDataSetChanged()
+  }
+  
+  companion object {
+    private const val HEADER_ITEM = 123
+  }
+  
+  private var onOpenListener: ((MyVideo) -> Unit)? = null
+  
+  fun setOnOpenListener(listener: (MyVideo) -> Unit) {
+    onOpenListener = listener
+  }
 }

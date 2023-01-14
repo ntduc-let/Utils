@@ -10,64 +10,67 @@ import com.ntduc.utils.databinding.ItemAppBinding
 import com.ntduc.utils.model.MyApp
 
 class InstalledAppAdapter(
-    val context: Context,
-    private var list: List<MyApp> = listOf()
+  val context: Context,
+  private var list: List<MyApp> = listOf()
 ) : RecyclerView.Adapter<InstalledAppAdapter.ItemAppViewHolder>() {
-
-    inner class ItemAppViewHolder(binding: ItemAppBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        internal val binding: ItemAppBinding
-
-        init {
-            this.binding = binding
-        }
+  
+  inner class ItemAppViewHolder(binding: ItemAppBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    internal val binding: ItemAppBinding
+    
+    init {
+      this.binding = binding
     }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InstalledAppAdapter.ItemAppViewHolder {
-        val binding = ItemAppBinding.inflate(LayoutInflater.from(context), parent, false)
-        return ItemAppViewHolder(binding)
+  }
+  
+  override fun onCreateViewHolder(
+    parent: ViewGroup,
+    viewType: Int
+  ): InstalledAppAdapter.ItemAppViewHolder {
+    val binding = ItemAppBinding.inflate(LayoutInflater.from(context), parent, false)
+    return ItemAppViewHolder(binding)
+  }
+  
+  @SuppressLint("SetTextI18n")
+  override fun onBindViewHolder(holder: InstalledAppAdapter.ItemAppViewHolder, position: Int) {
+    val item = list[position]
+    
+    holder.binding.img.setImageDrawable(item.icon)
+    holder.binding.txtTitle.text = item.name
+    holder.binding.txtDescription.text = item.packageName
+    
+    holder.binding.btnAction.setOnClickShrinkEffectListener {
+      onUninstallListener?.let {
+        it(item)
+      }
     }
-
-    @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: InstalledAppAdapter.ItemAppViewHolder, position: Int) {
-        val item = list[position]
-
-        holder.binding.img.setImageDrawable(item.icon)
-        holder.binding.txtTitle.text = item.name
-        holder.binding.txtDescription.text = item.packageName
-
-        holder.binding.btnAction.setOnClickShrinkEffectListener {
-            onUninstallListener?.let {
-                it(item)
-            }
-        }
-
-        holder.binding.root.setOnClickShrinkEffectListener {
-            onOpenListener?.let {
-                it(item)
-            }
-        }
+    
+    holder.binding.root.setOnClickShrinkEffectListener {
+      onOpenListener?.let {
+        it(item)
+      }
     }
-
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newList: List<MyApp>) {
-        list = newList
-        notifyDataSetChanged()
-    }
-
-    private var onUninstallListener: ((MyApp) -> Unit)? = null
-
-    fun setOnUninstallListener(listener: (MyApp) -> Unit) {
-        onUninstallListener = listener
-    }
-
-    private var onOpenListener: ((MyApp) -> Unit)? = null
-
-    fun setOnOpenListener(listener: (MyApp) -> Unit) {
-        onOpenListener = listener
-    }
+  }
+  
+  override fun getItemCount(): Int {
+    return list.size
+  }
+  
+  @SuppressLint("NotifyDataSetChanged")
+  fun updateData(newList: List<MyApp>) {
+    list = newList
+    notifyDataSetChanged()
+  }
+  
+  private var onUninstallListener: ((MyApp) -> Unit)? = null
+  
+  fun setOnUninstallListener(listener: (MyApp) -> Unit) {
+    onUninstallListener = listener
+  }
+  
+  private var onOpenListener: ((MyApp) -> Unit)? = null
+  
+  fun setOnOpenListener(listener: (MyApp) -> Unit) {
+    onOpenListener = listener
+  }
 }

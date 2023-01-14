@@ -1,5 +1,5 @@
 package com.ntduc.utils.model
 
 open class MyApk(
-    var myFile: MyFile? = null
+  var myFile: MyFile? = null
 )

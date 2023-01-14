@@ -91,7 +91,6 @@ public class AutoMediaIDHelper {
     }
 
     private static boolean isValidCategory(String category) {
-        return category == null ||
-                (!category.contains(CATEGORY_SEPARATOR) && !category.contains(LEAF_SEPARATOR));
+        return category == null || (!category.contains(CATEGORY_SEPARATOR) && !category.contains(LEAF_SEPARATOR));
     }
 }

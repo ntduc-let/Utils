@@ -14,5 +14,5 @@
 package com.ntduc.musicplayerutils.volume
 
 interface OnAudioVolumeChangedListener {
-    fun onAudioVolumeChanged(currentVolume: Int, maxVolume: Int)
+  fun onAudioVolumeChanged(currentVolume: Int, maxVolume: Int)
 }

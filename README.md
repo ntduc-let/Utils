@@ -2,11 +2,14 @@ Utils
 ==================
 
 # Index
+
 * [Setup](#Setup)
 
 Setup
 ======================
+
 ## Key Store
+
 ```
 Key store path: [Trong thư mục app]
 Password: password
@@ -21,6 +24,7 @@ Country Code (XX): 84
 ```
 
 ## build.gradle (Module:app)
+
 ```
 android {
   ...
@@ -85,6 +89,7 @@ dependencies {
 ```
 
 ## settings.gradle
+
 ```
 dependencyResolutionManagement {
   repositories {

@@ -18,44 +18,44 @@ import android.provider.BaseColumns
 import android.provider.MediaStore
 
 object Constants {
-    const val PRO_VERSION_PRODUCT_ID = "pro_version"
-    const val RATE_ON_GOOGLE_PLAY =
-        "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic"
-    const val TRANSLATE = "https://crowdin.com/project/retromusicplayer"
-    const val WEBSITE = "https://retromusic.app"
-    const val GITHUB_PROJECT = "https://github.com/RetroMusicPlayer/RetroMusicPlayer"
-    const val TELEGRAM_CHANGE_LOG = "https://t.me/retromusiclog"
-    const val USER_PROFILE = "profile.jpg"
-    const val USER_BANNER = "banner.jpg"
-    const val APP_INSTAGRAM_LINK = "https://www.instagram.com/retromusicapp/"
-    const val APP_TELEGRAM_LINK = "https://t.me/retromusicapp/"
-    const val APP_TWITTER_LINK = "https://twitter.com/retromusicapp"
-    const val FAQ_LINK = "https://github.com/RetroMusicPlayer/RetroMusicPlayer/blob/master/FAQ.md"
-    const val PINTEREST = "https://in.pinterest.com/retromusicapp/"
-    const val AUDIO_SCROBBLER_URL = "https://ws.audioscrobbler.com/2.0/"
-
-    const val IS_MUSIC =
-        MediaStore.Audio.AudioColumns.IS_MUSIC + "=1" + " AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''"
-
-    const val DATA = "_data"
-
-    @Suppress("Deprecation")
-    val baseProjection = arrayOf(
-        BaseColumns._ID, // 0
-        MediaStore.Audio.AudioColumns.TITLE, // 1
-        MediaStore.Audio.AudioColumns.TRACK, // 2
-        MediaStore.Audio.AudioColumns.YEAR, // 3
-        MediaStore.Audio.AudioColumns.DURATION, // 4
-        DATA, // 5
-        MediaStore.Audio.AudioColumns.DATE_MODIFIED, // 6
-        MediaStore.Audio.AudioColumns.ALBUM_ID, // 7
-        MediaStore.Audio.AudioColumns.ALBUM, // 8
-        MediaStore.Audio.AudioColumns.ARTIST_ID, // 9
-        MediaStore.Audio.AudioColumns.ARTIST, // 10
-        MediaStore.Audio.AudioColumns.COMPOSER, // 11
-        ALBUM_ARTIST // 12
-    )
-    const val NUMBER_OF_TOP_TRACKS = 99
+  const val PRO_VERSION_PRODUCT_ID = "pro_version"
+  const val RATE_ON_GOOGLE_PLAY =
+    "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic"
+  const val TRANSLATE = "https://crowdin.com/project/retromusicplayer"
+  const val WEBSITE = "https://retromusic.app"
+  const val GITHUB_PROJECT = "https://github.com/RetroMusicPlayer/RetroMusicPlayer"
+  const val TELEGRAM_CHANGE_LOG = "https://t.me/retromusiclog"
+  const val USER_PROFILE = "profile.jpg"
+  const val USER_BANNER = "banner.jpg"
+  const val APP_INSTAGRAM_LINK = "https://www.instagram.com/retromusicapp/"
+  const val APP_TELEGRAM_LINK = "https://t.me/retromusicapp/"
+  const val APP_TWITTER_LINK = "https://twitter.com/retromusicapp"
+  const val FAQ_LINK = "https://github.com/RetroMusicPlayer/RetroMusicPlayer/blob/master/FAQ.md"
+  const val PINTEREST = "https://in.pinterest.com/retromusicapp/"
+  const val AUDIO_SCROBBLER_URL = "https://ws.audioscrobbler.com/2.0/"
+  
+  const val IS_MUSIC =
+    MediaStore.Audio.AudioColumns.IS_MUSIC + "=1" + " AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''"
+  
+  const val DATA = "_data"
+  
+  @Suppress("Deprecation")
+  val baseProjection = arrayOf(
+    BaseColumns._ID, // 0
+    MediaStore.Audio.AudioColumns.TITLE, // 1
+    MediaStore.Audio.AudioColumns.TRACK, // 2
+    MediaStore.Audio.AudioColumns.YEAR, // 3
+    MediaStore.Audio.AudioColumns.DURATION, // 4
+    DATA, // 5
+    MediaStore.Audio.AudioColumns.DATE_MODIFIED, // 6
+    MediaStore.Audio.AudioColumns.ALBUM_ID, // 7
+    MediaStore.Audio.AudioColumns.ALBUM, // 8
+    MediaStore.Audio.AudioColumns.ARTIST_ID, // 9
+    MediaStore.Audio.AudioColumns.ARTIST, // 10
+    MediaStore.Audio.AudioColumns.COMPOSER, // 11
+    ALBUM_ARTIST // 12
+  )
+  const val NUMBER_OF_TOP_TRACKS = 99
 }
 
 const val EXTRA_PLAYLIST_TYPE = "type"

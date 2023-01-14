@@ -12,37 +12,37 @@ import com.ntduc.utils.R
 import com.ntduc.utils.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
-    private lateinit var binding: FragmentHomeBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentHomeBinding.inflate(inflater)
-        return binding.root
+  private lateinit var binding: FragmentHomeBinding
+  
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    binding = FragmentHomeBinding.inflate(inflater)
+    return binding.root
+  }
+  
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    
+    requireActivity().addMenuProvider(object : MenuProvider {
+      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.main_menu, menu)
+      }
+      
+      override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return true
+      }
+    }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    
+    binding.navigateDestinationButton.setOnClickShrinkEffectListener {
+      navigateToDes(R.id.flow_step_one_dest)
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.main_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return true
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
-        binding.navigateDestinationButton.setOnClickShrinkEffectListener {
-            navigateToDes(R.id.flow_step_one_dest)
-        }
-
-        binding.navigateActionButton.setOnClickShrinkEffectListener(navigateToActionListener(R.id.next_action))
-
-        binding.navigateBottomDeeplink.setOnClickShrinkEffectListener {
-            navigateToDes(R.id.deeplink_dest)
-        }
+    
+    binding.navigateActionButton.setOnClickShrinkEffectListener(navigateToActionListener(R.id.next_action))
+    
+    binding.navigateBottomDeeplink.setOnClickShrinkEffectListener {
+      navigateToDes(R.id.deeplink_dest)
     }
+  }
 }

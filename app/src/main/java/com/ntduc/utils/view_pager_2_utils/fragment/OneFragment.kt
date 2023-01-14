@@ -8,14 +8,14 @@ import androidx.fragment.app.Fragment
 import com.ntduc.utils.databinding.FragmentOneBinding
 
 class OneFragment : Fragment() {
-    private lateinit var binding: FragmentOneBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentOneBinding.inflate(layoutInflater, container, false)
-        return binding.root
-    }
+  private lateinit var binding: FragmentOneBinding
+  
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    binding = FragmentOneBinding.inflate(layoutInflater, container, false)
+    return binding.root
+  }
 }
