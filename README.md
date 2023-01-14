@@ -2,14 +2,11 @@ Utils
 ==================
 
 # Index
-
 * [Setup](#Setup)
 
 Setup
 ======================
-
 ## Key Store
-
 ```
 Key store path: [Trong thư mục app]
 Password: password
@@ -24,7 +21,6 @@ Country Code (XX): 84
 ```
 
 ## build.gradle (Module:app)
-
 ```
 android {
   ...
@@ -68,36 +64,5 @@ android {
      viewBinding true
   }
 }
-dependencies {
-  ...
-  def utilsVersion = "1.2.9"
-  implementation "com.github.ntduc-let.Utils:ActivityUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:AnimationUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:AppUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:ColorUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:ContextUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:DateTimeUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:FileUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:MusicPlayerUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:NumberUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:RecyclerViewUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:StringUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:ToastUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:VideoPlayerUtils:$utilsVersion"
-  implementation "com.github.ntduc-let.Utils:ViewPager2Utils:$utilsVersion"
-}
-```
 
-## settings.gradle
-
-```
-dependencyResolutionManagement {
-  repositories {
-    google()
-    mavenCentral()
-    maven {
-      url "https://jitpack.io"
-    }
-  }
-}
 ```
