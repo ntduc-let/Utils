@@ -91,6 +91,15 @@
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/paths" />
     </provider>
+    
+    <service
+      android:name="com.ntduc.musicplayerutils.PlaybackService"
+      android:exported="true"
+      android:foregroundServiceType="mediaPlayback">
+      <intent-filter>
+        <action android:name="androidx.media3.session.MediaSessionService" />
+      </intent-filter>
+    </service>
   </application>
 
 </manifest>
